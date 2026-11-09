@@ -6,6 +6,7 @@ import {
   Bell,
   CircleHelp,
   ChevronRight,
+  Coins,
   Gift,
   Heart,
   Languages,
@@ -44,6 +45,7 @@ interface ProfileData {
 const MENU: { href: string; label: string; Icon: typeof Heart; testid: string }[] = [
   { href: '/favorites', label: 'ร้านโปรดของฉัน', Icon: Heart, testid: 'menu-favorites' },
   { href: '/offers', label: 'ข้อเสนอพิเศษและคูปอง', Icon: Percent, testid: 'menu-offers' },
+  { href: '/points', label: 'แต้มสะสมของฉัน', Icon: Coins, testid: 'menu-points' },
   { href: '/wallet', label: 'กระเป๋าเงิน', Icon: Wallet, testid: 'menu-wallet' },
   { href: '/addresses', label: 'ที่อยู่ของฉัน', Icon: MapPin, testid: 'menu-addresses' },
   { href: '/settings/notifications', label: 'การแจ้งเตือน', Icon: Bell, testid: 'menu-notifications' },

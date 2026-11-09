@@ -78,7 +78,20 @@ export async function GET(req: NextRequest) {
     const base = new URL(req.url).origin;
     const upstream = await fetchRaw(full, { 'User-Agent': MAP_USER_AGENT });
     // ส่งสถานะต้นทางตรง — maplibre พึ่ง 404 ของ sprite@1x เพื่อไปใช้ @2x
-    if (upstream.status === 404) return new Response(null, { status: 404 });
+    if (upstream.status === 404) {
+      // sprite ที่ไม่มี @2x.png จะ 404 จากต้นทาง — ลองเติม @2x.png ให้เอง (maplibre ขอ base ได้ตาม pixelRatio)
+      if (/\/sprites\//.test(targetPath) && !/\.png$/.test(targetPath)) {
+        const fallback = await fetchRaw(`${full}@2x.png`, { 'User-Agent': MAP_USER_AGENT });
+        if (fallback.status === 200) {
+          const key2 = createHash('sha256').update(`${full}@2x.png`).digest('hex');
+          const cachePath2 = path.join(process.cwd(), MAP_CACHE_DIR, key2);
+          await mkdir(path.dirname(cachePath2), { recursive: true });
+          await writeFile(cachePath2, fallback.body);
+          return respond(fallback.body, false, fallback.contentType);
+        }
+      }
+      return new Response(null, { status: 404 });
+    }
     if (upstream.status >= 400) return new Response('upstream error', { status: 502 });
     let payload = upstream.body;
     if (upstream.contentType.includes('application/json')) {

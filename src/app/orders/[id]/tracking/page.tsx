@@ -228,16 +228,16 @@ export default function TrackingPage() {
         </p>
       </section>
 
-      {/* แผนที่ — ยังไม่เชื่อมจริง (งานถัดไป) — placeholder ตามข้อ 9 */}
-      <div
-        aria-label="แผนที่การจัดส่ง (ยังไม่พร้อมใช้งาน)"
-        className="flex h-44 flex-col items-center justify-center gap-2 rounded-3xl bg-[#FFF4CC] px-4 text-center"
+      {/* แผนที่ — ลิงก์เข้าหน้าแผนที่จริง (MapLibre + OpenStreetMap) */}
+      <Link
+        href={`/orders/${id}/map`}
+        aria-label="เปิดแผนที่เส้นทางจัดส่ง"
+        className="flex h-44 flex-col items-center justify-center gap-2 rounded-3xl bg-[#FFF4CC] px-4 text-center transition-transform active:scale-[0.99]"
       >
-        <MapPin className="h-7 w-7 text-black/40" aria-hidden />
-        <p className="text-xs leading-relaxed text-black/60">
-          แผนที่จะแสดงเมื่อเชื่อมต่อบริการแผนที่ (อยู่ระหว่างพัฒนา)
-        </p>
-      </div>
+        <MapPin className="h-7 w-7 text-black" aria-hidden />
+        <p className="text-sm font-bold text-black">เปิดแผนที่เส้นทางจัดส่ง</p>
+        <p className="text-xs text-black/60">ดูจุดรับ จุดส่ง และตำแหน่งไรเดอร์บนแผนที่จริง</p>
+      </Link>
 
       {/* ไทม์ไลน์แนวตั้ง */}
       <section aria-label="ไทม์ไลน์สถานะคำสั่งซื้อ" className="rounded-3xl border border-line bg-white p-4">

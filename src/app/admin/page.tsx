@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Bike,
@@ -90,7 +91,25 @@ export default function AdminPortalPage() {
               <p className="truncate-1 text-[11px] text-neutral-400">{user?.fullName ?? ''}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <Link
+              href="/admin/users"
+              className="flex h-10 items-center rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+            >
+              ผู้ใช้
+            </Link>
+            <Link
+              href="/admin/promotions"
+              className="flex h-10 items-center rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+            >
+              คูปอง
+            </Link>
+            <Link
+              href="/admin/approvals"
+              className="flex h-10 items-center rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+            >
+              อนุมัติร้าน
+            </Link>
             <button
               onClick={() => { setLoading(true); setTick((x) => x + 1); }}
               className="flex h-10 items-center gap-1.5 rounded-full border border-line px-3 text-xs font-semibold text-neutral-600 hover:bg-neutral-50"

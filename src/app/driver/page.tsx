@@ -1,8 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Bike,
+  History as HistoryIcon,
   MapPin,
   Navigation,
   LogOut,
@@ -120,7 +122,20 @@ export default function DriverPortalPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <Link
+              href="/driver/earnings"
+              className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+            >
+              <Wallet className="h-4 w-4" aria-hidden /> รายได้
+            </Link>
+            <Link
+              href="/driver/history"
+              aria-label="ประวัติงาน"
+              className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+            >
+              <HistoryIcon className="h-4 w-4" aria-hidden /> ประวัติ
+            </Link>
             <button
               onClick={() => void load()}
               aria-label="รีเฟรช"

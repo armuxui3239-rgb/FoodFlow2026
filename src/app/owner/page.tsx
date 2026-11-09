@@ -11,7 +11,9 @@ import {
   Package,
   Phone,
   RefreshCw,
+  Settings as SettingsIcon,
   Store,
+  TrendingUp,
   Utensils,
   Wallet,
 } from 'lucide-react';
@@ -105,12 +107,26 @@ export default function OwnerPortalPage() {
               <p className="text-[11px] text-neutral-400">มุมมองเจ้าของร้าน{user ? ` · ${user.fullName}` : ''}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <Link
-              href="/owner/menu"
+              href="/owner/stats"
               className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
             >
-              <Utensils className="h-4 w-4" aria-hidden /> จัดการเมนู
+              <TrendingUp className="h-4 w-4" aria-hidden /> สถิติ
+            </Link>
+            <Link
+              href="/owner/settings"
+              aria-label="ตั้งค่าร้าน"
+              className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+            >
+              <SettingsIcon className="h-4 w-4" aria-hidden /> ตั้งค่าร้าน
+            </Link>
+            <Link
+              href="/owner/menu"
+              aria-label="จัดการเมนู"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFF4CC] transition-colors hover:bg-[#FFC400]"
+            >
+              <Utensils className="h-4 w-4 text-black" aria-hidden />
             </Link>
             <button
               onClick={() => void logout()}
