@@ -16,22 +16,22 @@
 | ตาราง | แถว | คำอธิบาย |
 |---|---|---|
 | restaurants | 22 | ร้านอาหาร (ชื่อ ที่อยู่ พิกัด สถานะอนุมัติ) |
-| categories | 88 | หมวดเมนูต่อร้าน (4 ต่อร้าน) |
-| menu_items | 110 | รายการอาหาร (รูป ราคา คำอธิบาย) |
+| categories | 36 | หมวดเมนูต่อร้าน — **ล้างหมวดว่างแล้ว เหลือเฉพาะที่มีเมนูใช้จริง** |
+| menu_items | 110 | รายการอาหาร (รูป ราคา คำอธิบาย) — **ราคาเป็นสตางค์ครบทุกแถว** |
 | menu_item_options | 0 | กลุ่มตัวเลือก (ขนาด/ท็อปปิ้ง) — **ยังไม่ seed** |
 | menu_item_option_values | 0 | ค่าตัวเลือก + ราคาเพิ่ม — **ยังไม่ seed** |
-| restaurant_opening_hours | 56 | เวลาเปิด-ปิด — **มีแค่ 8/22 ร้าน** |
+| restaurant_opening_hours | 154 | เวลาเปิด-ปิด — **ครบ 22/22 ร้าน × 7 วัน (07:00–21:00)** |
 | restaurant_holiday_closures | 0 | ปิดพิเศษตามวันหยุด |
 
 ### โดเมนผู้ใช้และบัญชี
 | ตาราง | แถว | คำอธิบาย |
 |---|---|---|
-| users | 27 | บัญชีทุกบทบาท (role: customer/driver/restaurant/admin) |
-| customer_profiles | 10 | โปรไฟล์ลูกค้า + ที่อยู่ default |
-| driver_profiles | 5 | โปรไฟล์ไรเดอร์ (ยานพาหนะ คะแนน พิกัดปัจจุบัน) |
-| restaurant_profiles | 8 | บัญชีเจ้าของ/พนักงานร้าน — **ครอบคลุมแค่ 8/22 ร้าน** |
-| addresses | 8 | ที่อยู่จัดส่ง (label + geography) |
-| otp_codes | 11 | รหัส OTP (hash + หมดอายุ + นับครั้ง) |
+| users | 37 | บัญชีทุกบทบาท (customer 9 / driver 5 / restaurant 22 / admin 1) — verified 100% |
+| customer_profiles | 9 | โปรไฟล์ลูกค้า + PIN hash + ที่อยู่ default (ผูกครบทุกคน) |
+| driver_profiles | 5 | โปรไฟล์ไรเดอร์ — **ออนไลน์ + พิกัด + ยอมรับเงื่อนไขครบทุกคน** |
+| restaurant_profiles | 22 | บัญชีเจ้าของ/พนักงานร้าน — **ครบ 22/22 ร้าน (owner 1 ต่อ 1 ร้าน)** |
+| addresses | 9 | ที่อยู่จัดส่ง (label + geography) |
+| otp_codes | 7 | รหัส OTP (hash + หมดอายุ + นับครั้ง) |
 | password_reset_tokens | 0 | token ตั้งรหัสใหม่ |
 | email_verification_tokens | 0 | token ยืนยันอีเมล |
 | referral_codes | 1 | โค้ดเชิญเพื่อน |
@@ -41,15 +41,15 @@
 | ตาราง | แถว | คำอธิบาย |
 |---|---|---|
 | carts / cart_items | 0 | ตะกร้า (runtime — สร้างเมื่อผู้ใช้ใช้งาน) |
-| orders | 17 | คำสั่งซื้อ (สถานะ + ยอดเงิน + ค่าส่ง + ส่วนลด) |
-| order_items | 20 | รายการในออเดอร์ (snapshot ชื่อ/ราคา ณ เวลาสั่ง) |
-| order_status_history | 28 | ประวัติสถานะทุกการเปลี่ยนแปลง |
-| payments | 13 | การชำระเงิน (method: promptpay/cash) |
-| payment_intents | 4 | เจตนาชำระเงินก่อนยืนยัน |
+| orders | 187 | คำสั่งซื้อ (completed 176 / pending_payment 6 / paid 5) — ยอดเงินสตางค์ครบ |
+| order_items | 364 | รายการในออเดอร์ (snapshot ชื่อ/ราคา ณ เวลาสั่ง) |
+| order_status_history | 1,408 | ประวัติสถานะทุกการเปลี่ยนแปลง (changed_by ตามบทบาทจริง) |
+| payments | 184 | การชำระเงิน (completed/pending, method: promptpay/cash) |
+| payment_intents | 0 | เจตนาชำระเงินก่อนยืนยัน (สร้างตอนใช้จริง) |
 | payment_refund_requests | 0 | คำขอคืนเงิน |
 | payment_webhook_receipts | 0 | กำแพงกัน replay webhook |
-| reviews | 17 | รีวิวอาหาร+การส่ง (ดาว 1–5 + คอมเมนต์ + reply) |
-| delivery_tasks | 0 | งานจัดส่ง (ผูกกับไรเดอร์) |
+| reviews | 176 | รีวิวอาหาร+การส่ง — **มีเฉพาะออเดอร์ที่ส่งสำเร็จเท่านั้น + rating ร้านคำนวณจากของจริง** |
+| delivery_tasks | 176 | งานจัดส่ง (ผูกกับไรเดอร์ สถานะ delivered พร้อมพิกัดรับ-ส่ง) |
 | dispatch_offers | 0 | ข้อเสนองานไปยังไรเดอร์ |
 | driver_location_history | 0 | บันทึกพิกัดไรเดอร์ย้อนหลัง |
 | driver_tip_reports | 0 | รายงานทิป |
@@ -57,17 +57,17 @@
 ### โดเมนโปรโมชั่นและสะสมแต้ม
 | ตาราง | แถว | คำอธิบาย |
 |---|---|---|
-| promotions | 6 | คูปอง (THUNDER30, WELCOME20, FREESHIP, SUMMER50, COMBO15, MORNING25) |
+| promotions | 6 | คูปอง (THUNDER30, WELCOME20, FREESHIP, SUMMER50, COMBO15, MORNING25) — ใช้ได้จริงถึง 31 ธ.ค. 2026 |
 | promotion_items | 0 | คูปองผูกเมนูเฉพาะ |
-| promotion_usages | 0 | บันทึกการใช้คูปองต่อผู้ใช้ |
-| loyalty_transactions | 0 | สะสมแต้ม |
+| promotion_usages | 2 | บันทึกการใช้คูปองต่อผู้ใช้ — **หักเงินจริงแล้ว + ตัวนับ usage_count อัปเดตอัตโนมัติ** |
+| loyalty_transactions | 176 | สะสมแต้มจากออเดอร์ที่สำเร็จ (1 แต้ม/฿100) |
 
 ### โดเมนกระเป๋าเงินและบัญชีไรเดอร์
 | ตาราง | แถว | คำอธิบาย |
 |---|---|---|
-| wallet_transactions | 2 | เข้า/ออกกระเป๋า (credit/debit, สตางค์) |
+| wallet_transactions | 0 | เข้า/ออกกระเป๋า (credit/debit, สตางค์) — สร้างเมื่อผู้ใช้เติมเงินจริง |
 | payout_ledger | 0 | บัญชีโอนเงินให้ร้าน/ไรเดอร์ |
-| driver_bank_accounts | 0 | บัญชีธนาคารไรเดอร์ |
+| driver_bank_accounts | 5 | บัญชีธนาคารไรเดอร์ — **ครบทุกคน (KBANK/SCB/BBL/KTB/BAY)** |
 | driver_kyc_submissions | 0 | ยืนยันตัวตนไรเดอร์ |
 | driver_incentive_campaigns | 0 | แคมเปญจูงใจไรเดอร์ |
 

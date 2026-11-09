@@ -18,7 +18,7 @@ interface CartData {
   restaurant: { id: string; name: string; is_open: boolean } | null;
 }
 
-const DELIVERY_FEE = 35;
+const DELIVERY_FEE = 3500; // สตางค์ตามมาตรฐานฐานข้อมูล (฿35)
 
 export default function CartPage() {
   const { refresh } = useCart();
@@ -27,7 +27,9 @@ export default function CartPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [promo, setPromo] = useState('');
-  const [promoApplied, setPromoApplied] = useState<string | null>(null);
+  const [promoApplied, setPromoApplied] = useState<{ code: string; discount: number } | null>(null);
+  const [promoErr, setPromoErr] = useState('');
+  const [promoChecking, setPromoChecking] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -37,6 +39,31 @@ export default function CartPage() {
       .finally(() => setLoading(false));
   };
   useEffect(load, []);
+
+  /** ตรวจโค้ดจริงผ่าน API เดียวกับ checkout — ผ่านแล้วเก็บไว้ให้หน้า checkout หักเงินต่อ */
+  const applyPromo = async () => {
+    const code = promo.trim();
+    if (!code || subtotal <= 0) return;
+    setPromoChecking(true);
+    setPromoErr('');
+    try {
+      const res = await api<{ valid: boolean; code?: string; discount?: number; error?: string }>(
+        '/api/promotions/validate',
+        { method: 'POST', body: JSON.stringify({ code, subtotal }) },
+      );
+      if (res.valid && res.discount) {
+        setPromoApplied({ code: res.code ?? code.toUpperCase(), discount: res.discount });
+        try { sessionStorage.setItem('ft_coupon', res.code ?? code.toUpperCase()); } catch { /* ignore */ }
+      } else {
+        setPromoApplied(null);
+        setPromoErr(res.error ?? 'ใช้คูปองไม่สำเร็จ');
+      }
+    } catch (e) {
+      setPromoErr(e instanceof Error ? e.message : 'ตรวจคูปองไม่สำเร็จ');
+    } finally {
+      setPromoChecking(false);
+    }
+  };
 
   const updateQty = async (itemId: string, quantity: number) => {
     setBusy(true);
@@ -164,22 +191,28 @@ export default function CartPage() {
           onChange={(e) => {
             setPromo(e.target.value.toUpperCase());
             setPromoApplied(null);
+            setPromoErr('');
+            try { sessionStorage.removeItem('ft_coupon'); } catch { /* ignore */ }
           }}
           placeholder="ใส่โค้ดส่วนลด"
           aria-label="โค้ดส่วนลด"
           className="h-9 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-neutral-400"
         />
         <button
-          onClick={() => promo.trim() && setPromoApplied(promo.trim())}
-          className="btn-brand h-9 shrink-0 px-4 text-xs"
+          onClick={() => void applyPromo()}
+          disabled={promoChecking || promoApplied != null || subtotal <= 0}
+          className="btn-brand h-9 shrink-0 px-4 text-xs disabled:opacity-50"
         >
-          ใช้โค้ด
+          {promoChecking ? 'กำลังตรวจ…' : 'ใช้โค้ด'}
         </button>
       </section>
       {promoApplied && (
-        <p className="-mt-2 px-2 text-xs text-neutral-500">
-          ใส่โค้ด <span className="font-bold text-black">{promoApplied}</span> แล้ว — ส่วนลดจะหักที่หน้าชำระเงิน
+        <p className="-mt-2 px-2 text-xs font-medium text-emerald-600" role="status">
+          ใช้โค้ด <span className="font-bold text-black">{promoApplied.code}</span> สำเร็จ · ลด {baht(promoApplied.discount)} — จะหักตอนชำระเงิน
         </p>
+      )}
+      {promoErr && (
+        <p className="-mt-2 px-2 text-xs text-red-600" role="alert">{promoErr}</p>
       )}
 
       {/* สรุปยอด + ปุ่มชำระแบบ sticky (ลอยเหนือแถบล่าง) */}

@@ -5,9 +5,9 @@ import { currentUser, jsonError } from '@/lib/api-user';
 import { promptPayPayload } from '@/lib/promptpay';
 import QRCode from 'qrcode';
 
-const ALLOWED_AMOUNTS = [50, 100, 200, 300, 500, 1000];
-// ใช้เบอร์พร้อมเพย์จาก env PROMPTPAY_ID ก่อน ถ้าไม่มีใช้ fallback เดียวกับ orders/route.ts
-const FALLBACK_PROMPTPAY = '0812345678';
+const ALLOWED_AMOUNTS = [50, 100, 200, 300, 500, 1000]; // หน่วยบาท (input จากผู้ใช้)
+// ใช้เบอร์พร้อมเพย์จาก env PROMPTPAY_ID ก่อน ถ้าไม่มีใช้ fallback จาก env เดียวกับ orders/route.ts
+const FALLBACK_PROMPTPAY = process.env.PROMPTPAY_FALLBACK_TARGET ?? '0812345678';
 
 /** POST — สร้างรายการเติมเงิน (pending) พร้อมคิวอาร์โค้ดพร้อมเพย์ */
 export async function POST(req: NextRequest) {
@@ -19,10 +19,11 @@ export async function POST(req: NextRequest) {
     return jsonError('จำนวนเงินไม่ถูกต้อง กรุณาเลือก 50, 100, 200, 300, 500 หรือ 1,000 บาท', 400);
   }
   const value = Number(amount);
+  const valueSatang = value * 100; // มาตรฐานฐานข้อมูล: เก็บเงินเป็นสตางค์เสมอ
 
   const [row] = await sbInsert<{ id: string; amount_delta: number }>('wallet_transactions', {
     user_id: user.id,
-    amount_delta: value,
+    amount_delta: valueSatang,
     type: 'credit', // enum WalletTxnType จริงมีแค่ credit/debit — เติมเงิน = credit
     status: 'pending',
     reason: 'เติมเงินผ่านพร้อมเพย์',
@@ -30,11 +31,11 @@ export async function POST(req: NextRequest) {
   });
 
   const target = process.env.PROMPTPAY_ID || FALLBACK_PROMPTPAY;
-  const payload = promptPayPayload(target, value);
+  const payload = promptPayPayload(target, valueSatang);
   const qrDataUrl = await QRCode.toDataURL(payload, { width: 320, margin: 1 });
 
   return Response.json(
-    { data: { transactionId: row.id, qrDataUrl, amount: value } },
+    { data: { transactionId: row.id, qrDataUrl, amount: valueSatang } }, // ส่งกลับเป็นสตางค์ให้ UI ใช้ baht() แสดงผล
     { status: 201 },
   );
 }

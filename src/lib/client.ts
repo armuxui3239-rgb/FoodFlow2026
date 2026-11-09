@@ -15,8 +15,9 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
   return body;
 }
 
-export function baht(n: number): string {
-  return `฿${n.toLocaleString('th-TH', { maximumFractionDigits: 2 })}`;
+/** แปลงจำนวนเงินหน่วยสตางค์ (มาตรฐานฐานข้อมูล FoodFlow2026) เป็นข้อความบาท เช่น 18000 → "฿180" */
+export function baht(satang: number): string {
+  return `฿${(satang / 100).toLocaleString('th-TH', { maximumFractionDigits: 2 })}`;
 }
 
 export interface Me {

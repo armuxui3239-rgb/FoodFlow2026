@@ -42,38 +42,57 @@ const CATS: { name: string; Icon: LucideIcon }[] = [
   { name: 'ฟาสต์ฟู้ด', Icon: Sandwich },
 ];
 
-const OFFERS = [
-  {
-    pct: 'ลด 30%',
-    title: 'ยอดนิยมทุกเมนู',
-    code: 'THUNDER30',
-    dark: true,
-    img: '/food/boat-noodle.png',
-    alt: 'ก๋วยเตี๋ยวเรือน',
-  },
-  {
-    pct: 'ฟรีค่าส่ง',
-    title: 'ออเดอร์แรกของวัน',
-    code: 'FREESHIP',
-    dark: false,
-    img: '/food/som-tam.png',
-    alt: 'ส้มตำ',
-  },
-  {
-    pct: 'ลด 20%',
-    title: 'ชุดไก่ทอดกรอบ',
-    code: 'HOT20',
-    dark: true,
-    img: '/food/fried-chicken.png',
-    alt: 'ไก่ทอด',
-  },
+/** รูปประกอบการ์ดโปรโมชั่น — เลือกจากไฟล์ที่มีใน /public/food ตามลำดับ (การ์ด UI ไม่ใช่ข้อมูลส่วนลด) */
+const OFFER_IMGS = [
+  '/food/boat-noodle.png',
+  '/food/som-tam.png',
+  '/food/fried-chicken.png',
+  '/food/tom-yum.png',
+  '/food/pad-thai.png',
+  '/food/khao-mun-kai.png',
+  '/food/sushi.png',
+  '/food/pizza.png',
 ];
+
+interface OfferRow {
+  id: string;
+  code: string;
+  type: string;
+  value: number | null;
+  name: string;
+}
+
+interface OfferCard {
+  pct: string;
+  title: string;
+  code: string;
+  dark: boolean;
+  img: string;
+}
+
+/** ป้ายเปอร์เซ็นต์/จำนวนเงินจากข้อมูลจริงในตาราง promotions (เงินเป็นสตางค์) */
+function offerLabel(p: OfferRow): string {
+  if (p.type === 'percentage' || p.type === 'percent') return `ลด ${p.value ?? 0}%`;
+  if (p.type === 'fixed') return `ลด ฿${((p.value ?? 0) / 100).toLocaleString('th-TH')}`;
+  return 'ฟรีค่าส่ง';
+}
+
+function toOfferCard(p: OfferRow, i: number): OfferCard {
+  return {
+    pct: offerLabel(p),
+    title: p.name?.trim() || 'โปรโมชั่นพิเศษ',
+    code: p.code,
+    dark: i % 2 === 0,
+    img: OFFER_IMGS[i % OFFER_IMGS.length],
+  };
+}
 
 export default function HomePage() {
   const { user } = useSession();
   const { refresh: refreshCart } = useCart();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [popular, setPopular] = useState<PopularItem[]>([]);
+  const [offers, setOffers] = useState<OfferCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
   const [activeCat, setActiveCat] = useState<string | null>(null);
@@ -99,6 +118,13 @@ export default function HomePage() {
     api<{ data: PopularItem[] }>('/api/menu/popular')
       .then((r) => setPopular(r.data))
       .catch(() => setPopular([]));
+  }, []);
+
+  // โปรโมชั่นจากตาราง promotions จริง (ห้าม hard-code โค้ด/ส่วนลดในหน้าเว็บ)
+  useEffect(() => {
+    api<{ data: OfferRow[] }>('/api/promotions')
+      .then((r) => setOffers((r.data ?? []).slice(0, 6).map(toOfferCard)))
+      .catch(() => setOffers([]));
   }, []);
 
   const shown = useMemo(
@@ -165,14 +191,15 @@ export default function HomePage() {
         </button>
       </search>
 
-      {/* 3) ข้อเสนอพิเศษ — การ์ดโปรโมชั่นเลื่อนได้ */}
+      {/* 3) ข้อเสนอพิเศษ — การ์ดโปรโมชั่นเลื่อนได้ (ข้อมูลจริงจากตาราง promotions) */}
+      {offers.length > 0 ? (
       <section aria-label="ข้อเสนอพิเศษ">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-bold text-black">ข้อเสนอพิเศษ <Flame className="inline h-4 w-4 text-[#FFC400]" aria-hidden /></h2>
-          <span className="text-xs font-medium text-neutral-400">ดูทั้งหมด</span>
+          <Link href="/offers" className="text-xs font-medium text-neutral-400">ดูทั้งหมด</Link>
         </div>
         <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
-          {OFFERS.map((o) => (
+          {offers.map((o) => (
             <article
               key={o.code}
               className={`relative flex h-32 w-[85%] shrink-0 snap-start items-center justify-between overflow-hidden rounded-3xl p-4 ${
@@ -209,6 +236,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+      ) : null}
 
       {/* 4) แนะนำสำหรับคุณ — การ์ดอาหารเลื่อนแนวนอน */}
       {popular.length > 0 && (

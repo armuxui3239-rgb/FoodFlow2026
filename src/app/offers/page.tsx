@@ -20,17 +20,15 @@ interface Promotion {
 }
 
 /**
- * ข้อมูลจริงในตาราง promotions เก็บจำนวนเงินเป็นหน่วยสตางค์
- * (เช่น min_order_amount 100000 = ฿1,000, max_discount 15000 = ฿150 — สอดคล้องกันทุกแถว)
+ * จำนวนเงินทุกคอลัมน์ในตาราง promotions เป็นหน่วยสตางค์ตามมาตรฐานฐานข้อมูล
+ * (เช่น min_order_amount 100000 = ฿1,000, max_discount 15000 = ฿150)
+ * การแสดงผลใช้ baht() จาก lib/client ซึ่งรับสตางค์แล้วหาร 100 ให้เอง
  */
-function fromMinor(n: number): number {
-  return n / 100;
-}
 
 /** ป้ายส่วนลดใหญ่: percentage/percent → ลด x%, fixed → ลด ฿x, อื่น ๆ/free_shipping → ฟรีค่าส่ง */
 function discountLabel(p: Promotion): string {
   if (p.type === 'percentage' || p.type === 'percent') return `ลด ${p.value ?? 0}%`;
-  if (p.type === 'fixed') return `ลด ${baht(fromMinor(p.value ?? 0))}`;
+  if (p.type === 'fixed') return `ลด ${baht(p.value ?? 0)}`;
   return 'ฟรีค่าส่ง';
 }
 
@@ -40,7 +38,7 @@ function titleOf(p: Promotion): string {
 }
 
 function minOrderLabel(p: Promotion): string {
-  if (p.min_order_amount && p.min_order_amount > 0) return `ขั้นต่ำ ${baht(fromMinor(p.min_order_amount))}`;
+  if (p.min_order_amount && p.min_order_amount > 0) return `ขั้นต่ำ ${baht(p.min_order_amount)}`;
   return 'ไม่มียอดสั่งขั้นต่ำ';
 }
 
@@ -180,7 +178,7 @@ export default function OffersPage() {
                       {p.description && <p className="truncate-2 text-xs opacity-80">{p.description}</p>}
                       <p className="text-xs font-medium opacity-80">{minOrderLabel(p)}</p>
                       {(p.type === 'percentage' || p.type === 'percent') && p.max_discount != null && p.max_discount > 0 && (
-                        <p className="text-xs font-medium opacity-80">ลดสูงสุด {baht(fromMinor(p.max_discount))}</p>
+                        <p className="text-xs font-medium opacity-80">ลดสูงสุด {baht(p.max_discount)}</p>
                       )}
                       {p.first_order_only && (
                         <span

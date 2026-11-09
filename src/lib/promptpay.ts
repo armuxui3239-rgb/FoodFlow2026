@@ -1,6 +1,9 @@
 import 'server-only';
 
-/** PromptPay EMVCo payload (mobile number or national ID) + CRC16-CCITT */
+/**
+ * PromptPay EMVCo payload (mobile number or national ID) + CRC16-CCITT
+ * @param amount จำนวนเงินหน่วยสตางค์ตามมาตรฐานฐานข้อมูล (เช่น 35000 = ฿350.00)
+ */
 function crc16(input: string): string {
   let crc = 0xffff;
   for (let i = 0; i < input.length; i++) {
@@ -16,7 +19,8 @@ function tlv(id: string, value: string): string {
   return id + String(value.length).padStart(2, '0') + value;
 }
 
-export function promptPayPayload(target: string, amount: number): string {
+export function promptPayPayload(target: string, amountSatang: number): string {
+  const bahtAmount = amountSatang / 100; // สตางค์ → บาท (ฟิลด์ 54 ของ EMVCo ใช้หน่วยบาท ทศนิยม 2 ตำแหน่ง)
   const targetValue = target.replace(/\D/g, '');
   let merchant: string;
   if (targetValue.length === 13) {
@@ -32,7 +36,7 @@ export function promptPayPayload(target: string, amount: number): string {
     tlv('29', tlv('00', 'A000000677010111') + merchant) +
     tlv('52', '5999') +
     tlv('53', '764') +
-    tlv('54', amount.toFixed(2)) +
+    tlv('54', bahtAmount.toFixed(2)) +
     tlv('58', 'TH') +
     tlv('62', tlv('01', 'FoodThunder')) +
     '6304';

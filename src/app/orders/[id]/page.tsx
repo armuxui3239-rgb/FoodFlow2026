@@ -13,6 +13,7 @@ interface Order {
   status: string;
   subtotal: number;
   delivery_fee: number;
+  promotion_discount: number | null;
   total: number;
   notes: string | null;
   created_at: string;
@@ -159,7 +160,7 @@ export default function OrderDetailPage() {
             <div className="rounded-2xl bg-neutral-50 px-4 py-3">
               <p className="text-xs text-neutral-400">จำนวนเงิน</p>
               <p className="text-3xl font-bold tabular-nums text-black">
-                {order.total.toFixed(2)} <span className="text-base font-medium text-neutral-500">บาท</span>
+                {(order.total / 100).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-base font-medium text-neutral-500">บาท</span>
               </p>
             </div>
 
@@ -255,7 +256,7 @@ export default function OrderDetailPage() {
               <div className="flex justify-between gap-2">
                 <dt className="text-neutral-500">จำนวนเงิน</dt>
                 <dd className="shrink-0 text-xl font-bold tabular-nums text-black">
-                  {order.total.toFixed(2)} <span className="text-sm font-medium text-neutral-500">บาท</span>
+                  {(order.total / 100).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm font-medium text-neutral-500">บาท</span>
                 </dd>
               </div>
               <div className="flex justify-between gap-2">
@@ -283,6 +284,12 @@ export default function OrderDetailPage() {
           <span>ค่าจัดส่ง</span>
           <span className="tabular-nums">{baht(order.delivery_fee)}</span>
         </div>
+        {(order.promotion_discount ?? 0) > 0 && (
+          <div className="flex justify-between text-sm font-medium text-emerald-600">
+            <span>ส่วนลดคูปอง</span>
+            <span className="tabular-nums">−{baht(order.promotion_discount)}</span>
+          </div>
+        )}
         <div className="flex justify-between text-base font-bold text-black">
           <span>รวมทั้งสิ้น</span>
           <span className="tabular-nums">{baht(order.total)}</span>
