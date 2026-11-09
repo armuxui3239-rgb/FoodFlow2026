@@ -25,7 +25,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   const AUTH_PREFIXES = ['/login', '/register', '/verify-otp', '/forgot-pin', '/onboarding'];
-  const hideChrome = AUTH_PREFIXES.some((p) => pathname.startsWith(p));
+  // portal ของร้านค้า/ไรเดอร์/แอดมิน มี chrome ของตัวเอง (หัวเรื่อง+เมนูย่อยของ portal)
+  const PORTAL_PREFIXES = ['/owner', '/driver', '/admin'];
+  const hideChrome =
+    AUTH_PREFIXES.some((p) => pathname.startsWith(p)) ||
+    PORTAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   if (hideChrome) return <>{children}</>;
 
   return (

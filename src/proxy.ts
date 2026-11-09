@@ -15,8 +15,36 @@ const PUBLIC_PATHS = ['/login', '/register', '/verify-otp', '/forgot-pin', '/onb
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ---- ประตูตามบทบาท: /owner, /driver, /admin สำหรับบทบาทนั้นๆ เท่านั้น ----
+  const ROLE_GATES: [prefix: string, role: string, portal: string][] = [
+    ['/owner', 'restaurant', '/owner'],
+    ['/driver', 'driver', '/driver'],
+    ['/admin', 'admin', '/admin'],
+  ];
+  const sessionCookie = request.cookies.get('ft_session')?.value;
+
+  if (sessionCookie) {
+    const gate = ROLE_GATES.find(([p]) => pathname === p || pathname.startsWith(`${p}/`));
+    if (gate) {
+      let role: string | undefined;
+      try {
+        const [payload] = sessionCookie.split('.');
+        role = (JSON.parse(Buffer.from(payload, 'base64url').toString()) as { role?: string }).role;
+      } catch {
+        role = undefined;
+      }
+      // มี session แต่บทบาทไม่ตรง → พาไป portal ของบทบาทตัวเอง (ลูกค้า → หน้าแรก)
+      if (role && role !== gate[1]) {
+        const url = request.nextUrl.clone();
+        url.pathname = role === 'restaurant' ? '/owner' : role === 'driver' ? '/driver' : role === 'admin' ? '/admin' : '/';
+        url.search = '';
+        return NextResponse.redirect(url);
+      }
+    }
+  }
+
   // มี session → ผ่านทุกหน้า
-  if (request.cookies.get('ft_session')?.value) {
+  if (sessionCookie) {
     return NextResponse.next();
   }
 

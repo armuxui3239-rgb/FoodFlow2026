@@ -58,6 +58,26 @@ body {
   scrollbar-width: none;
 }
 
+/* แถบเลื่อนแบบบางสำหรับตาราง/รายการยาวในพอร์ทัลแอดมิน */
+.ft-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.ft-scroll::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 9999px;
+}
+.ft-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+.ft-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ft-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 transparent;
+}
+
 .btn-brand {
   background: var(--brand);
   color: var(--ink);

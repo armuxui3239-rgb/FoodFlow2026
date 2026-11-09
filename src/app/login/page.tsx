@@ -9,6 +9,10 @@ function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get('next') || '/';
+
+  /** บทบาทร้านค้า/ไรเดอร์/แอดมินเข้า portal ของตัวเองเสมอ — ลูกค้าไปหน้าที่ตั้งใจไว้ */
+  const roleHome = (role?: string) =>
+    role === 'restaurant' ? '/owner' : role === 'driver' ? '/driver' : role === 'admin' ? '/admin' : next;
   const [mode, setMode] = useState<'pin' | 'email'>('pin');
 
   // PIN mode
@@ -36,7 +40,7 @@ function LoginForm() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? 'เข้าสู่ระบบไม่สำเร็จ');
-      router.push(next);
+      router.push(roleHome(body.user?.role, next));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ');
@@ -56,7 +60,7 @@ function LoginForm() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? 'เข้าสู่ระบบไม่สำเร็จ');
-      router.push(next);
+      router.push(roleHome(body.user?.role, next));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ');
