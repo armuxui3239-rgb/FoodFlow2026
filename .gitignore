@@ -41,6 +41,7 @@ dev.out.log
 server.log
 tool-results/
 agent-ctx/
+.zscripts/
 .claude
 .z-ai-config
 /skills/
