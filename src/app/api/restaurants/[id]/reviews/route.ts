@@ -1,4 +1,4 @@
-import { sbList } from '@/lib/supabase';
+import { sbList, sbOne } from '@/lib/supabase';
 
 interface ReviewRow {
   id: string;
@@ -16,9 +16,18 @@ interface UserRow {
   full_name: string;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** GET (public) — รีวิวล่าสุดของร้าน + คะแนนเฉลี่ยจากรีวิวที่แสดงได้ (ไม่ต้องเข้าสู่ระบบ) */
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
-  const { id } = await ctx.params;
+  const { id: rawId } = await ctx.params;
+  // รองรับทั้ง UUID และ slug (เช่น ft-1)
+  let id = rawId;
+  if (!UUID_RE.test(rawId)) {
+    const rst = await sbOne<{ id: string }>('restaurants', { slug: `eq.${rawId}`, select: 'id' });
+    if (!rst) return Response.json({ data: { average: 0, count: 0, reviews: [] } });
+    id = rst.id;
+  }
 
   const reviews = await sbList<ReviewRow>('reviews', {
     restaurant_id: `eq.${id}`,

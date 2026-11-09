@@ -21,6 +21,7 @@ interface Item {
   is_popular: boolean;
 }
 interface Restaurant {
+  id: string;
   name: string;
   description: string | null;
   cover_url: string | null;
@@ -70,6 +71,8 @@ export default function RestaurantPage() {
   const [isFav, setIsFav] = useState(false);
   const [favBusy, setFavBusy] = useState(false);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  // ใช้ UUID จริงของร้าน (เมื่อเข้าด้วย slug เช่น ft-1 จะได้ id จาก API) — ใช้กับ favorites/cart
+  const rid = restaurant?.id ?? id;
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [activeCat, setActiveCat] = useState<string>('all');
@@ -109,11 +112,11 @@ export default function RestaurantPage() {
 
   // โหลดสถานะร้านโปรดของผู้ใช้ (ถ้าเข้าสู่ระบบ) — ไม่บล็อกการโหลดร้านหลัก
   useEffect(() => {
-    if (!user || !id) return;
+    if (!user || !rid) return;
     let cancelled = false;
     api<{ data: { restaurant_id: string }[] }>('/api/favorites')
       .then((r) => {
-        if (!cancelled) setIsFav(r.data.some((f) => f.restaurant_id === id));
+        if (!cancelled) setIsFav(r.data.some((f) => f.restaurant_id === rid));
       })
       .catch(() => {
         /* 401 → ยังไม่เข้าสู่ระบบ ปล่อยเป็น false */
@@ -121,17 +124,17 @@ export default function RestaurantPage() {
     return () => {
       cancelled = true;
     };
-  }, [user, id]);
+  }, [user, rid]);
 
   const toggleFav = async () => {
-    if (!user || favBusy || !id) return;
+    if (!user || favBusy || !rid) return;
     setFavBusy(true);
     try {
       if (isFav) {
-        await api(`/api/favorites?restaurantId=${id}`, { method: 'DELETE' });
+        await api(`/api/favorites?restaurantId=${rid}`, { method: 'DELETE' });
         setIsFav(false);
       } else {
-        await api('/api/favorites', { method: 'POST', body: JSON.stringify({ restaurantId: id }) });
+        await api('/api/favorites', { method: 'POST', body: JSON.stringify({ restaurantId: rid }) });
         setIsFav(true);
       }
     } catch {

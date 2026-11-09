@@ -19,12 +19,25 @@ interface ItemRow {
   is_popular: boolean;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
-  const { id } = await ctx.params;
-  const restaurant = await sbOne<Record<string, unknown>>('restaurants', {
-    id: `eq.${id}`,
-    select: '*',
-  });
+  const { id: rawId } = await ctx.params;
+  // รองรับทั้ง UUID และ slug (เช่น ft-1) — ค้นหาจาก slug เมื่อไม่ใช่ UUID
+  let restaurant: Record<string, unknown> | null = null;
+  let id = rawId;
+  if (UUID_RE.test(rawId)) {
+    restaurant = await sbOne<Record<string, unknown>>('restaurants', {
+      id: `eq.${rawId}`,
+      select: '*',
+    });
+  } else {
+    restaurant = await sbOne<Record<string, unknown>>('restaurants', {
+      slug: `eq.${rawId}`,
+      select: '*',
+    });
+    id = String(restaurant?.id ?? rawId);
+  }
   if (!restaurant) return jsonError('ไม่พบร้านอาหาร', 404);
   const categories = await sbList<CategoryRow>('categories', {
     restaurant_id: `eq.${id}`,
