@@ -1,0 +1,28 @@
+# docker-compose สำหรับพัฒนา (DEV เท่านั้น) — ตามแพตช์ v3.1
+# - PostgreSQL: ใช้เฉพาะเมื่อยังไม่มี DATABASE_URL หลังมีแล้วชี้ไปที่ Supabase และปิด service นี้ได้เลย
+# - Mailpit: เครื่องมือจับอีเมลใน dev เท่านั้น — ห้ามอยู่ใน production (ตัดตาม v3.1 ข้อ 2)
+# ใช้: docker compose up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["db"]
+    environment:
+      POSTGRES_USER: foodthunder
+      POSTGRES_PASSWORD: foodthunder
+      POSTGRES_DB: foodthunder
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    restart: unless-stopped
+
+volumes:
+  pgdata:

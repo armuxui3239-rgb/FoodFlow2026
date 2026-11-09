@@ -1,0 +1,69 @@
+# SMS Gateway for Android™ — private mode (โอเพนซอร์ส Apache-2.0)
+# แพตช์ v3.1 ข้อ 2/3: ตัด mailserver ออกจากการ deploy production แล้ว (ไฟล์นี้ไม่มี mailserver)
+#
+# สถาปัตยกรรม: Railway รัน server+worker+MariaDB → แอป Android บนมือถือของคุณเชื่อมเข้ามา (outbound)
+# ตั้งแอปเป็นโหมด Private server แล้วใส่ URL + private token ตามคู่มือ SMS_GATEWAY_ANDROID_TH.md
+#
+# หมายเหตุที่พิสูจน์จากซอร์ส v1.52.5: server ต้องมี MariaDB/MySQL ก่อนสตาร์ท (ถ้าไม่มีจะตายทันที)
+# และ worker ต้องรันเป็น process แยก (`sms-gateway worker`)
+
+services:
+  db:
+    image: mariadb:lts # ต่ำสุด 10.2.7 — แนะนำ LTS
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SMSGATE_DB_ROOT_PASSWORD:?ตั้งค่าใน .env}
+      MYSQL_DATABASE: ${SMSGATE_DB_NAME:-sms}
+      MYSQL_USER: ${SMSGATE_DB_USER:-sms}
+      MYSQL_PASSWORD: ${SMSGATE_DB_PASSWORD:?ตั้งค่าใน .env}
+      MARIADB_AUTO_UPGRADE: "1"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  backend:
+    image: ghcr.io/android-sms-gateway/server:latest
+    environment:
+      HTTP__LISTEN: 0.0.0.0:3000
+      DATABASE__HOST: db
+      DATABASE__PORT: "3306"
+      DATABASE__USER: ${SMSGATE_DB_USER:-sms}
+      DATABASE__PASSWORD: ${SMSGATE_DB_PASSWORD}
+      DATABASE__DATABASE: ${SMSGATE_DB_NAME:-sms}
+      DATABASE__TIMEZONE: Asia/Bangkok
+      # โหมดส่วนตัว: ลงทะเบียนเครื่องต้องใช้ token — ตั้งค่าเดียวกับที่ใส่ในแอป Android
+      GATEWAY__MODE: private
+      GATEWAY__PRIVATE_TOKEN: ${SMSGATE_PRIVATE_TOKEN:?ตั้งค่าใน .env}
+      # แจ้งเตือนแบบแรงผ่าน upstream ของผู้พัฒนา (payload มีแค่ {token, event} ไม่มีเนื้อหา SMS
+      # — พิสูจน์จากซอร์ส: internal/sms-gateway/modules/events/events.go NewMessageEnqueuedEvent → Data nil)
+      # ถ้าต้องการไม่ผ่านกลางเลย ให้ตั้งแอปบนมือถือเป็น NotificationChannel = SSE_ONLY (แอปเชื่อมตรงกับ server นี้)
+      JWT__SECRET: ${SMSGATE_JWT_SECRET:?ตั้งค่าใน .env}
+    ports:
+      - "127.0.0.1:3005:3000" # ให้ reverse proxy/TLS อยู่ข้างหน้า — ห้ามเปิด HTTP ตรงสู่อินเทอร์เน็ต
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    image: ghcr.io/android-sms-gateway/server:latest
+    command: ["/app/app", "worker"]
+    environment:
+      CONFIG_PATH: config.yml
+      DATABASE__HOST: db
+      DATABASE__PORT: "3306"
+      DATABASE__USER: ${SMSGATE_DB_USER:-sms}
+      DATABASE__PASSWORD: ${SMSGATE_DB_PASSWORD}
+      DATABASE__DATABASE: ${SMSGATE_DB_NAME:-sms}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mariadb-data:

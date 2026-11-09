@@ -1,0 +1,33 @@
+# LiveKit + coturn + redis — โครงสร้างพื้นฐานโทรเสียง/วิดีโอ (ตามแพตช์ v3.1 ข้อ 6)
+#
+# ⚠️ สถานะ: "รอเซิร์ฟเวอร์" — ไฟล์นี้พร้อมใช้ทันที "เมื่อ" นำไปรันบนเครื่องที่เปิดพอร์ต UDP
+# และมีใบรับรอง TLS ได้ (Vercel/Railway ให้ไม่ได้) — ห้ามรายงานว่าฟีเจอร์โทรใช้งานได้
+# จนกว่าจะทดสอบจริงบนเซิร์ฟเวอร์นี้ (เกณฑ์ข้อ 18 ของ v3 ถูกย้ายออกจากรอบนี้)
+#
+# เปิดใช้ในแอป: ตั้ง NEXT_PUBLIC_CALLS_ENABLED=true + LIVEKIT_URL + LIVEKIT_API_KEY + LIVEKIT_API_SECRET
+
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --config /etc/livekit.yaml
+    ports:
+      - "7880:7880" # HTTP/WebSocket signaling (ต้องมี TLS ข้างหน้าจาก reverse proxy)
+      - "7881:7881" # TCP fallback สำหรับ WebRTC
+      - "7882:7882/udp" # UDP media (จำเป็น)
+      - "50000-50100:50000-50100/udp" # ช่วงพอร์ต media relay
+    environment:
+      LIVEKIT_KEYS: ${LIVEKIT_API_KEY:?ตั้งค่าใน .env}: ${LIVEKIT_API_SECRET:?ตั้งค่าใน .env}
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  coturn:
+    image: coturn/coturn:latest
+    network_mode: host # TURN ต้องเห็น IP จริงของเครื่อง
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf:ro
+    restart: unless-stopped
