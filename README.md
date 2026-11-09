@@ -44,12 +44,27 @@ cp .env.example .env
 #   แก้ค่า SUPABASE_URL / SUPABASE_SERVICE_KEY / SUPABASE_ANON_KEY
 #   และ SESSION_SECRET (สุ่มสตริงยาว 48+ ตัวอักษร)
 
-# 3) รันเซิร์ฟเวอร์พัฒนา
+# 3) (Supabase ใหม่เท่านั้น) สร้างตาราง + ข้อมูลตั้งต้น
+#    รันไฟล์ supabase/schema.sql ใน SQL Editor ของ Supabase ก่อน
+#    แล้วรัน seed: SUPABASE_URL=... SBK=... bun scripts/seed-thai.mjs
+
+# 4) รันเซิร์ฟเวอร์พัฒนา
 bun run dev          # http://localhost:3000
 
-# 4) ตรวจคุณภาพโค้ด
+# 5) ตรวจคุณภาพโค้ด
 bun run lint
 ```
+
+### บทบาทผู้ใช้ (4 บทบาท — ประตูกันตามบทบาทใน src/proxy.ts)
+
+| บทบาท | หน้าพอร์ทัล | ความสามารถหลัก |
+|---|---|---|
+| ลูกค้า (customer) | `/` | สั่งอาหาร ตะกร้า จ่ายพร้อมเพย์ ติดตาม รีวิว คูปอง กระเป๋าเงิน แต้ม |
+| เจ้าของร้าน (restaurant) | `/owner` | รับ/ปฏิเสธออเดอร์ สถานะครัว จัดการเมนู ตั้งค่าร้าน สถิติยอดขาย |
+| ไรเดอร์ (driver) | `/driver` | เปิด-ปิดรับงาน รับ/จัดส่ง รายได้ ประวัติงาน |
+| ผู้ดูแลระบบ (admin) | `/admin` | ภาพรวมทั้งระบบ ผู้ใช้ คูปอง อนุมัติร้าน |
+
+> บัญชีทดสอบ (seed): `{admin,driver1,restaurant1,customer1}@foodthunder.co.th` รหัสผ่าน `Food@1234`
 
 ### ตัวแปรสภาพแวดล้อม (Environment Variables)
 

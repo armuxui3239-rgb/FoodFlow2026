@@ -1,5 +1,24 @@
 # การติดตั้งและเดปลอย (Deployment Guide)
 
+## 0. ติดตั้งจากศูนย์ (Fresh Install — Supabase โปรเจกต์ใหม่)
+
+สำหรับเครื่อง/โปรเจกต์ใหม่ที่ยังไม่มีตารางเลย:
+
+```bash
+# 1) สร้างโปรเจกต์ใหม่บน supabase.com → เปิด SQL Editor
+# 2) รันไฟล์ supabase/schema.sql ทั้งไฟล์ (สร้าง 62 ตาราง + 27 enum + 91 FK ครบ)
+#    - ไฟล์นี้สร้างจากโปรเจกต์จริงด้วย scripts/generate-schema-sql.mjs
+#    - รวม CREATE EXTENSION postgis / pgcrypto / vector ให้อัตโนมัติ
+# 3) ใส่ค่า env ให้ครบ (ดูข้อ 2) แล้วรัน seed ข้อมูลตั้งต้น:
+SUPABASE_URL=https://<ref>.supabase.co SBK=<service_role key> bun scripts/seed-thai.mjs
+# 4) bun run dev → เข้า http://localhost:3000 ทดสอบ
+```
+
+หมายเหตุตรงไปตรงมา:
+- `schema.sql` สร้างอัตโนมัติจาก OpenAPI ของ PostgREST — ได้คอลัมน์/ชนิด/NOT NULL/PK/FK ตรงจริงทุกตัว
+- DEFAULT บางคอลัมน์ (เช่น id/created_at/is_active) เติมจากที่แอปใช้จริง — คอลัมน์ status ต่าง ๆ ไม่มี default (โค้ดแอปส่งค่าเองอยู่แล้ว)
+- ค่า enum รื้อจากข้อมูลจริง + ค่าที่โค้ดเขียนได้สำเร็จในระบบจริง (ดูตรรกะใน `scripts/generate-schema-sql.mjs`)
+
 ## 1. สภาพแวดล้อม (Environments)
 
 | สภาพแวดล้อม | ฐานข้อมูล | การส่ง SMS | หมายเหตุ |

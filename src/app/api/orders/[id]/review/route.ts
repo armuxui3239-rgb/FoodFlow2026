@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { sbInsert, sbList, sbOne } from '@/lib/supabase';
+import { sbInsert, sbList, sbOne, sbUpdate } from '@/lib/supabase';
 import { currentUser, jsonError } from '@/lib/api-user';
 
 interface ReviewRow {
@@ -57,10 +57,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   const text = typeof comment === 'string' ? comment.trim() : '';
   if (text.length > 500) return jsonError('คอมเมนต์ต้องไม่เกิน 500 ตัวอักษร', 400);
 
-  const order = await sbOne<{ id: string; status: string; restaurant_id: string }>('orders', {
+  const order = await sbOne<{ id: string; status: string; restaurant_id: string; driver_id: string | null }>('orders', {
     id: `eq.${id}`,
     customer_id: `eq.${user.id}`,
-    select: 'id,status,restaurant_id',
+    select: 'id,status,restaurant_id,driver_id',
   });
   if (!order) return jsonError('ไม่พบคำสั่งซื้อ', 404);
   if (!RATEABLE_STATUS.has(order.status)) {
@@ -75,13 +75,45 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   });
   if (existing.length > 0) return jsonError('คุณให้คะแนนคำสั่งซื้อนี้แล้ว', 409);
 
-  const [row] = await sbInsert<ReviewRow>('reviews', {
+  const [row] = await sbInsert<ReviewRow & { restaurant_id: string; driver_id: string | null }>('reviews', {
     order_id: order.id,
     customer_id: user.id,
     restaurant_id: order.restaurant_id,
+    driver_id: order.driver_id,
     food_rating: foodRating,
     delivery_rating: deliveryRating,
     comment: text ? text : null,
   });
+
+  // ---- คำนวณคะแนนเฉลี่ยใหม่ทันที (ร้าน + ไรเดอร์) เพื่อให้หน้าเว็บโชว์ตรงจริงเสมอ ----
+  try {
+    // 1) ร้าน: rating = เฉลี่ย (food+delivery)/2 ปัด 1 ตำแหน่ง, total_reviews = จำนวนรีวิวจริง
+    const revs = await sbList<{ food_rating: number; delivery_rating: number }>('reviews', {
+      restaurant_id: `eq.${order.restaurant_id}`,
+      select: 'food_rating,delivery_rating',
+      limit: '10000',
+    });
+    if (revs.length > 0) {
+      const avg = Math.round((revs.reduce((s, r) => s + (r.food_rating + r.delivery_rating) / 2, 0) / revs.length) * 10) / 10;
+      await sbUpdate('restaurants', { id: `eq.${order.restaurant_id}` }, { rating: avg, total_reviews: revs.length });
+    }
+
+    // 2) ไรเดอร์: rating = เฉลี่ย delivery_rating ของรีวิวที่ระบุไรเดอร์
+    if (order.driver_id) {
+      const drevs = await sbList<{ delivery_rating: number }>('reviews', {
+        driver_id: `eq.${order.driver_id}`,
+        select: 'delivery_rating',
+        limit: '10000',
+      });
+      if (drevs.length > 0) {
+        const dAvg = Math.round((drevs.reduce((s, r) => s + r.delivery_rating, 0) / drevs.length) * 10) / 10;
+        // orders.driver_id ชี้ไปที่ users.id ของไรเดอร์ → ต้องอัปเดต driver_profiles ด้วย user_id
+        await sbUpdate('driver_profiles', { user_id: `eq.${order.driver_id}` }, { rating: dAvg });
+      }
+    }
+  } catch {
+    // คำนวณคะแนนล้มเหลวไม่ควรทำให้การส่งรีวิวพัง — รีวิวบันทึกสำเร็จแล้ว
+  }
+
   return Response.json({ data: row }, { status: 201 });
 }
