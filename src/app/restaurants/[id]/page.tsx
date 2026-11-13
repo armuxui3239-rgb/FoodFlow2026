@@ -296,16 +296,22 @@ export default function RestaurantPage() {
               key={item.id}
               className="flex items-stretch gap-3 rounded-3xl border border-line bg-white p-3 shadow-sm"
             >
-              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-neutral-100">
+              <Link
+                href={`/food/${item.id}`}
+                aria-label={`ดูรายละเอียด ${item.name}`}
+                className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-neutral-100"
+              >
                 {item.image_url ? (
                   <img src={item.image_url} alt={`รูป ${item.name}`} className="h-full w-full object-cover" />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center text-neutral-300"><Utensils className="h-8 w-8" aria-hidden /></span>
                 )}
-              </div>
+              </Link>
               <div className="flex min-w-0 flex-1 flex-col">
                 <div className="flex items-center gap-2">
-                  <h3 className="truncate-1 flex-1 text-sm font-bold text-black">{item.name}</h3>
+                  <Link href={`/food/${item.id}`} className="truncate-1 flex-1 text-sm font-bold text-black underline-offset-2 hover:underline">
+                    {item.name}
+                  </Link>
                   {item.is_popular && (
                     <span className="shrink-0 rounded-full bg-[#FFC400] px-2 py-0.5 text-[10px] font-bold text-black">
                       ยอดนิยม

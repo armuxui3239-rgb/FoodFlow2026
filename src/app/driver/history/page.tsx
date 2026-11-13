@@ -64,19 +64,21 @@ export default function DriverHistoryPage() {
           <ul className="overflow-hidden rounded-3xl border border-line bg-white">
             {rows.map((r, i) => (
               <li key={r.id} className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? 'border-t border-line' : ''}`}>
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFF4CC]">
-                  <CheckCircle2 className="h-5 w-5 text-black" aria-hidden />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate-1 text-sm font-bold text-black">#{r.orderCode} · {r.restaurantName}</p>
-                  <p className="text-[11px] text-neutral-400">
-                    {r.deliveredAt
-                      ? new Date(r.deliveredAt).toLocaleString('th-TH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-                      : '-'}
-                    {r.distanceKm ? ` · ${Number(r.distanceKm).toFixed(1)} กม.` : ''}
-                  </p>
-                </div>
-                <span className="shrink-0 text-sm font-bold text-black">+{baht(r.deliveryFee)}</span>
+                <Link href={`/driver/trips/${r.id}`} className="flex min-w-0 flex-1 items-center gap-3" aria-label={`ดูรายละเอียดงาน ${r.orderCode}`}>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFF4CC]">
+                    <CheckCircle2 className="h-5 w-5 text-black" aria-hidden />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate-1 text-sm font-bold text-black">#{r.orderCode} · {r.restaurantName}</p>
+                    <p className="text-[11px] text-neutral-400">
+                      {r.deliveredAt
+                        ? new Date(r.deliveredAt).toLocaleString('th-TH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                        : '-'}
+                      {r.distanceKm ? ` · ${Number(r.distanceKm).toFixed(1)} กม.` : ''}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-sm font-bold text-black">+{baht(r.deliveryFee)}</span>
+                </Link>
               </li>
             ))}
           </ul>

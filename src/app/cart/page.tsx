@@ -9,6 +9,7 @@ interface CartItem {
   id: string;
   quantity: number;
   unit_price: number;
+  selected_options: { name: string; value: string; priceModifier: number }[] | null;
   notes: string | null;
   menu_items: { name: string; image_url: string | null } | null;
 }
@@ -148,6 +149,14 @@ export default function CartPage() {
               <h2 className="truncate-1 text-sm font-bold text-black">
                 {item.menu_items?.name ?? 'รายการอาหาร'}
               </h2>
+              {(item.selected_options ?? []).length > 0 && (
+                <p className="truncate-2 text-[11px] leading-relaxed text-neutral-500">
+                  {(item.selected_options ?? []).map((o) => o.value).join(' · ')}
+                </p>
+              )}
+              {item.notes && (
+                <p className="truncate-1 text-[11px] italic text-neutral-400">หมายเหตุ: {item.notes}</p>
+              )}
               <span className="block text-sm font-bold text-black">
                 {baht(item.unit_price * item.quantity)}
               </span>

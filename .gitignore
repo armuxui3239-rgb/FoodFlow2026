@@ -13,7 +13,6 @@ node_modules
 
 # testing / coverage
 /coverage
-
 # next.js build output
 /.next/
 /out/
@@ -69,3 +68,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# แม่แบบต้นทาง (โคลน JasonTM17/FoodDelivery_App) — เก็บไว้เทียบ/ดึงอัพเดทต้นทาง แต่ไม่ commit ลง repo นี้
+/_template-ref/
+
+# ผลจาก npm install (โปรเจกต์มาตรฐานใช้ Bun — มี bun.lock เป็นหลัก)
+/package-lock.json

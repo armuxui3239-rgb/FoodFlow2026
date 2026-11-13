@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return Response.json({ ok: true, next: '/onboarding/pin' });
+    return Response.json({ ok: true, next: '/onboarding/notification' });
   } catch (err) {
     console.error('onboard/location error:', err);
     return Response.json({ error: 'บันทึกที่อยู่ไม่สำเร็จ กรุณาลองใหม่' }, { status: 500 });

@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, Clock, MapPin, Search, Soup, Star, Utensils } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, Clock, MapPin, Search, SlidersHorizontal, Soup, Star, Utensils } from 'lucide-react';
 import { api } from '@/lib/client';
 
 interface Restaurant {
@@ -19,26 +20,64 @@ interface Restaurant {
 
 /** หมวดกรองด่วย — ดึงจาก cuisine_types จริงในฐานข้อมูล */
 export default function RestaurantsPage() {
+  return (
+    <Suspense fallback={<div className="space-y-5">
+      <div className="h-10 w-48 animate-pulse rounded-2xl bg-neutral-100" />
+      <div className="h-56 animate-pulse rounded-3xl bg-neutral-100" />
+    </div>}>
+      <RestaurantsList />
+    </Suspense>
+  );
+}
+
+function RestaurantsList() {
+  const sp = useSearchParams();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
   const [activeCat, setActiveCat] = useState<string | null>(null);
 
+  const cuisine = sp.get('cuisine') ?? '';
+  const price = sp.get('price') ?? '';
+  const rating = sp.get('rating') ?? '';
+  const open = sp.get('open') ?? '';
+  const sort = sp.get('sort') ?? '';
+
+  const apiQuery = useMemo(() => {
+    const qs = new URLSearchParams();
+    if (cuisine) qs.set('cuisine', cuisine);
+    if (price) qs.set('price', price);
+    if (rating) qs.set('rating', rating);
+    if (open) qs.set('open', open);
+    if (sort) qs.set('sort', sort);
+    const s = qs.toString();
+    return s ? `?${s}` : '';
+  }, [cuisine, price, rating, open, sort]);
+
   useEffect(() => {
-    api<{ data: Restaurant[] }>('/api/restaurants')
+    api<{ data: Restaurant[] }>(`/api/restaurants${apiQuery}`)
       .then((r) => setRestaurants(r.data))
       .catch(() => setRestaurants([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [apiQuery]);
 
   useEffect(() => {
     const t = setTimeout(() => {
-      api<{ data: Restaurant[] }>(`/api/restaurants${q ? `?q=${encodeURIComponent(q)}` : ''}`)
+      const qs = new URLSearchParams(apiQuery ? new URLSearchParams(apiQuery.slice(1)) : undefined);
+      if (q) qs.set('q', q);
+      const s = qs.toString();
+      api<{ data: Restaurant[] }>(`/api/restaurants${s ? `?${s}` : ''}`)
         .then((r) => setRestaurants(r.data))
         .catch(() => setRestaurants([]));
     }, 300);
     return () => clearTimeout(t);
-  }, [q]);
+  }, [q, apiQuery]);
+
+  const activeFilterCount =
+    (cuisine ? cuisine.split(',').filter(Boolean).length : 0) +
+    (price ? price.split(',').filter(Boolean).length : 0) +
+    (rating ? 1 : 0) +
+    (open ? 1 : 0);
 
   const cats = useMemo(() => {
     const s = new Set<string>();
@@ -63,6 +102,17 @@ export default function RestaurantsPage() {
         </Link>
         <h1 className="text-lg font-bold text-black">ร้านอาหารทั้งหมด</h1>
         <span className="ml-auto text-xs text-neutral-400">{loading ? 'กำลังโหลด…' : `พบ ${shown.length} ร้าน`}</span>
+        <Link
+          href={`/restaurants/filters${apiQuery ? `${apiQuery}` : ''}`}
+          aria-label="เปิดตัวกรองร้าน"
+          data-testid="open-filters"
+          className="ml-1 flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+        >
+          <SlidersHorizontal className="h-4 w-4" aria-hidden /> ตัวกรอง
+          {activeFilterCount > 0 && (
+            <span className="rounded-full bg-black px-1.5 py-0.5 text-[10px] font-bold text-[#FFC400]">{activeFilterCount}</span>
+          )}
+        </Link>
       </header>
 
       <search className="flex h-12 items-center gap-2 rounded-full bg-neutral-100 px-4">

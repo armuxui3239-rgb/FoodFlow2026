@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { CheckCircle2, QrCode, Store, Zap } from 'lucide-react';
+import { CheckCircle2, QrCode, Store, XCircle, Zap } from 'lucide-react';
 import { api, baht, STATUS_COLOR, STATUS_TH, useSession } from '@/lib/client';
 import { CallButton } from '@/components/call-button';
 
@@ -42,6 +42,7 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [paying, setPaying] = useState(false);
+  const [canceling, setCanceling] = useState(false);
 
   const load = useCallback(() => {
     api<{ order: Order; payment: Payment | null }>(`/api/orders/${id}`)
@@ -69,6 +70,22 @@ export default function OrderDetailPage() {
       load();
     } finally {
       setPaying(false);
+    }
+  };
+
+  /** ยกเลิกได้เฉพาะสถานะเดียวกับที่ API ยอมรับ (ก่อนร้านตอบรับออเดอร์) */
+  const canCancel = ['created', 'pending_payment', 'restaurant_pending'].includes(order?.status ?? '');
+
+  const cancelOrder = async () => {
+    if (!window.confirm('ยืนยันการยกเลิกคำสั่งซื้อนี้? การยกเลิกไม่สามารถย้อนคืนได้')) return;
+    setCanceling(true);
+    try {
+      await api(`/api/orders/${id}/cancel`, { method: 'POST' });
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setCanceling(false);
     }
   };
 
@@ -106,6 +123,24 @@ export default function OrderDetailPage() {
           ))}
         </ol>
       </section>
+
+      {/* ยกเลิกคำสั่งซื้อ — เฉพาะก่อนร้านตอบรับ */}
+      {canCancel && (
+        <section aria-label="ยกเลิกคำสั่งซื้อ" className="flex items-center justify-between rounded-3xl border border-line bg-white p-4">
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-ink">ยกเลิกคำสั่งซื้อ</p>
+            <p className="truncate-1 text-xs text-ink-soft">ยกเลิกได้ก่อนร้านตอบรับออเดอร์เท่านั้น</p>
+          </div>
+          <button
+            onClick={() => void cancelOrder()}
+            disabled={canceling}
+            data-testid="order-cancel"
+            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-red-200 bg-white px-4 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+          >
+            <XCircle className="h-4 w-4" aria-hidden /> {canceling ? 'กำลังยกเลิก...' : 'ยกเลิก'}
+          </button>
+        </section>
+      )}
 
       {/* โทรเสียง/วิดีโอ — ปิดด้วย feature flag (v3.1 ข้อ 6) */}
       {stepIndex >= 1 && stepIndex < STEPS.length - 1 && (

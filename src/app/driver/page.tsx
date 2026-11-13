@@ -13,6 +13,11 @@ import {
   Star,
   Wallet,
   PackageCheck,
+  Landmark,
+  ShieldCheck,
+  Gift,
+  HeartHandshake,
+  Settings,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { api, baht, STATUS_TH } from '@/lib/client';
@@ -196,6 +201,32 @@ export default function DriverPortalPage() {
               <p className="text-[11px] text-neutral-500">{label}</p>
             </div>
           ))}
+        </section>
+
+        {/* เมนูพอร์ทัลไรเดอร์ */}
+        <section aria-label="เมนูไรเดอร์">
+          <h2 className="mb-2 text-sm font-bold text-black">เมนูของฉัน</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { href: '/driver/bank', label: 'บัญชีธนาคาร', Icon: Landmark },
+              { href: '/driver/kyc', label: 'ยืนยันตัวตน', Icon: ShieldCheck },
+              { href: '/driver/ratings', label: 'คะแนน', Icon: Star },
+              { href: '/driver/incentives', label: 'โบนัส', Icon: Gift },
+              { href: '/driver/tips', label: 'ทิป', Icon: HeartHandshake },
+              { href: '/driver/settings', label: 'ตั้งค่า', Icon: Settings },
+            ].map(({ href, label, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex flex-col items-center gap-1.5 rounded-3xl border border-line bg-white p-4 text-center transition-colors hover:border-[#FFC400] hover:bg-[#FFF4CC]"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFF4CC] text-black">
+                  <Icon className="h-5 w-5" aria-hidden />
+                </span>
+                <span className="text-[11px] font-bold text-black">{label}</span>
+              </Link>
+            ))}
+          </div>
         </section>
 
         {/* งานของฉัน */}

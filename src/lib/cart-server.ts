@@ -13,6 +13,7 @@ interface CartItemRow {
   menu_item_id: string;
   quantity: number;
   unit_price: number;
+  selected_options: unknown;
   notes: string | null;
   menu_items: { name: string; image_url: string | null; base_price: number } | null;
 }
@@ -40,7 +41,7 @@ export async function loadCart(userId: string) {
   if (!cart || !cart.restaurant_id) return { cart: null, items: [], restaurant: null };
   const items = await sbList<CartItemRow>('cart_items', {
     cart_id: `eq.${cart.id}`,
-    select: 'id,cart_id,menu_item_id,quantity,unit_price,notes,menu_items(name,image_url,base_price)',
+    select: 'id,cart_id,menu_item_id,quantity,unit_price,selected_options,notes,menu_items(name,image_url,base_price)',
   });
   const restaurant = await sbOne<Record<string, unknown>>('restaurants', {
     id: `eq.${cart.restaurant_id}`,
