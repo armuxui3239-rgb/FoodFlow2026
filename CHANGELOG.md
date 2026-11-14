@@ -10,7 +10,11 @@
 - **ปุ่มลบบัญชี (PDPA) พัง 500 มาตลอด**: `cart_items` ไม่มีคอลัมน์ `user_id` (เชื่อมผ่าน `cart_id`) → ลบ items ผ่าน `cart_id in.(…)` ก่อนลบ carts — พิสูจน์ end-to-end จริงบน production (สมัคร → ลบ → anonymize → ล็อกอินไม่ได้อีก)
 - ข้อความล้าสมัย 2 จุด: แคตตาล็อก integrations + ปุ่มโทรยังอ้าง "รอเซิร์ฟเวอร์ LiveKit" ทั้งที่โทรใช้ได้แล้ว (WebRTC P2P)
 
-### เพิ่ม (Added) — เครื่องมือยืนยันรับมือ + เลขพร้อมเพย์จริง
+### แก้ไข (Fixed) — บั๊ก high 3 ตัวจาก workflow ตรวจฟังก์ชันครบทุกกลุ่ม (พิสูจน์ทั้ง dev + production แล้ว)
+- **เพิ่มที่อยู่ 500 เสมอ**: POST /api/addresses ใส่ `location: null` ทั้งที่คอลัมน์ geography NOT NULL → ใช้พิกัดที่ส่งมา หรือจุดกลางกรุงเทพฯ เป็นค่าตั้งต้น (ระบุสัจจะ) + ลำดับ default แบบ insert ก่อน-ตั้งทีหลัง กัน default เดิมหาย + รองรับ unique index "หนึ่ง default ต่อคน"
+- **ประวัติโอนเงินร้านว่างเสมอ**: /api/owner/revenue คิวรี payout_ledger ด้วย restaurant id ทั้งที่ระบบเขียนด้วย user id ของเจ้าของ → คิวรีด้วย user.id ตรงฝั่งเขียน — ร้านเห็นประวัติโอนครบแล้ว
+- **ปิดคูปองจากหน้าแก้ไข 500 ทุกครั้ง**: status `'inactive'` ไม่มีใน enum PromotionStatus → ใช้ `'paused'` + เขียน is_active พร้อมกัน — PATCH isActive:false → 200 พร้อม audit log
+- ที่อยู่ตัวอย่างจากผลตรวจ workflow ล้างคืนสถานะเดิมครบ (default กลับที่เดิม)
 - `scripts/audit-security-proofs.mjs` — พิสูจน์ 3 กลไกบนระบบจริง: cookie Secure/HttpOnly/SameSite · rate limit 429 จริง · PDPA ลบบัญชีจริง (12 จุด, dev/prod เช็ก Secure แบบมีเงื่อนไข)
 - `scripts/audit-rls-anon.mjs` — ยิงด้วยคีย์คนแปลกหน้าทุกตาราง พิสูจน์ไม่รั่ว (64 ตาราง รั่ว 0)
 - `scripts/audit-db-truth.mjs` — ตรวจความจริงฐานข้อมูลรวมจุด (อ่านอย่างเดียว)
