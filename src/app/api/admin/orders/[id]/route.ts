@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireRole, pushStatusHistory } from '@/lib/portal';
 import { dispatchOrderToDrivers } from '@/lib/dispatch';
+import { earnLoyaltyPoints } from '@/lib/loyalty';
 import { sbList, sbOne, sbUpdate, sbHeaders } from '@/lib/supabase';
 import { jsonError } from '@/lib/api-user';
 
@@ -164,9 +165,9 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const { status, reason } = (await req.json().catch(() => ({}))) as { status?: string; reason?: string };
   if (!status) return jsonError('กรุณาระบุสถานะใหม่', 400);
 
-  const order = await sbOne<Pick<OrderRow, 'id' | 'order_code' | 'status' | 'cancelled_reason'>>('orders', {
+  const order = await sbOne<Pick<OrderRow, 'id' | 'order_code' | 'status' | 'cancelled_reason' | 'customer_id'>>('orders', {
     id: `eq.${id}`,
-    select: 'id,order_code,status,cancelled_reason',
+    select: 'id,order_code,status,cancelled_reason,customer_id',
   });
   if (!order) return jsonError('ไม่พบคำสั่งซื้อ', 404);
 
@@ -208,5 +209,11 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     }
   }
 
-  return Response.json({ ok: true, order: updated, dispatched });
+  // แต้มสะสมจริง (P1): ออเดอร์จบสมบูรณ์ → 1 แต้ม (กันซ้ำใน lib) — พังไม่รบกวนการเปลี่ยนสถานะ
+  let loyaltyEarned = 0;
+  if (status === 'completed') {
+    loyaltyEarned = await earnLoyaltyPoints({ id: updated.id, customer_id: order.customer_id });
+  }
+
+  return Response.json({ ok: true, order: updated, dispatched, loyaltyEarned });
 }
