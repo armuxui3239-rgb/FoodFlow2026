@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { sbOne, sbUpdate } from '@/lib/supabase';
-import { serializeSession, sessionCookieOptions, SESSION_COOKIE } from '@/lib/session';
+import { serializeSession, sessionCookieValue } from '@/lib/session';
 
 interface DbUser {
   id: string;
@@ -69,10 +69,6 @@ export async function POST(req: NextRequest) {
   });
   const session = { id: user.id, email: user.email, role: user.role, fullName: user.full_name };
   const res = Response.json({ user: session });
-  const opt = sessionCookieOptions();
-  res.headers.append(
-    'Set-Cookie',
-    `${SESSION_COOKIE}=${serializeSession(session)}; Path=${opt.path}; Max-Age=${opt.maxAge}; HttpOnly; SameSite=Lax`,
-  );
+  res.headers.append('Set-Cookie', sessionCookieValue(serializeSession(session)));
   return res;
 }

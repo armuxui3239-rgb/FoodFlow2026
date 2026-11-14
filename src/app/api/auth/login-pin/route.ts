@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { sbOne, sbList, sbUpdate } from '@/lib/supabase';
 import { normalizePhone, maskPhone } from '@/lib/auth-flow';
-import { serializeSession, sessionCookieOptions, SESSION_COOKIE } from '@/lib/session';
+import { serializeSession, sessionCookieValue } from '@/lib/session';
 
 interface DbUser {
   id: string;
@@ -116,16 +116,12 @@ export async function POST(req: NextRequest) {
       role: 'customer',
       fullName: user.full_name ?? '',
     };
-    const opt = sessionCookieOptions();
-    const maxAge = remember ? 60 * 60 * 24 * 30 : opt.maxAge;
+    const maxAge = remember ? 60 * 60 * 24 * 30 : undefined;
     const res = Response.json({
       user: session,
       phoneMasked: maskPhone(phone),
     });
-    res.headers.append(
-      'Set-Cookie',
-      `${SESSION_COOKIE}=${serializeSession(session)}; Path=${opt.path}; Max-Age=${maxAge}; HttpOnly; SameSite=Lax`,
-    );
+    res.headers.append('Set-Cookie', sessionCookieValue(serializeSession(session), maxAge));
     return res;
   } catch (err) {
     console.error('login-pin error:', err);

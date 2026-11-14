@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { cookies } from 'next/headers';
 import { sbOne, sbUpdate, sbInsert, sbList } from '@/lib/supabase';
 import { PENDING_COOKIE, newPendingFlow, serializePending, pendingCookieOptions } from '@/lib/auth-flow';
+import { namedCookieValue } from '@/lib/session';
 
 interface OtpRow {
   id: string;
@@ -138,10 +139,7 @@ export async function POST(req: NextRequest) {
 
     const res = Response.json({ ok: true, purpose: otp.purpose, next: nextPath });
     const opt = pendingCookieOptions();
-    res.headers.append(
-      'Set-Cookie',
-      `${PENDING_COOKIE}=${serializePending(flow)}; Path=${opt.path}; Max-Age=${opt.maxAge}; HttpOnly; SameSite=Lax`,
-    );
+    res.headers.append('Set-Cookie', namedCookieValue(PENDING_COOKIE, serializePending(flow), opt));
     return res;
   } catch (err) {
     console.error('otp/verify error:', err);

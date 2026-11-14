@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { cookies } from 'next/headers';
 import { sbOne, sbUpdate, sbInsert } from '@/lib/supabase';
 import { PENDING_COOKIE, parsePending, isWeakPin } from '@/lib/auth-flow';
-import { serializeSession, sessionCookieOptions, SESSION_COOKIE } from '@/lib/session';
+import { serializeSession, sessionCookieValue, clearNamedCookieValue } from '@/lib/session';
 
 interface PinPrefs {
   pin_hash?: string;
@@ -103,16 +103,9 @@ export async function POST(req: NextRequest) {
       role: 'customer',
       fullName: flow.fullName,
     };
-    const opt = sessionCookieOptions();
     const res = Response.json({ ok: true, next: redirect });
-    res.headers.append(
-      'Set-Cookie',
-      `${SESSION_COOKIE}=${serializeSession(session)}; Path=${opt.path}; Max-Age=${opt.maxAge}; HttpOnly; SameSite=Lax`,
-    );
-    res.headers.append(
-      'Set-Cookie',
-      `${PENDING_COOKIE}=; Path=${opt.path}; Max-Age=0; HttpOnly; SameSite=Lax`,
-    );
+    res.headers.append('Set-Cookie', sessionCookieValue(serializeSession(session)));
+    res.headers.append('Set-Cookie', clearNamedCookieValue(PENDING_COOKIE));
     return res;
   } catch (err) {
     console.error('onboard/pin error:', err);

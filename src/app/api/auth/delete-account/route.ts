@@ -17,8 +17,11 @@ export async function POST() {
     // ลบข้อมูลส่วนบุคคลที่ผูกกับบัญชี
     await sbDelete('addresses', { user_id: `eq.${user.id}` });
     await sbDelete('favorite_restaurants', { user_id: `eq.${user.id}` });
-    await sbDelete('cart_items', { user_id: `eq.${user.id}` });
+    // cart_items เชื่อมผ่าน cart_id (ไม่มี user_id ตรง) — ลบ items ของตะกร้าตัวเองก่อน แล้วค่อยลบ carts
     const carts = await sbList<{ id: string }>('carts', { user_id: `eq.${user.id}`, select: 'id', limit: '10' });
+    if (carts.length > 0) {
+      await sbDelete('cart_items', { cart_id: `in.(${carts.map((c) => c.id).join(',')})` });
+    }
     for (const cart of carts) await sbDelete('carts', { id: `eq.${cart.id}` });
 
     // ไม่ระบุตัวตนบัญชี (คง order/wallet history เพื่อภาระกฎหมาย — ไม่ผูกตัวตนได้อีก)

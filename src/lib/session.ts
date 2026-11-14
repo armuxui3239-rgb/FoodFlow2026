@@ -43,6 +43,37 @@ export function sessionCookieOptions() {
   };
 }
 
+/** สร้างค่า header Set-Cookie ของ ft_session — ใช้ค่าจาก sessionCookieOptions() ครบทุก flag
+ *  (จุดเดียวของระบบ — ห้ามสร้าง string เองที่ route อื่น ไม่งั้น flag Secure หลุดบน production) */
+export function sessionCookieValue(token: string, maxAgeOverride?: number): string {
+  const opt = sessionCookieOptions();
+  const maxAge = maxAgeOverride ?? opt.maxAge;
+  const flags = [`Path=${opt.path}`, `Max-Age=${maxAge}`, 'HttpOnly', 'SameSite=Lax'];
+  if (opt.secure) flags.push('Secure');
+  return `${SESSION_COOKIE}=${token}; ${flags.join('; ')}`;
+}
+
+/** ล้าง ft_session — flag เดียวกันกับตอน set เสมอ */
+export function clearSessionCookieValue(): string {
+  const opt = sessionCookieOptions();
+  const flags = [`Path=${opt.path}`, 'Max-Age=0', 'HttpOnly', 'SameSite=Lax'];
+  if (opt.secure) flags.push('Secure');
+  return `${SESSION_COOKIE}=; ${flags.join('; ')}`;
+}
+
+/** สร้าง/ล้างค่า Set-Cookie ของ cookie อื่น (เช่น ft_pending) — ตาม options ที่ผู้เรียกส่ง + Secure บน production */
+export function namedCookieValue(name: string, token: string, opts: { path: string; maxAge: number }): string {
+  const flags = [`Path=${opts.path}`, `Max-Age=${opts.maxAge}`, 'HttpOnly', 'SameSite=Lax'];
+  if (process.env.NODE_ENV === 'production') flags.push('Secure');
+  return `${name}=${token}; ${flags.join('; ')}`;
+}
+
+export function clearNamedCookieValue(name: string, path = '/'): string {
+  const flags = [`Path=${path}`, 'Max-Age=0', 'HttpOnly', 'SameSite=Lax'];
+  if (process.env.NODE_ENV === 'production') flags.push('Secure');
+  return `${name}=; ${flags.join('; ')}`;
+}
+
 export function orderCode(): string {
   const d = new Date();
   const ymd = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
