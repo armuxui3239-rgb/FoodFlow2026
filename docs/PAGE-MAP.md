@@ -1,11 +1,11 @@
 # ผังหน้าใช้งานทั้งระบบ (Page Map) — ฟู๊ด ธันเดอร์ FoodFlow2026
 
 > หลักการ: ทุกหน้าต้อง "พร้อมใช้งานจริง" — ผูก API/ฐานข้อมูลจริง ไม่มีหน้าโชว์
-> อัปเดต 2026-11-14 (เฟส 5-8): นับจากไฟล์จริง `find src/app -name page.tsx` = **108 หน้า** + 124 API routes (เพิ่ม: อนุมัติเติมเงิน / อนุมัติรีเซ็ต PIN / เหตุผลยกเลิก)
+> อัปเดต 2026-11-14 (หมวด D ครบ): นับจากไฟล์จริง `find src/app -name page.tsx` = **109 หน้า** + 136 API routes (เพิ่มจาก 0.6.0: จัดการคืนเงิน / เวรพนักงาน / payout ไรเดอร์ / ท่อเหตุการณ์ outbox)
 > ยืนยันครบเทียบแม่แบบต้นทาง 122 จอ (web 70 + mobile 52) — ทุกจอมีของเทียบเท่า (บางจอรวมเป็นหน้าเดียว เช่น login รวมศูนย์, chat→messages, vouchers→offers, loyalty→points)
 > แหล่งอ้างอิง: `_template-ref/FoodDelivery_App` (โอเพนซอร์ส MIT)
 
-## สถานะ: ✅ พร้อมใช้แล้ว (ตรวจ curl 200 + API จริง + qa-all.sh 4 ชุด 99 จุดผ่าน) | 🔜 เฟส 9 ความปลอดภัยรอบเต็ม (ตามแผน)
+## สถานะ: ✅ พร้อมใช้แล้ว (curl 200 + API จริง + qa-all.sh 5 ชุด 120 จุดผ่าน + เฟส 9 ความปลอดภัยเสร็จ + หมวด D ครบ)
 
 ## เฟส 1 — ลูกค้า (Customer) 41 หน้า
 
@@ -67,13 +67,13 @@
 | ซัพพอร์ต: คิว + ตั๋ว (แชท/แมโคร/สถานะ) | /admin/support · /admin/support/[id] | ✅ |
 | ตั้งค่า: รวม · แบรนด์ · ข้อกำหนด/PDPA · การเชื่อมต่อ | /admin/settings · settings/branding · settings/compliance · settings/integrations | ✅ |
 | วิเคราะห์ + AI monitor | /admin/analytics · /admin/ai-monitor | ✅ |
+| จัดการคืนเงิน (ลูกค้าขอคืน → อนุมัติเงินเข้ากระเป๋า/ปฏิเสธ + audit) | /admin/refunds | ✅ (D1) |
 
-## 🔜 งานระบบถัดไป (ตาม REMAINING-WORK.md หมวด D — รอคำสั่งอนุมัติ)
+## ✅ หมวด D ตาม REMAINING-WORK.md — เสร็จครบ (2026-11-14)
 
-- D3 dispatch offers เสนองานอัตโนมัติ (dispatch_offers มีข้อมูล 70 แถว ยังไม่มีโค้ดใช้)
-- D1 ระบบคืนเงิน (payment_refund_requests รอ flow อนุมัติ)
-- D4 เวรพนักงาน (staff_shifts) · D5 จ่ายเงินไรเดอร์ (payout_ledger) · D6 เก็บเส้นทางขับ (driver_location_history) · D7 realtime event pipeline
-- D2 FCM push (รอ Firebase project) · D8 LiveKit (รอเซิร์ฟเวอร์)
+- **D1** ระบบคืนเงิน ✅ (commit 4701663) · **D3** dispatch เสนองานอัตโนมัติ ✅ (d556b3e) · **D4 เวรพนักงาน + D5 payout + D6 ประวัติพิกัด + D7 outbox** ✅ (4c8a8fd)
+- **D2 FCM** — ยกเลิกตามนโยบายจบในระบบ (แจ้งเตือนในแอป + realtime_outbox แทน) · **D8 LiveKit** — ใช้ WebRTC P2P ในระบบอยู่ (รอเซิร์ฟเวอร์เจ้าของเฉพาะกรณีจะเปิด)
+- เหลือนอกหมวด D: ระบบสะสมแต้มตอนสั่งซื้อ (ROADMAP P1) · ทดสอบโหลดบริการโอเพนซอร์ส (P2) — รอคำสั่ง
 
 ## กติกา
 

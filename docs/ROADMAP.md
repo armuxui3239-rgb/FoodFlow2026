@@ -32,10 +32,10 @@ P1 = ความครบถ้วนของวงจรธุรกิจ, P
 - ✅ Admin Portal ครบ 26 หน้า (orders/restaurants/drivers+KYC/users/promotions/reports/exports/logs/support/settings×4/analytics/ai-monitor + audit log ทุก mutation)
 - ✅ Restaurant Portal ครบ 20 หน้า (kanban/menu CRUD/หมวด/คูปอง/รีวิว+ตอบ/staff+เชิญ/analytics/insights/revenue/settings+profile)
 - ✅ Driver Portal ครบ 17 หน้า (onboarding 3 ขั้น/KYC/heatmap/tips/trip map/notifications/profile/support)
-- ⏳ dispatch_offers เสนองานอัตโนมัติ (ตารางมี 70 แถว — รอคำสั่งอนุมัติทำ D3)
-- ⏳ ระบบคืนเงิน (payment_refund_requests — รอคำสั่ง)
-- ~~FCM push~~ ยกเลิกตามนโยบายจบในระบบ — แจ้งเตือนในแอปแทน (เฟส 5) · ⏳ realtime_outbox (รอคำสั่ง)
-- ⏳ เปิด LiveKit เมื่อมีเซิร์ฟเวอร์ (flag ปิดอยู่ — ปัจจุบันใช้ WebRTC P2P ในระบบ) · ⏳ payout_ledger · ⏳ driver_location_history · ⏳ ทดสอบโหลดบริการโอเพนซอร์ส
+- ✅ dispatch_offers เสนองานอัตโนมัติ — D3 เสร็จ (d556b3e: เสนอทีละคนใกล้ GPS สุดก่อน TTL 120 วิ รับคนแรกชนะ + การ์ดข้อเสนอบนแดชบอร์ดไรเดอร์)
+- ✅ ระบบคืนเงิน — D1 เสร็จ (4701663: ลูกค้าขอคืน → แอดมินอนุมัติ → เงินเข้ากระเป๋าอัตโนมัติ + audit + กันขอซ้ำ)
+- ~~FCM push~~ ยกเลิกตามนโยบายจบในระบบ — แจ้งเตือนในแอปแทน · ✅ realtime_outbox — D7 เสร็จ (4c8a8fd: push ทุกเปลี่ยนสถานะ → drain broadcast ผ่าน Supabase Realtime)
+- ~~LiveKit~~ ใช้ WebRTC P2P ในระบบ (รอเซิร์ฟเวอร์เจ้าของเฉพาะกรณีจะเปิด) · ✅ payout_ledger — D5 เสร็จ (4c8a8fd) · ✅ driver_location_history — D6 เสร็จ (4c8a8fd) · ⏳ ทดสอบโหลดบริการโอเพนซอร์ส (รอคำสั่ง)
 
 ## เพิ่ม/เสร็จ 2026-11-14 (เฟส 5-8 ตาม UI-ALIGNMENT-PLAN)
 
@@ -49,6 +49,8 @@ P1 = ความครบถ้วนของวงจรธุรกิจ, P
 | ETA ค่าประมาณ (แจ้งสัจจะ) + remnant บริการบุคคลที่สามหมด (grep=0) | ✅ | d0cd8dd · third-party-replacement.md |
 | Seed ข้อ 8: เมนู ≥8/ร้าน (24 ร้าน) + กาฬสินธุ์/ขอนแก่น + เหตุผลยกเลิกจัดการได้ + กระเป๋าเงินตัวอย่าง + รหัสทดสอบออก README | ✅ | 95ebb6f · seed-phase7.mjs (idempotent 2 รอบ) |
 | เอกสารส่งมอบ: TRACEABILITY + third-party-replacement + qa-all.sh | ✅ | เฟส 8 (0.6.0) |
+| เฟส 9 ความปลอดภัยรอบเต็ม: RLS ทุกตาราง + rate limit 429 + cookie Secure + Origin check + PDPA + ลบบัญชีจริง | ✅ | 6268974 + b5a4c69 · Release v0.6.0 |
+| หมวด D ครบ: D3 dispatch + D1 คืนเงิน + D4 เวร + D5 payout + D6 ประวัติพิกัด + D7 outbox (D2 FCM/D8 LiveKit ยกเลิกตามนโยบาย) | ✅ | d556b3e + 4701663 + 4c8a8fd · E2E 120/120 · CHANGELOG 0.7.0 |
 
 ## กติกาการใช้ Roadmap
 

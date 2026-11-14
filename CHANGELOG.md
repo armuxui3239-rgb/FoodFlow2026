@@ -3,6 +3,24 @@
 รูปแบบตาม [Keep a Changelog](https://keepachangelog.com/th/1.1.0/)
 และกำหนดเวอร์ชันตาม [Semantic Versioning](https://semver.org/lang/th/)
 
+## [0.7.0] — 2026-11-14 (หมวด D ครบตาม REMAINING-WORK)
+
+### เพิ่ม (Added) — หมวด D ทั้งหมด
+- **D3 จัดส่งอัตโนมัติ (dispatch offers)**: ร้านกด "พร้อมส่ง" → ระบบเสนองานไล่ทีละคนให้ไรเดอร์ออนไลน์ (คนใกล้ GPS สุดก่อน, ข้อเสนออายุ 120 วิ) รับคนแรกชนะ · ตัดออเดอร์ที่มีข้อเสนอค้างออกจากกองงานสาธารณะ · การ์ดข้อเสนอบนแดชบอร์ดไรเดอร์ (นับถอยหลัง/ระยะทาง/รับ-ปฏิเสธ)
+- **D1 ระบบคืนเงิน**: ลูกค้าขอคืนในหน้าออเดอร์ (เฉพาะสถานะที่คืนได้ กันขอซ้ำ 409) → หน้าแอดมิน /admin/refunds อนุมัติ = เงินเข้ากระเป๋าอัตโนมัติ + payments/orders เปลี่ยนสถานะ + แจ้งเตือน + audit / ปฏิเสธ = หมายเหตุ + แจ้งเตือน
+- **D4 เวรพนักงาน (staff_shifts)**: เจ้าของร้านสร้าง/ดู/ปิดเวรพนักงาน — ส่วนใหม่ในหน้าพนักงานของร้าน
+- **D5 จ่ายเงินไรเดอร์ (payout_ledger)**: แอดมินบันทึกโอนรายได้ → ยืนยันเมื่อโอนจริง = settled (+audit, กันยืนยันซ้ำ 409, batch id เป็น uuid) · ไรเดอร์เห็นประวัติการจ่ายเงินของตัวเอง
+- **D6 ประวัติพิกัดไรเดอร์ (driver_location_history)**: บันทึกเส้นทางระหว่าง picked_up/delivering (PostGIS geography) — พิสูจน์แล้วด้วย GPS จริงระหว่างจัดส่ง
+- **D7 ท่อเหตุการณ์ (realtime_outbox)**: ทุกการเปลี่ยนสถานะ push เข้า outbox → drain ส่งทาง Supabase Realtime broadcast · แอดมินดูคิวค้าง/ระบายได้ (/api/admin/outbox)
+- **โลโก้จริงครบทุกจุดที่เหลือ**: login/intro/invite/messages/notifications/home (BrandLogo 12 ไฟล์)
+
+### ยกเลิก (ยืนยันจาก REMAINING-WORK)
+- ~~D2 FCM push~~ — แจ้งเตือนในแอป + realtime_outbox แทน ตามนโยบายจบในระบบ · ~~D8 LiveKit~~ — ใช้ WebRTC P2P ในระบบอยู่ (รอเซิร์ฟเวอร์เจ้าของเฉพาะกรณีจะเปิด)
+
+### ตรวจรับ (Verification)
+- E2E: dispatch 11/11 · refund 21/21 · d4d5d7 22/22 · qa-all.sh รวม 5 ชุด 120/120 · tsc 0 error · lint 0 error · grep บริการบุคคลที่สาม = 0
+- นับไฟล์จริง: 109 หน้า / 136 API routes
+
 ## [0.6.0] — 2026-11-14 (เฟส 5-8 ตาม UI-ALIGNMENT-PLAN)
 
 ### เพิ่ม (Added) — การเงินครบวงจร (v4 ข้อ 6)
@@ -43,10 +61,9 @@
 - **owner/settings เขียน field ผิด** (`opens_at`→`open_time`) — เคยทำเวลาเปิด-ปิดร้านโดนรีเซ็ตทุกครั้งที่บันทึก
 - login รองรับ `?next=` จริง (เดิมส่ง arg เกินแล้วถูกละเลิก) · support รายละเอียดออเดอร์ · attributionControl 2 จุด
 
-### วางแผนไว้ (รอคำสั่งอนุมัติ ตาม REMAINING-WORK.md หมวด D)
-- dispatch_offers เสนองานอัตโนมัติ (มีข้อมูล 70 แถว ยังไม่มีโค้ดใช้)
-- ระบบคืนเงิน · เวรพนักงาน · payout · เก็บเส้นทางขับ · realtime event pipeline
-- ความปลอดภัย (RLS/หมุน key — รอคำสั่ง) · ~~FCM~~/~~LiveKit~~ ยกเลิกตามนโยบายจบในระบบ (ดู OPEN-SOURCE-PLAN.md)
+### วางแผนไว้ ณ 0.6.0 → ทำครบแล้วใน [0.7.0]
+- dispatch_offers · ระบบคืนเงิน · เวรพนักงาน · payout · เก็บเส้นทางขับ · realtime event pipeline → เสร็จครบใน 0.7.0 (ด้านบน)
+- ความปลอดภัย RLS/rate limit/cookie/PDPA เสร็จในเฟส 9 · หมุน key รอเจ้าของ (docs/KEY-ROTATION.md) · ~~FCM~~/~~LiveKit~~ ยกเลิกตามนโยบายจบในระบบ (ดู OPEN-SOURCE-PLAN.md)
 
 ### รอเจ้าของโปรเจค 1 คลิก
 - รัน `deployments/sql/add_th_locale.sql` ใน SQL Editor (ALTER TYPE ทำผ่าน REST ไม่ได้) แล้วตั้งภาษาไทยให้ผู้ใช้ทุกคน
