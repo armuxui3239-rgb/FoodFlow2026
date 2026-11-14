@@ -3,6 +3,23 @@
 รูปแบบตาม [Keep a Changelog](https://keepachangelog.com/th/1.1.0/)
 และกำหนดเวอร์ชันตาม [Semantic Versioning](https://semver.org/lang/th/)
 
+## [0.7.4] — 2026-11-15 (ยืนยันรับมือ + จับบั๊กความปลอดภัยจริง 2 ตัว)
+
+### แก้ไข (Fixed) — บั๊กที่ซ่อนมาตลอด จับได้จากการยืนยันรับมือรอบ 1-4
+- **cookie Secure หลุดบน production มาตลอด**: routes สร้าง Set-Cookie string เองและลืม flag `Secure` (ค่าใน sessionCookieOptions ไม่เคยถูกใช้) → แก้ด้วยตัวช่วยกลาง `sessionCookieValue/clearSessionCookieValue/namedCookieValue/clearNamedCookieValue` แทนทั้ง 5 จุด (login / login-pin / logout / onboard-pin / otp-verify + cookie ft_pending) — ยืนยันแล้วว่า Secure ขึ้นจริงบน production
+- **ปุ่มลบบัญชี (PDPA) พัง 500 มาตลอด**: `cart_items` ไม่มีคอลัมน์ `user_id` (เชื่อมผ่าน `cart_id`) → ลบ items ผ่าน `cart_id in.(…)` ก่อนลบ carts — พิสูจน์ end-to-end จริงบน production (สมัคร → ลบ → anonymize → ล็อกอินไม่ได้อีก)
+- ข้อความล้าสมัย 2 จุด: แคตตาล็อก integrations + ปุ่มโทรยังอ้าง "รอเซิร์ฟเวอร์ LiveKit" ทั้งที่โทรใช้ได้แล้ว (WebRTC P2P)
+
+### เพิ่ม (Added) — เครื่องมือยืนยันรับมือ + เลขพร้อมเพย์จริง
+- `scripts/audit-security-proofs.mjs` — พิสูจน์ 3 กลไกบนระบบจริง: cookie Secure/HttpOnly/SameSite · rate limit 429 จริง · PDPA ลบบัญชีจริง (12 จุด, dev/prod เช็ก Secure แบบมีเงื่อนไข)
+- `scripts/audit-rls-anon.mjs` — ยิงด้วยคีย์คนแปลกหน้าทุกตาราง พิสูจน์ไม่รั่ว (64 ตาราง รั่ว 0)
+- `scripts/audit-db-truth.mjs` — ตรวจความจริงฐานข้อมูลรวมจุด (อ่านอย่างเดียว)
+- `scripts/seed-restaurant-banks.mjs` — บัญชีตั้งต้นให้ร้าน 24/24 (idempotent)
+- โลโก้ธนาคารจริง SVG 16 แห่ง (omise/banks-logo MIT) ทุกจอเลือกธนาคาร + บัญชีตั้งต้นให้ร้าน
+- `docs/BACKUP-RESTORE-TH.md` — คู่มือสำรองข้อมูล/กู้คืน (pg_dump รายสัปดาห์ + กู้คืน + จุดจำกัดแผนฟรี)
+- **เลขพร้อมเพย์จริง** ใส่ระบบแล้ว (Vercel sensitive — เลขไม่ลง repo) + พิสูจน์ QR จริง: ถอดรหัส QR บน production เลข/ประเภทบัตรประชาชน/ยอดถูกต้อง
+- schema.sql รีเจนจากฐานจริง (63 ตาราง — ครบ cancellation_reasons + บัญชีธนาคารร้าน)
+
 ## [0.7.3] — 2026-11-14 (บัญชีธนาคารรับรายได้ร้าน + โอนรายได้ร้าน + จุดแจ้งเตือนแดง)
 
 ### เพิ่ม (Added) — ปิดช่องว่างบทบาทร้านค้า (ที่เคยมีแต่ไรเดอร์)

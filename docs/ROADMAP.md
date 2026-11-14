@@ -51,6 +51,7 @@ P1 = ความครบถ้วนของวงจรธุรกิจ, P
 | เอกสารส่งมอบ: TRACEABILITY + third-party-replacement + qa-all.sh | ✅ | เฟส 8 (0.6.0) |
 | เฟส 9 ความปลอดภัยรอบเต็ม: RLS ทุกตาราง + rate limit 429 + cookie Secure + Origin check + PDPA + ลบบัญชีจริง | ✅ | 6268974 + b5a4c69 · Release v0.6.0 |
 | หมวด D ครบ: D3 dispatch + D1 คืนเงิน + D4 เวร + D5 payout + D6 ประวัติพิกัด + D7 outbox (D2 FCM/D8 LiveKit ยกเลิกตามนโยบาย) | ✅ | d556b3e + 4701663 + 4c8a8fd · E2E 120/120 · CHANGELOG 0.7.0 |
+| ยืนยันรับมือรอบ 1-4 (ตรวจโค้ด↔เอกสาร + ฐานจริง + RLS ยิงจริง + QA 135/135 dev+prod) — จับบั๊กจริง 2 ตัวแก้: cookie Secure prod + ลบบัญชี PDPA 500 | ✅ | de3eaca + 0c5b759 · audit-rls-anon + audit-security-proofs 12/12 (2026-11-15) |
 
 ## กติกาการใช้ Roadmap
 
