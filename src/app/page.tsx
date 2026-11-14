@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { Check, ChevronDown, Bird, Clock, Drumstick, Fish, Flame, MapPin, Pizza, Plus, Salad, Sandwich, Search, SlidersHorizontal, Soup, Sparkles, Star, Utensils, Zap } from 'lucide-react';
+import { Check, ChevronDown, Bird, Clock, Drumstick, Fish, Flame, MapPin, Pizza, Plus, Salad, Sandwich, Search, SlidersHorizontal, Soup, Sparkles, Star, Utensils } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 import type { LucideIcon } from 'lucide-react';
 // ไอคอนทั้งหมดมาจากไฟล์ SVG (lucide-react) ห้ามใช้อีโมจิ
 import { api, baht, useCart, useSession } from '@/lib/client';
@@ -152,12 +153,16 @@ export default function HomePage() {
     <div className="space-y-6">
       {/* 1) หัวทักทาย — ตาม FoodU: avatar + สวัสดี + ส่งถึง */}
       <header className="flex items-center gap-3 pt-1">
-        <span
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-xl text-[#FFC400]"
-          aria-hidden
-        >
-          {user ? firstName.slice(0, 1) : <Zap className="h-6 w-6" aria-hidden />}
-        </span>
+        {user ? (
+          <span
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-xl text-[#FFC400]"
+            aria-hidden
+          >
+            {firstName.slice(0, 1)}
+          </span>
+        ) : (
+          <BrandLogo className="h-12 w-12 shrink-0 rounded-full" />
+        )}
         <div className="min-w-0 flex-1">
           <h1 className="truncate-1 text-lg font-bold text-black">
             สวัสดี, {firstName}

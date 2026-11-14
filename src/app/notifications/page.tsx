@@ -10,9 +10,9 @@ import {
   Info,
   PackageCheck,
   Percent,
-  Zap,
 } from 'lucide-react';
 import { api, useSession } from '@/lib/client';
+import { BrandLogo } from '@/components/brand-logo';
 
 interface NotificationRow {
   id: string;
@@ -124,9 +124,7 @@ export default function NotificationsPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100">
-          <Zap className="h-9 w-9 text-[#FFC400]" aria-hidden />
-        </span>
+        <BrandLogo className="h-20 w-20 rounded-3xl shadow-sm" />
         <h1 className="text-lg font-bold text-black">เข้าสู่ระบบเพื่อดูการแจ้งเตือน</h1>
         <p className="text-sm text-neutral-400">ติดตามสถานะคำสั่งซื้อและโปรโมชันของคุณ</p>
         <Link href="/login?next=%2Fnotifications" className="btn-brand inline-flex h-12 items-center px-8 text-sm">

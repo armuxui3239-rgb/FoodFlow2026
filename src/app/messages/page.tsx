@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { CircleHelp, Headset, MessageCirclePlus, Zap } from 'lucide-react';
+import { CircleHelp, Headset, MessageCirclePlus } from 'lucide-react';
 import { api, useSession } from '@/lib/client';
+import { BrandLogo } from '@/components/brand-logo';
 
 interface ChatSessionItem {
   id: string;
@@ -87,9 +88,7 @@ export default function MessagesPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100">
-          <Zap className="h-9 w-9 text-[#FFC400]" aria-hidden />
-        </span>
+        <BrandLogo className="h-20 w-20 rounded-3xl shadow-sm" />
         <h1 className="text-lg font-bold text-black">เข้าสู่ระบบเพื่อดูข้อความ</h1>
         <p className="text-sm text-neutral-400">ติดต่อฝ่ายบริการลูกค้าได้หลังเข้าสู่ระบบ</p>
         <Link href="/login?next=%2Fmessages" className="btn-brand inline-flex h-12 items-center px-8 text-sm">

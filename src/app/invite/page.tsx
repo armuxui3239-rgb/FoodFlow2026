@@ -11,9 +11,9 @@ import {
   MessageCircle,
   Send,
   Users,
-  Zap,
 } from 'lucide-react';
 import { api, useSession } from '@/lib/client';
+import { BrandLogo } from '@/components/brand-logo';
 
 interface ReferralData {
   code: string;
@@ -110,9 +110,7 @@ export default function InvitePage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100">
-          <Zap className="h-9 w-9 text-[#FFC400]" aria-hidden />
-        </span>
+        <BrandLogo className="h-20 w-20 rounded-3xl shadow-sm" />
         <h1 className="text-lg font-bold text-black">เข้าสู่ระบบเพื่อรับโค้ดเชิญ</h1>
         <p className="text-sm text-neutral-400">เชิญเพื่อนมาสั่งอาหารและรับส่วนลดไปด้วยกัน</p>
         <Link href="/login?next=%2Finvite" className="btn-brand inline-flex h-12 items-center px-8 text-sm">

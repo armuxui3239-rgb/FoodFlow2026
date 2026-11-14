@@ -3,7 +3,8 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Zap, Smartphone, KeyRound, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Smartphone, KeyRound, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 
 function LoginForm() {
   const router = useRouter();
@@ -72,9 +73,7 @@ function LoginForm() {
     <div className="flex min-h-screen flex-col bg-white">
       <main className="flex flex-1 flex-col items-center justify-center px-5 py-10">
         <div className="mb-8 flex flex-col items-center gap-2">
-          <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-brand">
-            <Zap className="h-8 w-8 text-black" aria-hidden />
-          </span>
+          <BrandLogo className="h-16 w-16 rounded-3xl" />
           <h1 className="text-2xl font-bold text-ink">ฟู๊ด ธันเดอร์</h1>
           <p className="text-sm text-ink-soft">สั่งอาหาร ส่งไว ถึงบ้าน</p>
         </div>

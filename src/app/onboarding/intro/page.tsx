@@ -2,7 +2,8 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Zap } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 
 /**
  * หน้าแนะนำก่อนเข้าแอป (Intro Onboarding) — ภาพถ่ายจริงเต็มจอ
@@ -106,7 +107,7 @@ export default function IntroPage() {
           className="pointer-events-auto flex h-10 items-center gap-1.5 rounded-full bg-black/55 px-3.5 backdrop-blur-sm"
           aria-label="ฟู๊ด ธันเดอร์"
         >
-          <Zap className="h-4 w-4 fill-[#FFC400] text-[#FFC400]" aria-hidden />
+          <BrandLogo className="h-6 w-6 rounded-md" />
           <span className="text-sm font-bold text-[#FFC400]">ฟู๊ด ธันเดอร์</span>
         </span>
         <button
