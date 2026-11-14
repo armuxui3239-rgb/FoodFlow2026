@@ -2,25 +2,33 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
-  Bike,
-  History as HistoryIcon,
-  MapPin,
-  Navigation,
-  LogOut,
-  Power,
-  RefreshCw,
-  Star,
-  Wallet,
-  PackageCheck,
-  Landmark,
-  ShieldCheck,
+  Bell,
+  ChevronRight,
+  Flame,
   Gift,
   HeartHandshake,
+  Landmark,
+  LifeBuoy,
+  MapPin,
+  Navigation,
+  Phone,
+  PhoneIncoming,
+  PhoneOff,
+  Power,
+  RefreshCw,
   Settings,
+  ShieldCheck,
+  Star,
+  UserRound,
+  Wallet,
+  PackageCheck,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { api, baht, STATUS_TH } from '@/lib/client';
+import { sendRejectedToRoom, useIncomingRing } from '@/lib/calls';
+import { DriverFooter, DriverHeader } from '@/components/portal/driver-header';
 
 interface DriverMe {
   driver: {
@@ -53,6 +61,7 @@ const NEXT_ACTION: Record<string, { action: string; label: string }> = {
 };
 
 export default function DriverPortalPage() {
+  const router = useRouter();
   const [me, setMe] = useState<DriverMe | null>(null);
   const [available, setAvailable] = useState<Task[]>([]);
   const [mine, setMine] = useState<Task[]>([]);
@@ -60,6 +69,7 @@ export default function DriverPortalPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [tick, setTick] = useState(0);
+  const [lastGpsAt, setLastGpsAt] = useState<number | null>(null);
 
   const load = useCallback(() => {
     Promise.all([
@@ -112,55 +122,49 @@ export default function DriverPortalPage() {
 
   const online = me?.driver.is_online ?? false;
 
+  // กริ่งสายเรียกเข้า (ระบบโทรจบในระบบ) — ฟังช่อง ring ส่วนตัวเสมอ รับ/ปฏิเสธได้จากพอร์ทัลไรเดอร์
+  const incomingCall = useIncomingRing(true);
+
+  const acceptCall = () => {
+    if (!incomingCall) return;
+    router.push(`/calls/${encodeURIComponent(incomingCall.room)}?order=${encodeURIComponent(incomingCall.orderId)}`);
+  };
+
+  const rejectCall = () => {
+    if (!incomingCall) return;
+    void sendRejectedToRoom(incomingCall.room); // แจ้งห้องโทรให้ผู้ฝั่งโทรเห็นว่าถูกปฏิเสธ
+  };
+
+  // ส่งพิกัด GPS ทุก 15 วินาทีขณะเปิดรับงาน — หยุดเมื่อปิดรับงาน และพักเมื่อหน้าถูกซ่อน
+  useEffect(() => {
+    if (!online) return;
+    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
+      console.warn('เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง');
+      return;
+    }
+    const send = () => {
+      if (document.visibilityState === 'hidden') return;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          api('/api/driver/location', {
+            method: 'PATCH',
+            body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          })
+            .then(() => setLastGpsAt(Date.now()))
+            .catch((e) => console.warn('ส่งพิกัดไม่สำเร็จ:', e));
+        },
+        (err) => console.warn('อ่านพิกัดไม่สำเร็จ:', err.message),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 20000 },
+      );
+    };
+    send();
+    const t = setInterval(send, 15000);
+    return () => clearInterval(t);
+  }, [online]);
+
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#FFC400] text-black">
-              <Bike className="h-5 w-5" aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate-1 text-sm font-bold text-black">{me?.fullName ?? 'พอร์ทัลไรเดอร์'}</p>
-              <p className="text-[11px] text-neutral-400">
-                {me?.driver.vehicle_type === 'motorbike' ? 'มอเตอร์ไซค์' : me?.driver.vehicle_type ?? ''} · {me?.driver.vehicle_plate}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Link
-              href="/driver/earnings"
-              className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
-            >
-              <Wallet className="h-4 w-4" aria-hidden /> รายได้
-            </Link>
-            <Link
-              href="/driver/history"
-              aria-label="ประวัติงาน"
-              className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
-            >
-              <HistoryIcon className="h-4 w-4" aria-hidden /> ประวัติ
-            </Link>
-            <button
-              onClick={() => void load()}
-              aria-label="รีเฟรช"
-              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-neutral-100"
-            >
-              <RefreshCw className={`h-5 w-5 text-neutral-500 ${loading ? 'animate-spin' : ''}`} aria-hidden />
-            </button>
-            <button
-              onClick={() => {
-                api('/api/auth/logout', { method: 'POST' }).catch(() => {});
-                window.location.href = '/login';
-              }}
-              aria-label="ออกจากระบบ"
-              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-neutral-100"
-            >
-              <LogOut className="h-5 w-5 text-neutral-500" aria-hidden />
-            </button>
-          </div>
-        </div>
-      </header>
+      <DriverHeader />
 
       <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">
         {error && (
@@ -168,6 +172,16 @@ export default function DriverPortalPage() {
             {error}
           </p>
         )}
+
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-lg font-bold text-black">งานของฉัน</h1>
+          <button
+            onClick={() => void load()}
+            className="flex items-center gap-1.5 rounded-full border border-line px-3 py-2 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden /> รีเฟรช
+          </button>
+        </div>
 
         {/* สวิตช์เปิดรับงาน */}
         <section aria-label="สถานะรับงาน" className={`flex items-center justify-between rounded-3xl border p-5 ${online ? 'border-[#FFC400] bg-[#FFF4CC]' : 'border-line bg-white'}`}>
@@ -178,6 +192,12 @@ export default function DriverPortalPage() {
             <div>
               <p className="text-sm font-bold text-black">{online ? 'เปิดรับงาน' : 'ปิดรับงาน'}</p>
               <p className="text-xs text-neutral-500">{online ? 'งานใหม่จะเข้าที่นี่เมื่อร้านพร้อมส่ง' : 'เปิดสวิตช์เพื่อเริ่มรับงาน'}</p>
+              {lastGpsAt !== null && (
+                <p className="mt-0.5 text-[11px] text-neutral-400">
+                  พิกัด: ส่งล่าสุด{' '}
+                  {new Date(lastGpsAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              )}
             </div>
           </div>
           <Switch
@@ -208,6 +228,10 @@ export default function DriverPortalPage() {
           <h2 className="mb-2 text-sm font-bold text-black">เมนูของฉัน</h2>
           <div className="grid grid-cols-3 gap-3">
             {[
+              { href: '/driver/heatmap', label: 'แผนที่ความต้องการ', Icon: Flame },
+              { href: '/driver/notifications', label: 'แจ้งเตือน', Icon: Bell },
+              { href: '/driver/profile', label: 'โปรไฟล์', Icon: UserRound },
+              { href: '/driver/support', label: 'ช่วยเหลือ', Icon: LifeBuoy },
               { href: '/driver/bank', label: 'บัญชีธนาคาร', Icon: Landmark },
               { href: '/driver/kyc', label: 'ยืนยันตัวตน', Icon: ShieldCheck },
               { href: '/driver/ratings', label: 'คะแนน', Icon: Star },
@@ -266,9 +290,45 @@ export default function DriverPortalPage() {
         </section>
       </main>
 
-      <footer className="mt-auto border-t border-line bg-white pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 text-center text-xs text-neutral-400">
-        © {new Date().getFullYear()} ฟู๊ด ธันเดอร์ — พอร์ทัลไรเดอร์
-      </footer>
+      {/* สายเรียกเข้า — โมดัลกริ่งจากช่อง ring ส่วนตัว (auto หายไปเองใน 60 วิ) */}
+      {incomingCall && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="สายเรียกเข้า"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        >
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-xl">
+            <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#FFF4CC]" aria-hidden>
+              <PhoneIncoming className="h-8 w-8 animate-bounce text-black" />
+            </span>
+            <p className="mt-3 text-base font-bold text-black">สายเรียกเข้า</p>
+            <p className="mt-1 text-sm text-ink-soft">
+              สายเรียกเข้าจาก {incomingCall.fromName} เรื่องออเดอร์ #{incomingCall.orderCode}
+            </p>
+            <div className="mt-5 flex gap-2">
+              <button
+                type="button"
+                onClick={rejectCall}
+                aria-label="ปฏิเสธสาย"
+                className="flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 transition-colors hover:bg-red-50"
+              >
+                <PhoneOff className="h-4 w-4" aria-hidden /> ปฏิเสธ
+              </button>
+              <button
+                type="button"
+                onClick={acceptCall}
+                aria-label="รับสาย"
+                className="flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-brand text-sm font-bold text-black transition hover:bg-brand-strong"
+              >
+                <Phone className="h-4 w-4" aria-hidden /> รับสาย
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <DriverFooter />
     </div>
   );
 }
@@ -279,10 +339,17 @@ function TaskCard({ task, busy, onAct }: { task: Task; busy: boolean; onAct: (id
   return (
     <li className={`rounded-3xl border bg-white p-4 shadow-sm ${isAvailableTask ? 'border-[#FFC400]' : 'border-line'}`}>
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-bold text-black">#{task.order_code}</span>
-        <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${isAvailableTask ? 'bg-[#FFC400] text-black' : 'bg-neutral-100 text-neutral-700'}`}>
-          {STATUS_TH[task.status] ?? task.status}
-        </span>
+        <Link
+          href={`/driver/trips/${task.id}`}
+          className="flex min-w-0 items-center gap-2 transition-opacity hover:opacity-70"
+          aria-label={`ดูรายละเอียดงาน #${task.order_code}`}
+        >
+          <span className="text-sm font-bold text-black">#{task.order_code}</span>
+          <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${isAvailableTask ? 'bg-[#FFC400] text-black' : 'bg-neutral-100 text-neutral-700'}`}>
+            {STATUS_TH[task.status] ?? task.status}
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-neutral-400" aria-hidden />
+        </Link>
       </div>
       <div className="mt-2 space-y-1.5 text-sm">
         <p className="flex items-start gap-2 text-neutral-700">

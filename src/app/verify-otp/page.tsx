@@ -9,7 +9,7 @@ interface OtpFlow {
   otpId: string;
   phone: string;
   phoneMasked: string;
-  deliveryChannel?: 'dev_console' | 'sms_gateway_selfhosted';
+  deliveryChannel?: 'dev_console' | 'internal_code' | 'sms_gateway_selfhosted';
   devCode?: string;
   purpose: 'register' | 'reset_pin';
   resendInSec: number;
@@ -140,8 +140,8 @@ export default function VerifyOtpPage() {
         </p>
       </div>
 
-      {/* แจ้งช่องทางที่รับรหัสจริง — dev_console แสดงโค้ด, SMS ให้ดูข้อความในเครื่อง */}
-      {flow.deliveryChannel === 'dev_console' && flow.devCode ? (
+      {/* แจ้งช่องทางรับรหัส — internal_code แสดงรหัสในระบบทันที (นโยบายจบในระบบ ไม่มีการส่ง SMS) */}
+      {(flow.deliveryChannel === 'dev_console' || flow.deliveryChannel === 'internal_code') && flow.devCode ? (
         <button
           type="button"
           onClick={() => {
@@ -152,16 +152,16 @@ export default function VerifyOtpPage() {
         >
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            โหมดพัฒนา — รหัสยืนยัน:{' '}
+            รหัสยืนยันภายในระบบของคุณ:{' '}
             <span className="font-bold tracking-[0.3em]">{flow.devCode}</span>
-            <span className="block text-xs text-ink-soft">กดเพื่อกรอกโค้ดอัตโนมัติ</span>
+            <span className="block text-xs text-ink-soft">กดเพื่อกรอกโค้ดอัตโนมัติ (ระบบไม่ส่ง SMS — แสดงในแอปเท่านั้น)</span>
           </span>
         </button>
       ) : (
         <div className="mb-5 flex items-start gap-2 rounded-2xl bg-[#FFF4CC] px-4 py-3 text-sm text-ink">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            ระบบส่ง SMS รหัส 6 หลักถึงเบอร์นี้แล้ว — กรอกตามข้อความที่ได้รับ (หมดอายุ 5 นาที)
+            ระบบสร้างรหัสยืนยัน 6 หลักแล้ว — กรอกรหัสที่ได้รับ (หมดอายุ 5 นาที)
           </span>
         </div>
       )}

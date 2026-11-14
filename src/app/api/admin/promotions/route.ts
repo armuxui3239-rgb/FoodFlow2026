@@ -54,11 +54,12 @@ export async function POST(req: NextRequest) {
   if (exists) return jsonError('มีโค้ดนี้ในระบบแล้ว', 409);
 
   // ตาราง promotions บังคับคอลัมน์ครบ — เติมค่าเริ่มต้นทุกช่องที่จำเป็น
+  // value: fixed เก็บหน่วยสตางค์ (บาท × 100), percentage เก็บจำนวนเต็ม 1-100
   const [created] = await sbInsert<{ id: string; code: string }>('promotions', {
     code: b.code.toUpperCase(),
     name: b.name?.trim() || `โปรโมชั่น ${b.code.toUpperCase()}`,
     type: b.type,
-    value: b.value,
+    value: b.type === 'fixed' ? Math.round(b.value * 100) : Math.round(b.value),
     min_order_amount: Math.round((b.minOrderBaht ?? 0) * 100),
     ...(b.maxDiscountBaht ? { max_discount: Math.round(b.maxDiscountBaht * 100) } : {}),
     usage_limit: b.usageLimit ?? 500,

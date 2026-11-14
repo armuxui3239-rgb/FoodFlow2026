@@ -1,19 +1,16 @@
 'use client';
 
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Bike,
   ClipboardList,
-  LogOut,
   RefreshCw,
   Star,
   Store,
   Users,
-  Wallet,
-  Zap,
 } from 'lucide-react';
-import { api, baht, STATUS_TH, useSession } from '@/lib/client';
+import { api, baht, STATUS_TH } from '@/lib/client';
+import { AdminFooter, AdminHeader } from '@/components/portal/admin-header';
 
 interface Stats {
   users: { total: number; byRole: Record<string, number>; active: number };
@@ -47,7 +44,6 @@ interface AdminRestaurant {
 
 /** หน้าผู้ดูแลระบบ — ภาพรวมทั้งระบบแบบเรียลไทม์ (ดึงใหม่ทุก 20 วินาที) */
 export default function AdminPortalPage() {
-  const { user, logout } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([]);
@@ -80,54 +76,20 @@ export default function AdminPortalPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-black text-[#FFC400]">
-              <Zap className="h-5 w-5" aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-black">ศูนย์ควบคุมผู้ดูแลระบบ</p>
-              <p className="truncate-1 text-[11px] text-neutral-400">{user?.fullName ?? ''}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Link
-              href="/admin/users"
-              className="flex h-10 items-center rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
-            >
-              ผู้ใช้
-            </Link>
-            <Link
-              href="/admin/promotions"
-              className="flex h-10 items-center rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
-            >
-              คูปอง
-            </Link>
-            <Link
-              href="/admin/approvals"
-              className="flex h-10 items-center rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
-            >
-              อนุมัติร้าน
-            </Link>
-            <button
-              onClick={() => { setLoading(true); setTick((x) => x + 1); }}
-              className="flex h-10 items-center gap-1.5 rounded-full border border-line px-3 text-xs font-semibold text-neutral-600 hover:bg-neutral-50"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden /> รีเฟรช
-            </button>
-            <button
-              onClick={() => void logout()}
-              aria-label="ออกจากระบบ"
-              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-neutral-100"
-            >
-              <LogOut className="h-5 w-5 text-neutral-500" aria-hidden />
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader />
 
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-5">
+        {/* หัวข้อหน้า + ปุ่มรีเฟรช */}
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-lg font-bold text-black">ภาพรวมทั้งระบบ</h1>
+          <button
+            onClick={() => { setLoading(true); setTick((x) => x + 1); }}
+            className="flex items-center gap-1.5 rounded-full border border-line px-3 py-2 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden /> รีเฟรช
+          </button>
+        </div>
+
         {error && (
           <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
@@ -226,9 +188,7 @@ export default function AdminPortalPage() {
         </section>
       </main>
 
-      <footer className="mt-auto border-t border-line bg-white pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 text-center text-xs text-neutral-400">
-        © {new Date().getFullYear()} ฟู๊ด ธันเดอร์ — ศูนย์ควบคุมผู้ดูแลระบบ
-      </footer>
+      <AdminFooter />
     </div>
   );
 }

@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
       otpId: otp.id,
       phoneMasked: maskPhone(phone),
       deliveryChannel: delivery.channel,
-      // devCode มีเฉพาะ dev_console เท่านั้น — production ไม่มีค่านี้
+      // devCode มีเฉพาะช่องทางที่แสดงรหัสในระบบ (dev_console / internal_code — นโยบายจบในระบบ ไม่ส่ง SMS)
       devCode: sent.devCode,
       expiresInSec: OTP_TTL_SEC,
       resendInSec: RESEND_COOLDOWN_SEC,

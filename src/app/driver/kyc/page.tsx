@@ -95,6 +95,13 @@ export default function DriverKycPage() {
       </header>
 
       <main className="mx-auto w-full max-w-5xl flex-1 space-y-4 px-4 py-5">
+        <Link
+          href="/driver/onboarding/agreement"
+          className="block rounded-2xl bg-neutral-50 px-3 py-2.5 text-xs text-neutral-500 transition hover:bg-neutral-100"
+          data-testid="kyc-onboarding-link"
+        >
+          ขั้นตอนสมัคร: <span className="font-bold text-black">ข้อตกลง</span> → ยานพาหนะ → เอกสาร
+        </Link>
         {error && <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
 
         {loading ? (

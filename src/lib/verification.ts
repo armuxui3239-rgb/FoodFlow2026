@@ -10,7 +10,7 @@ import 'server-only';
  * จำกัดการส่งซ้ำ 55 วินาที — ตรวจใน route (otp/send, otp/verify)
  */
 
-export type DeliveryChannel = 'dev_console' | 'sms_gateway_selfhosted';
+export type DeliveryChannel = 'dev_console' | 'internal_code' | 'sms_gateway_selfhosted';
 
 export interface OtpDeliveryResult {
   ok: boolean;
@@ -37,6 +37,18 @@ export const devConsoleDelivery: VerificationDelivery = {
   channel: 'dev_console',
   async sendOtp(phone, code, purpose) {
     console.info(`[dev_console] OTP ${purpose} → ${phone}: ${code}`);
+    return { ok: true, devCode: code };
+  },
+};
+
+/**
+ * รหัสยืนยันภายในระบบ — นโยบายเจ้าของโปรเจค 2026-11-14: ไม่มีการส่ง SMS ออกภายนอกเลย
+ * รหัสคืนให้เฉพาะ session ผู้ขอ (ผู้ใช้เห็นในหน้า verify-otp ของแอป) — flow ตรวจ/กันละเมิดเหมือนเดิมทุกอย่าง
+ */
+export const internalCodeDelivery: VerificationDelivery = {
+  channel: 'internal_code',
+  async sendOtp(phone, code, purpose) {
+    console.info(`[internal_code] OTP ${purpose} → ${phone}: ${code} (แสดงในระบบเท่านั้น — ไม่มีการส่งออก)`);
     return { ok: true, devCode: code };
   },
 };
@@ -77,18 +89,19 @@ export const smsGatewaySelfHostedDelivery: VerificationDelivery = {
   },
 };
 
-/** เลือกช่องทางจาก env — production ห้ามใช้ dev_console เด็ดขาด */
+/** เลือกช่องทางจาก env — ค่าเริ่มต้น internal_code (นโยบายจบในระบบ); dev_console ห้ามใน production */
 export function getVerificationDelivery(): VerificationDelivery {
-  const channel = (process.env.VERIFICATION_DELIVERY ?? 'dev_console') as DeliveryChannel;
+  const channel = (process.env.VERIFICATION_DELIVERY ?? 'internal_code') as DeliveryChannel;
   const isProd = process.env.NODE_ENV === 'production';
+  if (channel === 'internal_code') return internalCodeDelivery;
   if (channel === 'sms_gateway_selfhosted') return smsGatewaySelfHostedDelivery;
   if (isProd) {
-    throw new Error('production ห้ามใช้ VERIFICATION_DELIVERY=dev_console — ตั้งเป็น sms_gateway_selfhosted พร้อม SMS_GATE_* ก่อน');
+    throw new Error('production ห้ามใช้ VERIFICATION_DELIVERY=dev_console — ตั้งเป็น internal_code (ค่าเริ่มต้น) หรือ sms_gateway_selfhosted');
   }
   return devConsoleDelivery;
 }
 
 export function getDeliveryChannel(): DeliveryChannel {
-  const channel = (process.env.VERIFICATION_DELIVERY ?? 'dev_console') as DeliveryChannel;
-  return channel === 'sms_gateway_selfhosted' ? 'sms_gateway_selfhosted' : 'dev_console';
+  const channel = (process.env.VERIFICATION_DELIVERY ?? 'internal_code') as DeliveryChannel;
+  return channel === 'sms_gateway_selfhosted' ? 'sms_gateway_selfhosted' : channel === 'dev_console' ? 'dev_console' : 'internal_code';
 }

@@ -38,11 +38,16 @@ export default function LocationSetupPage() {
       } catch (e) {
         console.error('[ft-map] set WORKER_URL failed', e);
       }
+      // โหมดปิดสนิทในระบบ: PMTiles จาก Supabase Storage เมื่อตั้งค่า — ปกติใช้ proxy ของเรา
+      const { PMTILES_ENABLED, buildPmtilesStyle, ensurePmtilesProtocol } = await import('@/lib/map-pmtiles');
+      const pmtilesActive = await ensurePmtilesProtocol();
       // style ผ่าน proxy ของเรา (แคชแผ่นที่ในเครื่อง + User-Agent) — เปลี่ยนต้นทางที่ env เดียว
-      const styleUrl = new URL('/api/map/style', window.location.origin).toString();
+      const style = pmtilesActive
+        ? buildPmtilesStyle()
+        : new URL('/api/map/style', window.location.origin).toString();
       const map = new maplibregl.Map({
         container: mapDiv.current,
-        style: styleUrl,
+        style,
         center: [BANGKOK.lng, BANGKOK.lat],
         zoom: 14,
       });

@@ -62,7 +62,8 @@ export default function AdminPromotionsPage() {
           code: form.code.trim().toUpperCase(),
           name: form.name,
           type: form.type,
-          value: Number(form.value),
+          // fixed เก็บหน่วยสตางค์ (บาท × 100), percentage เก็บจำนวนเต็ม
+          value: form.type === 'fixed' ? Math.round(Number(form.value) * 100) : Math.round(Number(form.value)),
           minOrderBaht: Number(form.minOrderBaht) || 0,
           ...(form.maxDiscountBaht ? { maxDiscountBaht: Number(form.maxDiscountBaht) } : {}),
         }),

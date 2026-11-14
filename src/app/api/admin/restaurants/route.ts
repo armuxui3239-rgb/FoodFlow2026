@@ -3,10 +3,27 @@ import { requireRole } from '@/lib/portal';
 import { sbList } from '@/lib/supabase';
 import { jsonError } from '@/lib/api-user';
 
-/** GET /api/admin/restaurants — ร้านทั้งหมด + เจ้าของ + สถานะ */
-export async function GET(_req: NextRequest) {
+/**
+ * GET /api/admin/restaurants — ร้านทั้งหมด + เจ้าของ + สถานะ
+ * ตัวกรอง (ไม่ใส่ = คืนรูปแบบเดิมทั้งหมด):
+ *  - q=ค้นหาชื่อร้าน (ไม่สนตัวพิมพ์)
+ *  - status=approved|pending|rejected|suspended (approval_status)
+ */
+export async function GET(req: NextRequest) {
   const user = await requireRole('admin');
   if (!user) return jsonError('เฉพาะผู้ดูแลระบบเท่านั้น', 403);
+
+  const sp = req.nextUrl.searchParams;
+  const q = sp.get('q')?.trim() ?? '';
+  const status = sp.get('status')?.trim() ?? '';
+
+  const params: Record<string, string> = {
+    select: 'id,name,slug,is_open,is_active,approval_status,rating,total_reviews,logo_url,city',
+    order: 'name.asc',
+    limit: '200',
+  };
+  if (status) params.approval_status = `eq.${status}`;
+  if (q) params.name = `ilike.*${q}*`;
 
   const restaurants = await sbList<{
     id: string;
@@ -17,11 +34,9 @@ export async function GET(_req: NextRequest) {
     approval_status: string;
     rating: number | null;
     total_reviews: number | null;
-  }>('restaurants', {
-    select: 'id,name,slug,is_open,is_active,approval_status,rating,total_reviews',
-    order: 'name.asc',
-    limit: '200',
-  });
+    logo_url: string | null;
+    city: string | null;
+  }>('restaurants', params);
 
   const rstIds = restaurants.map((r) => r.id);
   const profiles = rstIds.length

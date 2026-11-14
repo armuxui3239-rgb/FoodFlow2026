@@ -79,6 +79,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       distanceKm: task.delivery_distance_km,
     },
     order: {
+      id: order.id,
       code: order.order_code,
       status: order.status,
       deliveryFeeSatang: Number(order.delivery_fee),

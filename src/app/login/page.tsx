@@ -40,7 +40,7 @@ function LoginForm() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? 'เข้าสู่ระบบไม่สำเร็จ');
-      router.push(roleHome(body.user?.role, next));
+      router.push(next || roleHome(body.user?.role));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ');
@@ -60,7 +60,7 @@ function LoginForm() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? 'เข้าสู่ระบบไม่สำเร็จ');
-      router.push(roleHome(body.user?.role, next));
+      router.push(next || roleHome(body.user?.role));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ');

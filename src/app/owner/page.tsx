@@ -1,23 +1,18 @@
 'use client';
 
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import {
   BadgeCheck,
   ChefHat,
   ClipboardList,
   Clock,
-  LogOut,
   Package,
   Phone,
   RefreshCw,
-  Settings as SettingsIcon,
-  Store,
-  TrendingUp,
-  Utensils,
   Wallet,
 } from 'lucide-react';
-import { api, baht, STATUS_TH, useSession } from '@/lib/client';
+import { api, baht, STATUS_TH } from '@/lib/client';
+import { OwnerFooter, OwnerHeader } from '@/components/portal/owner-header';
 
 interface OwnerMe {
   restaurant: { id: string; name: string; isOpen: boolean };
@@ -49,7 +44,6 @@ const NEXT_ACTION: Record<string, { action: string; label: string }> = {
 };
 
 export default function OwnerPortalPage() {
-  const { user, logout } = useSession();
   const [me, setMe] = useState<OwnerMe | null>(null);
   const [orders, setOrders] = useState<OwnerOrder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,48 +90,7 @@ export default function OwnerPortalPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#FFC400] text-black">
-              <Store className="h-5 w-5" aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate-1 text-sm font-bold text-black">{me?.restaurant.name ?? 'พอร์ทัลร้านค้า'}</p>
-              <p className="text-[11px] text-neutral-400">มุมมองเจ้าของร้าน{user ? ` · ${user.fullName}` : ''}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Link
-              href="/owner/stats"
-              className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
-            >
-              <TrendingUp className="h-4 w-4" aria-hidden /> สถิติ
-            </Link>
-            <Link
-              href="/owner/settings"
-              aria-label="ตั้งค่าร้าน"
-              className="flex h-10 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
-            >
-              <SettingsIcon className="h-4 w-4" aria-hidden /> ตั้งค่าร้าน
-            </Link>
-            <Link
-              href="/owner/menu"
-              aria-label="จัดการเมนู"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFF4CC] transition-colors hover:bg-[#FFC400]"
-            >
-              <Utensils className="h-4 w-4 text-black" aria-hidden />
-            </Link>
-            <button
-              onClick={() => void logout()}
-              aria-label="ออกจากระบบ"
-              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-neutral-100"
-            >
-              <LogOut className="h-5 w-5 text-neutral-500" aria-hidden />
-            </button>
-          </div>
-        </div>
-      </header>
+      <OwnerHeader />
 
       <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">
         {error && (
@@ -216,9 +169,7 @@ export default function OwnerPortalPage() {
         )}
       </main>
 
-      <footer className="mt-auto border-t border-line bg-white pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 text-center text-xs text-neutral-400">
-        © {new Date().getFullYear()} ฟู๊ด ธันเดอร์ — พอร์ทัลร้านค้า
-      </footer>
+      <OwnerFooter />
     </div>
   );
 }

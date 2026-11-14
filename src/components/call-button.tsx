@@ -1,28 +1,38 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Phone, PhoneOff } from 'lucide-react';
 import { api } from '@/lib/client';
 
 /**
- * ปุ่มโทรเสียง/วิดีโอ — ตามแพตช์ v3.1 ข้อ 6
- * ฟีเจอร์นี้ต้องมีเซิร์ฟเวอร์ LiveKit + coturn (UDP + TLS) ซึ่ง Vercel/Railway ให้ไม่ได้
- * จึงปิดด้วย feature flag และแสดงสถานะ "ยังไม่เปิดใช้งาน" อย่างชัดเจนเสมอ
- * ห้ามอวดอ้างว่าใช้งานได้จนกว่าจะทดสอบจริงบนเซิร์ฟเวอร์
+ * ปุ่มโทรเสียง/วิดีโอ — ระบบโทรจบในระบบ (in-system call)
+ * สื่อวิ่ง P2P ผ่าน WebRTC ของเบราว์เซอร์ (ไม่มีเซิร์ฟเวอร์สื่อภายนอก)
+ * สัญญาณใช้ Supabase Broadcast บนช่องคาดเดาไม่ได้ที่ /api/calls/token แจกให้ผู้ร่วมออเดอร์เท่านั้น
+ * ปิดด้วย feature flag NEXT_PUBLIC_CALLS_ENABLED — ปิดอยู่จะแสดงสถานะ "ยังไม่เปิดใช้งาน" เสมอ
  */
 const CALLS_ENABLED = process.env.NEXT_PUBLIC_CALLS_ENABLED === 'true';
 
 export function CallButton({ orderId }: { orderId: string }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
 
   const startCall = async () => {
     setNotice(null);
+    setStarting(true);
     try {
-      const body = await api<{ roomName: string }>(`/api/calls/token?order=${orderId}`, { method: 'POST' });
-      window.open(`/calls/${encodeURIComponent(body.roomName)}`, '_blank', 'noopener');
+      const res = await api<{ ok: boolean; room: string }>(
+        `/api/calls/token?order=${encodeURIComponent(orderId)}`,
+        { method: 'POST' },
+      );
+      // เปิดในแท็บเดิม — อยู่ในแอปต่อ (หน้าสายจะ subscribe ช่องห้องแล้วยิง offer เอง)
+      router.push(`/calls/${encodeURIComponent(res.room)}?order=${encodeURIComponent(orderId)}&initiate=1`);
     } catch (e) {
       setNotice(e instanceof Error ? e.message : 'เรียกไม่สำเร็จ');
+    } finally {
+      setStarting(false);
     }
   };
 
@@ -73,11 +83,12 @@ export function CallButton({ orderId }: { orderId: string }) {
     <>
       <button
         type="button"
-        onClick={startCall}
-        className="flex items-center gap-2 rounded-full bg-brand px-4 py-2.5 text-sm font-bold text-black transition hover:bg-brand-strong"
+        onClick={() => void startCall()}
+        disabled={starting}
+        className="flex items-center gap-2 rounded-full bg-brand px-4 py-2.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-50"
       >
         <Phone className="h-4 w-4" aria-hidden />
-        โทรเสียง/วิดีโอ
+        {starting ? 'กำลังเรียก...' : 'โทรเสียง/วิดีโอ'}
       </button>
       {notice && (
         <p role="alert" className="mt-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">

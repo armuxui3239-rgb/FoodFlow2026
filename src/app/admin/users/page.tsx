@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Ban, Search, ShieldCheck, Users } from 'lucide-react';
+import { ArrowLeft, Ban, ChevronRight, Search, ShieldCheck, Users } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { api } from '@/lib/client';
 
@@ -119,16 +119,19 @@ export default function AdminUsersPage() {
           <ul className="overflow-hidden rounded-3xl border border-line bg-white">
             {rows.map((u, i) => (
               <li key={u.id} className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? 'border-t border-line' : ''}`}>
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${u.is_active ? 'bg-[#FFF4CC] text-black' : 'bg-red-50 text-red-500'}`}>
-                  {u.full_name?.slice(0, 1) ?? '?'}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate-1 text-sm font-bold text-black">{u.full_name}</p>
-                  <p className="truncate-1 text-[11px] text-neutral-400">
-                    {ROLE_TH[u.role] ?? u.role} · {u.email}
-                    {u.phone ? ` · ${u.phone}` : ''}
-                  </p>
-                </div>
+                <Link href={`/admin/users/${u.id}`} className="flex min-w-0 flex-1 items-center gap-3 transition-colors hover:opacity-80" aria-label={`เปิดโปรไฟล์ ${u.full_name}`}>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${u.is_active ? 'bg-[#FFF4CC] text-black' : 'bg-red-50 text-red-500'}`}>
+                    {u.full_name?.slice(0, 1) ?? '?'}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate-1 text-sm font-bold text-black">{u.full_name}</span>
+                    <span className="block truncate-1 text-[11px] text-neutral-400">
+                      {ROLE_TH[u.role] ?? u.role} · {u.email}
+                      {u.phone ? ` · ${u.phone}` : ''}
+                    </span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-neutral-300" aria-hidden />
+                </Link>
                 <div className="flex shrink-0 items-center gap-2">
                   {u.is_active ? (
                     <ShieldCheck className="h-4 w-4 text-black" aria-label="บัญชีปกติ" />

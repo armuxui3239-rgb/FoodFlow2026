@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { CheckCircle2, QrCode, Store, XCircle, Zap } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { CheckCircle2, ChevronDown, HeartHandshake, MessageCircle, Phone, PhoneIncoming, PhoneOff, QrCode, SendHorizontal, Store, XCircle, Zap } from 'lucide-react';
 import { api, baht, STATUS_COLOR, STATUS_TH, useSession } from '@/lib/client';
+import { useOrderChat, type ChatMessage } from '@/lib/realtime';
+import { sendRejectedToRoom, useIncomingRing } from '@/lib/calls';
 import { CallButton } from '@/components/call-button';
 
 interface Order {
@@ -17,6 +19,7 @@ interface Order {
   total: number;
   notes: string | null;
   created_at: string;
+  driver_id: string | null;
   restaurants: { name: string } | null;
   order_items: { id: string; name_snapshot: string; quantity: number; unit_price: number }[];
 }
@@ -28,6 +31,31 @@ interface Payment {
 
 const STEPS = ['pending_payment', 'paid', 'restaurant_accepted', 'preparing', 'ready_for_pickup', 'delivering', 'delivered'];
 
+// ทิปพร้อมเลือก: 20 / 50 / 100 บาท (สตางค์) — ช่วงที่ API รองรับคือ 2,000–100,000 สตางค์
+const TIP_PRESETS = [2000, 5000, 10000];
+
+// แชทใช้ได้เมื่อถึงช่วงที่มีไรเดอร์/กำลังจัดส่ง/ส่งถึงแล้ว — มีไรเดอร์คุยกับไรเดอร์ ยังไม่มีคุยกับร้าน
+const CHAT_STATUSES = ['driver_assigned', 'driver_arriving_restaurant', 'picked_up', 'delivering', 'delivered', 'completed'];
+
+// enum จริงของ chat_messages.sender_type: customer/driver/ai/system/restaurant/admin
+const SENDER_TH: Record<string, string> = {
+  customer: 'ลูกค้า',
+  driver: 'ไรเดอร์',
+  restaurant: 'ร้าน',
+  ai: 'ผู้ช่วย AI',
+  system: 'ระบบ',
+  admin: 'แอดมิน',
+};
+
+function senderLabel(m: ChatMessage, myId: string | null | undefined): string {
+  if (m.sender_id != null && m.sender_id === myId) return 'คุณ';
+  return SENDER_TH[m.sender_type] ?? 'ผู้ส่ง';
+}
+
+function chatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
 function thaiDateTime(iso: string): string {
   const d = new Date(iso);
   return `${d.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' })} – ${d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
@@ -35,6 +63,7 @@ function thaiDateTime(iso: string): string {
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const { user } = useSession();
   const [order, setOrder] = useState<Order | null>(null);
   const [payment, setPayment] = useState<Payment | null>(null);
@@ -43,6 +72,37 @@ export default function OrderDetailPage() {
   const [error, setError] = useState('');
   const [paying, setPaying] = useState(false);
   const [canceling, setCanceling] = useState(false);
+  const [tipSatang, setTipSatang] = useState<number>(TIP_PRESETS[0]);
+  const [tipCustom, setTipCustom] = useState<string>('');
+  const [tipping, setTipping] = useState(false);
+  const [tipDone, setTipDone] = useState(false);
+  const [tipError, setTipError] = useState('');
+
+  // แชทรายออเดอร์ — subscribe Supabase Broadcast เฉพาะเมื่อเปิดแท็บ (ล้มเหลว = polling สำรองทุก 8 วินาที)
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatDraft, setChatDraft] = useState('');
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
+  const chatAvailable = !!order && CHAT_STATUSES.includes(order.status) && (!!order.driver_id || !!order.restaurants);
+  const chat = useOrderChat(order?.id ?? null, chatOpen && chatAvailable, user?.id ?? null);
+
+  // กริ่งสายเรียกเข้า (ระบบโทรจบในระบบ) — ลูกค้าฟังช่อง ring ส่วนตัวเฉพาะระหว่างเปิดหน้าออเดอร์
+  // (ยอมรับข้อจำกัด: รับสายได้เมื่อกำลังเปิดหน้าออเดอร์บางหน้าอยู่เท่านั้น)
+  const incomingCall = useIncomingRing(true);
+
+  const acceptCall = () => {
+    if (!incomingCall) return;
+    router.push(`/calls/${encodeURIComponent(incomingCall.room)}?order=${encodeURIComponent(incomingCall.orderId)}`);
+  };
+
+  const rejectCall = () => {
+    if (!incomingCall) return;
+    void sendRejectedToRoom(incomingCall.room); // แจ้งห้องโทรให้ผู้ฝั่งโทรเห็นว่าถูกปฏิเสธ
+  };
+
+  useEffect(() => {
+    const el = chatScrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [chat.messages, chatOpen]);
 
   const load = useCallback(() => {
     api<{ order: Order; payment: Payment | null }>(`/api/orders/${id}`)
@@ -76,6 +136,26 @@ export default function OrderDetailPage() {
   /** ยกเลิกได้เฉพาะสถานะเดียวกับที่ API ยอมรับ (ก่อนร้านตอบรับออเดอร์) */
   const canCancel = ['created', 'pending_payment', 'restaurant_pending'].includes(order?.status ?? '');
 
+  /** ทิปไรเดอร์ — ใช้จำนวนที่พิมพ์เองถ้ามี ไม่งั้นใช้พรีเซ็ต */
+  const sendTip = async () => {
+    if (!order) return;
+    setTipError('');
+    const amount = tipCustom.trim() === '' ? tipSatang : Math.round(Number(tipCustom) * 100);
+    if (!Number.isFinite(amount) || amount < 2000 || amount > 100000) {
+      setTipError('จำนวนทิปต้องอยู่ระหว่าง 20–1,000 บาท');
+      return;
+    }
+    setTipping(true);
+    try {
+      await api('/api/driver/tips', { method: 'POST', body: JSON.stringify({ orderId: order.id, amountSatang: amount }) });
+      setTipDone(true);
+    } catch (e) {
+      setTipError((e as Error).message); // 409 → "คุณทิปคำสั่งซื้อนี้ไปแล้ว"
+    } finally {
+      setTipping(false);
+    }
+  };
+
   const cancelOrder = async () => {
     if (!window.confirm('ยืนยันการยกเลิกคำสั่งซื้อนี้? การยกเลิกไม่สามารถย้อนคืนได้')) return;
     setCanceling(true);
@@ -87,6 +167,16 @@ export default function OrderDetailPage() {
     } finally {
       setCanceling(false);
     }
+  };
+
+  // คู่สนทนา: session แบบ driver_customer = คุยกับไรเดอร์ ไม่เช่นนั้นคุยกับร้าน
+  const chatPeer = chat.session?.type === 'driver_customer' ? 'ไรเดอร์' : 'ร้าน';
+
+  const submitChat = async (e: FormEvent) => {
+    e.preventDefault();
+    const text = chatDraft.trim();
+    if (!text || text.length > 1000) return;
+    if (await chat.send(text)) setChatDraft('');
   };
 
   if (loading) return <div className="h-64 animate-pulse rounded-3xl bg-neutral-100" />;
@@ -150,6 +240,142 @@ export default function OrderDetailPage() {
             <p className="truncate-1 text-xs text-ink-soft">โทรเสียง/วิดีโอระหว่างจัดส่ง</p>
           </div>
           <CallButton orderId={order.id} />
+        </section>
+      )}
+
+      {/* แชทรายออเดอร์ — Supabase Broadcast ส่งแค่สัญญาณ เนื้อหาข้อความดึงใหม่จาก API เสมอ */}
+      {chatAvailable && (
+        <section aria-label="แชท" className="rounded-3xl border border-line bg-white">
+          <button
+            type="button"
+            onClick={() => setChatOpen((v) => !v)}
+            aria-expanded={chatOpen}
+            data-testid="chat-toggle"
+            className="flex w-full items-center justify-between gap-2 px-4 py-3.5"
+          >
+            <span className="flex items-center gap-2 text-sm font-bold text-black">
+              <MessageCircle className="h-4.5 w-4.5 text-black" aria-hidden /> แชทกับ{chatPeer}
+            </span>
+            <ChevronDown className={`h-4 w-4 shrink-0 text-neutral-400 transition-transform ${chatOpen ? 'rotate-180' : ''}`} aria-hidden />
+          </button>
+          {chatOpen && (
+            <div className="border-t border-line p-4">
+              {chat.loading ? (
+                <div className="h-40 animate-pulse rounded-2xl bg-neutral-100" />
+              ) : chat.error ? (
+                <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{chat.error}</p>
+              ) : (
+                <>
+                  <div ref={chatScrollRef} className="flex max-h-72 flex-col gap-2 overflow-y-auto pr-1">
+                    {chat.messages.length === 0 && (
+                      <p className="py-8 text-center text-xs text-neutral-400">ยังไม่มีข้อความ — เริ่มสนทนาได้เลย</p>
+                    )}
+                    {chat.messages.map((m) => {
+                      const mine = chat.isMine(m);
+                      return (
+                        <div key={m.id} className={`max-w-[85%] ${mine ? 'self-end' : 'self-start'}`}>
+                          <p className={`mb-0.5 text-[10px] text-neutral-400 ${mine ? 'text-right' : ''}`}>
+                            {senderLabel(m, user?.id)} · {chatTime(m.created_at)}
+                          </p>
+                          <div className={`whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm ${mine ? 'bg-black text-white' : 'bg-neutral-100 text-black'}`}>
+                            {m.content}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <form onSubmit={(e) => void submitChat(e)} className="mt-3 flex items-center gap-2">
+                    <input
+                      value={chatDraft}
+                      onChange={(e) => setChatDraft(e.target.value)}
+                      maxLength={1000}
+                      placeholder="พิมพ์ข้อความ…"
+                      aria-label="ข้อความแชท"
+                      data-testid="chat-input"
+                      className="h-11 min-w-0 flex-1 rounded-full border border-line px-4 text-sm text-black outline-none placeholder:text-neutral-400 focus:border-[#FFC400]"
+                    />
+                    <button
+                      type="submit"
+                      disabled={chat.sending || chatDraft.trim() === ''}
+                      aria-label="ส่งข้อความ"
+                      data-testid="chat-send"
+                      className="btn-brand flex h-11 w-11 shrink-0 items-center justify-center rounded-full disabled:opacity-50"
+                    >
+                      <SendHorizontal className="h-4.5 w-4.5" aria-hidden />
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ทิปไรเดอร์ — หลังส่งถึงแล้ว และมีไรเดอร์ผู้รับงาน (ทิปได้ครั้งเดียวต่อออเดอร์) */}
+      {['delivered', 'completed'].includes(order.status) && order.driver_id && (
+        <section aria-label="ทิปไรเดอร์" className="rounded-3xl border border-line bg-white p-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFF4CC]" aria-hidden>
+              <HeartHandshake className="h-4.5 w-4.5 text-black" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-ink">ทิปไรเดอร์</p>
+              <p className="truncate-1 text-xs text-ink-soft">ขอบคุณไรเดอร์ที่ส่งอาหารถึงมือคุณ (ทิปได้ครั้งเดียวต่อออเดอร์)</p>
+            </div>
+          </div>
+          {tipDone ? (
+            <p className="mt-3 flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-600">
+              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden /> ขอบคุณสำหรับทิป
+            </p>
+          ) : (
+            <>
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {TIP_PRESETS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      setTipSatang(s);
+                      setTipCustom('');
+                      setTipError('');
+                    }}
+                    className={`h-11 rounded-full border text-sm font-bold transition-colors ${
+                      tipCustom.trim() === '' && tipSatang === s
+                        ? 'border-[#FFC400] bg-[#FFF4CC] text-black'
+                        : 'border-line text-neutral-600 hover:bg-neutral-50'
+                    }`}
+                  >
+                    {baht(s)}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  inputMode="decimal"
+                  value={tipCustom}
+                  onChange={(e) => {
+                    setTipCustom(e.target.value.replace(/[^0-9.]/g, ''));
+                    setTipError('');
+                  }}
+                  placeholder="จำนวนเอง (บาท)"
+                  aria-label="จำนวนทิปแบบกำหนดเอง"
+                  className="h-11 min-w-0 flex-1 rounded-full border border-line px-4 text-sm text-black outline-none placeholder:text-neutral-400 focus:border-[#FFC400]"
+                />
+                <button
+                  onClick={() => void sendTip()}
+                  disabled={tipping}
+                  data-testid="tip-send"
+                  className="btn-brand flex h-11 shrink-0 items-center gap-1.5 rounded-full px-5 text-sm"
+                >
+                  <HeartHandshake className="h-4 w-4" aria-hidden /> {tipping ? 'กำลังส่ง...' : 'ส่งทิป'}
+                </button>
+              </div>
+              {tipError && (
+                <p role="alert" className="mt-2 rounded-2xl bg-red-50 px-4 py-2.5 text-xs text-red-600">
+                  {tipError}
+                </p>
+              )}
+            </>
+          )}
         </section>
       )}
 
@@ -322,7 +548,7 @@ export default function OrderDetailPage() {
         {(order.promotion_discount ?? 0) > 0 && (
           <div className="flex justify-between text-sm font-medium text-emerald-600">
             <span>ส่วนลดคูปอง</span>
-            <span className="tabular-nums">−{baht(order.promotion_discount)}</span>
+            <span className="tabular-nums">−{baht(order.promotion_discount ?? 0)}</span>
           </div>
         )}
         <div className="flex justify-between text-base font-bold text-black">
@@ -340,6 +566,44 @@ export default function OrderDetailPage() {
           สั่งอาหารต่อ
         </Link>
       </div>
+
+      {/* สายเรียกเข้า — โมดัลกริ่งจากช่อง ring ส่วนตัว (auto หายไปเองใน 60 วิ) */}
+      {incomingCall && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="สายเรียกเข้า"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        >
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-xl">
+            <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#FFF4CC]" aria-hidden>
+              <PhoneIncoming className="h-8 w-8 animate-bounce text-black" />
+            </span>
+            <p className="mt-3 text-base font-bold text-black">สายเรียกเข้า</p>
+            <p className="mt-1 text-sm text-ink-soft">
+              สายเรียกเข้าจาก {incomingCall.fromName} เรื่องออเดอร์ #{incomingCall.orderCode}
+            </p>
+            <div className="mt-5 flex gap-2">
+              <button
+                type="button"
+                onClick={rejectCall}
+                aria-label="ปฏิเสธสาย"
+                className="flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 transition-colors hover:bg-red-50"
+              >
+                <PhoneOff className="h-4 w-4" aria-hidden /> ปฏิเสธ
+              </button>
+              <button
+                type="button"
+                onClick={acceptCall}
+                aria-label="รับสาย"
+                className="flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-brand text-sm font-bold text-black transition hover:bg-brand-strong"
+              >
+                <Phone className="h-4 w-4" aria-hidden /> รับสาย
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

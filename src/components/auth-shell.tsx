@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Zap } from 'lucide-react';
 
 interface AuthShellProps {
-  title: string;
+  /** หัวข้อ — เว้นได้สำหรับหน้าที่จัดองค์ประกอบเอง (เช่น welcome) */
+  title?: string;
   subtitle?: string;
   backHref?: string;
   children: React.ReactNode;
@@ -27,7 +28,7 @@ export function AuthShell({ title, subtitle, backHref, children, centered }: Aut
             <ArrowLeft className="h-5 w-5" aria-hidden />
           </button>
         )}
-        <h1 className="text-lg font-bold text-ink">{title}</h1>
+        {title && <h1 className="text-lg font-bold text-ink">{title}</h1>}
       </header>
       <main
         className={`mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-10 ${

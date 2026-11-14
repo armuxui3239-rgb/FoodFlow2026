@@ -35,6 +35,7 @@ export async function PATCH(req: NextRequest) {
 
   const body = (await req.json().catch(() => ({}))) as {
     isOnline?: boolean;
+    vehicleType?: string;
     vehiclePlate?: string;
     licenseNumber?: string;
     maxRadiusKm?: number;
@@ -42,6 +43,12 @@ export async function PATCH(req: NextRequest) {
 
   const patch: Record<string, unknown> = {};
   if (typeof body.isOnline === 'boolean') patch.is_online = body.isOnline;
+
+  if (body.vehicleType !== undefined) {
+    const vt = String(body.vehicleType).trim();
+    if (!['motorbike', 'car', 'bicycle'].includes(vt)) return jsonError('ประเภทยานพาหนะไม่ถูกต้อง', 400);
+    patch.vehicle_type = vt;
+  }
 
   if (body.vehiclePlate !== undefined) {
     const plate = String(body.vehiclePlate).trim().toUpperCase();

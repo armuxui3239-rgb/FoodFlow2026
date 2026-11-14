@@ -59,8 +59,8 @@ export default function OwnerSettingsPage() {
           prepMinutes: Number(prep) || 20,
           hours: hours.map((h) => ({
             dayOfWeek: h.day_of_week,
-            opensAt: h.opens_at ?? '08:00',
-            closesAt: h.closes_at ?? '21:00',
+            opensAt: h.open_time ?? '08:00',
+            closesAt: h.close_time ?? '21:00',
             isClosed: h.is_closed,
           })),
         }),
