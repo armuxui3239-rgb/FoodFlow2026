@@ -99,7 +99,7 @@ export default function AdminDriverMapPage() {
                     {VEHICLE_TH[d.vehicleType] ?? d.vehicleType}
                     {d.plate ? ` · ${d.plate}` : ''}
                   </p>
-                  <p className="mt-1 font-mono text-[11px] text-neutral-500">
+                  <p className="mt-1 text-[11px] text-neutral-500">
                     {d.lat.toFixed(5)}, {d.lng.toFixed(5)}
                   </p>
                 </li>

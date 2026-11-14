@@ -246,7 +246,7 @@ export default function AdminDriverDetailPage() {
                       </button>
                       <button
                         onClick={() => { setSubmissionId(shown.id); setConfirmAction('rejected'); }}
-                        className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-red-50 text-sm font-bold text-red-600 transition-colors hover:bg-red-100"
+                        className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 transition-colors hover:bg-red-50"
                       >
                         <ShieldX className="h-4 w-4" aria-hidden /> ปฏิเสธ
                       </button>
@@ -289,7 +289,7 @@ export default function AdminDriverDetailPage() {
                       {detail.trips.map((t) => (
                         <tr key={t.id} className="border-t border-line">
                           <td className="px-4 py-2.5">
-                            <Link href={`/admin/orders/${t.id}`} className="font-mono text-xs font-bold text-black hover:underline">{t.order_code}</Link>
+                            <Link href={`/admin/orders/${t.id}`} className="text-xs font-bold text-black hover:underline">{t.order_code}</Link>
                           </td>
                           <td className="hidden max-w-40 truncate-1 px-4 py-2.5 text-neutral-500 sm:table-cell">{t.restaurantName}</td>
                           <td className="px-4 py-2.5">
@@ -333,7 +333,7 @@ export default function AdminDriverDetailPage() {
                 onChange={(e) => setRejectReason(e.target.value)}
                 rows={3}
                 placeholder="เช่น ภาพใบขับขี่ไม่ชัด กรุณาถ่ายใหม่"
-                className="w-full rounded-2xl border border-line bg-white px-3 py-2 text-sm outline-none focus:border-black"
+                className="w-full rounded-2xl border border-line bg-neutral-50 px-3 py-2 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
           )}

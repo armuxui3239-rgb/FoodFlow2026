@@ -34,7 +34,7 @@ const STATUS_TH: Record<string, string> = {
 };
 
 function statusCls(status: string): string {
-  if (status === 'completed') return 'bg-black text-white';
+  if (status === 'completed') return 'bg-black text-[#FFC400]';
   if (status === 'failed') return 'bg-red-50 text-red-600';
   if (status === 'running') return 'bg-[#FFC400] text-black';
   return 'bg-neutral-100 text-neutral-500';
@@ -84,7 +84,7 @@ export default function AdminExportJobsPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <Download className="h-5 w-5" aria-hidden /> ส่งออกข้อมูล
@@ -108,7 +108,7 @@ export default function AdminExportJobsPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">ข้อมูลที่ต้องการส่งออก</span>
-              <select value={resource} onChange={(e) => setResource(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-white px-3 text-sm outline-none focus:border-black">
+              <select value={resource} onChange={(e) => setResource(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]">
                 <option value="orders">ออเดอร์</option>
                 <option value="users">ผู้ใช้</option>
                 <option value="restaurants">ร้านค้า</option>
@@ -166,7 +166,7 @@ export default function AdminExportJobsPage() {
                 {j.status === 'completed' && (
                   <a
                     href={`/api/admin/exports/${j.id}?download=1`}
-                    className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-black px-3 text-xs font-bold text-white transition-transform active:scale-95"
+                    className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-black px-3 text-xs font-bold text-[#FFC400] transition-transform active:scale-95"
                   >
                     <Download className="h-3.5 w-3.5" aria-hidden /> ดาวน์โหลด
                   </a>

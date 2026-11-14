@@ -67,7 +67,7 @@
 - 1.2 ปรับ `src/components/ui/{button,dialog,alert-dialog,sheet}` ค่าเริ่มต้นให้เป็นรูปเม็ด/rounded-3xl — กันหลุดภาษาในอนาคต (call-site เดิมที่ override ไว้แล้วไม่ต้องแตะ)
 - 1.3 ตรวจ DoD รอบเดียว
 
-### เฟส 2 — แอดมิน 26 หน้า (งานเหนือกว่าในรายการ divergence)
+### เฟส 2 — แอดมิน 26 หน้า (งานเหนือกว่าในรายการ divergence) — ✅ เสร็จ 2026-11-14 (26 ไฟล์/74 จุด: ฟอร์ม neutral-50+โฟกัสเหลือง 29 จุด, 6xl→5xl 15 ไฟล์, แท็บ active ดำ-เหลือง 4 จุด, text-white→เหลืองบนดำ 10 จุด, font-mono 8 จุด, สีนอกพาเลต→เหลือง/emerald 8 จุด, ปุ่มแดง→outline 5 จุด; หลักฐาน: tsc 0, lint 0, build ผ่าน, qa-smoke 42/42, ตรวจภาพ 3 หน้า)
 - 2.1 ฟอร์ม: 10 ไฟล์ cluster (โฟกัสเหลือง + พื้น neutral-50 + select สไตล์เดียวกัน)
 - 2.2 คอนเทนเนอร์ 15 ไฟล์ 6xl→5xl
 - 2.3 แท็บ/ชิป/ป้าย: loose pills → segment track; `bg-black text-white` → `bg-black text-[#FFC400]`

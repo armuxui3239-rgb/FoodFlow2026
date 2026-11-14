@@ -247,7 +247,7 @@ export default function AdminSupportDetailPage() {
                 onChange={(e) => setReply(e.target.value)}
                 rows={3}
                 placeholder="พิมพ์ข้อความตอบกลับ"
-                className="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm text-black outline-none focus:border-black"
+                className="w-full rounded-2xl border border-line bg-neutral-50 px-4 py-3 text-sm text-black outline-none focus:border-[#FFC400]"
               />
             </label>
             {macros.length > 0 && (
@@ -267,7 +267,7 @@ export default function AdminSupportDetailPage() {
             <button
               onClick={() => void sendReply()}
               disabled={sending || !reply.trim()}
-              className="flex h-11 w-full items-center justify-center gap-1.5 rounded-full bg-black text-sm font-bold text-white transition-transform active:scale-95 disabled:opacity-50"
+              className="flex h-11 w-full items-center justify-center gap-1.5 rounded-full bg-black text-sm font-bold text-[#FFC400] transition-transform active:scale-95 disabled:opacity-50"
             >
               <Send className="h-4 w-4" aria-hidden /> {sending ? 'กำลังส่ง…' : 'ส่งข้อความ'}
             </button>
@@ -283,7 +283,7 @@ export default function AdminSupportDetailPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder="อธิบายวิธีแก้ไขปัญหานี้"
-                className="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm text-black outline-none focus:border-black"
+                className="w-full rounded-2xl border border-line bg-neutral-50 px-4 py-3 text-sm text-black outline-none focus:border-[#FFC400]"
               />
             </label>
             <div className="flex flex-wrap gap-2">
@@ -297,7 +297,7 @@ export default function AdminSupportDetailPage() {
               <button
                 onClick={() => void patch({ status: 'resolved', resolutionNotes: notes })}
                 disabled={busy || ticket.status === 'resolved' || ticket.status === 'closed' || !notes.trim()}
-                className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-black text-sm font-bold text-white transition-transform active:scale-95 disabled:opacity-50"
+                className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-black text-sm font-bold text-[#FFC400] transition-transform active:scale-95 disabled:opacity-50"
               >
                 <CheckCircle2 className="h-4 w-4" aria-hidden /> ทำเครื่องหมายแก้ไขแล้ว
               </button>

@@ -79,7 +79,7 @@ export default function AdminReportsPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <FileBarChart className="h-5 w-5" aria-hidden /> รายงานภาพรวม
@@ -162,7 +162,7 @@ export default function AdminReportsPage() {
                 <h2 className="text-sm font-bold text-black">ยอดขายรายวัน ({data.days} วันล่าสุด)</h2>
                 <button
                   onClick={downloadCsv}
-                  className="flex h-9 items-center gap-1.5 rounded-full bg-black px-3 text-xs font-bold text-white transition-transform active:scale-95"
+                  className="flex h-9 items-center gap-1.5 rounded-full bg-black px-3 text-xs font-bold text-[#FFC400] transition-transform active:scale-95"
                 >
                   <Download className="h-3.5 w-3.5" aria-hidden /> CSV
                 </button>

@@ -33,7 +33,7 @@ const STATUS_LABEL: Record<Status, string> = {
 };
 
 const STATUS_BADGE: Record<Status, string> = {
-  ready: 'bg-emerald-50 text-emerald-700',
+  ready: 'bg-[#FFF4CC] text-black',
   not_connected: 'bg-neutral-100 text-neutral-500',
   server_side: 'bg-[#FFF4CC] text-neutral-700',
   disabled: 'bg-red-50 text-red-600',
@@ -183,7 +183,7 @@ export default function AdminIntegrationsPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <Webhook className="h-5 w-5" aria-hidden /> สถานะการเชื่อมต่อ

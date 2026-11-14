@@ -84,39 +84,39 @@ export default function AdminPromotionNewPage() {
                 value={form.code}
                 onChange={(e) => set('code')(e.target.value.toUpperCase())}
                 placeholder="เช่น SONGKRAN50"
-                className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black"
+                className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">ชื่อโปรโมชั่น (ไทย)</span>
-              <input value={form.name} onChange={(e) => set('name')(e.target.value)} placeholder="เช่น ลด 50% สงกรานต์" className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+              <input value={form.name} onChange={(e) => set('name')(e.target.value)} placeholder="เช่น ลด 50% สงกรานต์" className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">ประเภท</span>
-              <select value={form.type} onChange={(e) => set('type')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-white px-3 text-sm outline-none focus:border-black">
+              <select value={form.type} onChange={(e) => set('type')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]">
                 <option value="percentage">ลดเปอร์เซ็นต์ (%)</option>
                 <option value="fixed">ลดเป็นจำนวนเงิน (บาท)</option>
               </select>
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">{form.type === 'percentage' ? 'มูลค่า (%)' : 'มูลค่า (บาท)'}</span>
-              <input type="number" min={1} value={form.value} onChange={(e) => set('value')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+              <input type="number" min={1} value={form.value} onChange={(e) => set('value')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">ยอดขั้นต่ำ (บาท)</span>
-              <input type="number" min={0} value={form.minOrderBaht} onChange={(e) => set('minOrderBaht')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+              <input type="number" min={0} value={form.minOrderBaht} onChange={(e) => set('minOrderBaht')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">ลดสูงสุด (บาท — สำหรับ %)</span>
-              <input type="number" min={0} value={form.maxDiscountBaht} onChange={(e) => set('maxDiscountBaht')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+              <input type="number" min={0} value={form.maxDiscountBaht} onChange={(e) => set('maxDiscountBaht')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">จำนวนครั้งที่ใช้ได้สูงสุด</span>
-              <input type="number" min={1} value={form.usageLimit} onChange={(e) => set('usageLimit')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+              <input type="number" min={1} value={form.usageLimit} onChange={(e) => set('usageLimit')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">มีอายุ (วัน)</span>
-              <input type="number" min={1} value={form.expiresDays} onChange={(e) => set('expiresDays')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+              <input type="number" min={1} value={form.expiresDays} onChange={(e) => set('expiresDays')(e.target.value)} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
             </label>
             <label className="col-span-2 block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">คำอธิบาย (ไม่บังคับ)</span>
@@ -125,7 +125,7 @@ export default function AdminPromotionNewPage() {
                 onChange={(e) => set('description')(e.target.value)}
                 rows={2}
                 placeholder="เงื่อนไขการใช้งานแบบสั้น ๆ"
-                className="w-full rounded-2xl border border-line bg-white px-4 py-2.5 text-sm outline-none focus:border-black"
+                className="w-full rounded-2xl border border-line bg-neutral-50 px-4 py-2.5 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
           </div>

@@ -79,7 +79,7 @@ export default function AdminLogsPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-4 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-4 px-4 py-5">
         <div className="flex items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <ClipboardList className="h-5 w-5" aria-hidden /> บันทึกกิจกรรมผู้ดูแล
@@ -93,7 +93,7 @@ export default function AdminLogsPage() {
             </button>
             <a
               href={`/api/admin/audit-logs?${query()}&format=csv`}
-              className="flex items-center gap-1.5 rounded-full bg-black px-3 py-2 text-xs font-bold text-white transition-transform active:scale-95"
+              className="flex items-center gap-1.5 rounded-full bg-black px-3 py-2 text-xs font-bold text-[#FFC400] transition-transform active:scale-95"
             >
               <Download className="h-3.5 w-3.5" aria-hidden /> CSV
             </a>
@@ -180,11 +180,11 @@ export default function AdminLogsPage() {
                       <div className="grid gap-1.5 sm:grid-cols-2">
                         <div>
                           <p className="mb-0.5 font-semibold text-neutral-400">ค่าเดิม</p>
-                          <pre className="max-h-40 overflow-y-auto rounded-2xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600">{pretty(l.old_value)}</pre>
+                          <pre className="max-h-40 overflow-y-auto rounded-2xl bg-neutral-50 p-3 text-[11px] text-neutral-600">{pretty(l.old_value)}</pre>
                         </div>
                         <div>
                           <p className="mb-0.5 font-semibold text-neutral-400">ค่าใหม่</p>
-                          <pre className="max-h-40 overflow-y-auto rounded-2xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600">{pretty(l.new_value)}</pre>
+                          <pre className="max-h-40 overflow-y-auto rounded-2xl bg-neutral-50 p-3 text-[11px] text-neutral-600">{pretty(l.new_value)}</pre>
                         </div>
                       </div>
                     </div>

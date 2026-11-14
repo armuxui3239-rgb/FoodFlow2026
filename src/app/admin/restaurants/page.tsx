@@ -39,7 +39,7 @@ const APPR_TH: Record<string, string> = {
 function ApprovalBadge({ status }: { status: string }) {
   const style =
     status === 'approved'
-      ? 'bg-black text-white'
+      ? 'bg-black text-[#FFC400]'
       : status === 'pending'
         ? 'bg-[#FFC400] text-black'
         : 'bg-red-50 text-red-600';
@@ -78,7 +78,7 @@ export default function AdminRestaurantsPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">
         {/* หัวข้อหน้า */}
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-lg font-bold text-black">ร้านค้าทั้งหมด</h1>
@@ -117,7 +117,7 @@ export default function AdminRestaurantsPage() {
               aria-selected={status === t.key}
               onClick={() => setStatus(t.key)}
               className={`flex h-9 shrink-0 items-center rounded-full px-3.5 text-xs font-bold transition-colors ${
-                status === t.key ? 'bg-[#FFC400] text-black' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
+                status === t.key ? 'bg-black text-[#FFC400]' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
               }`}
             >
               {t.label}
@@ -151,7 +151,7 @@ export default function AdminRestaurantsPage() {
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-1.5 truncate-1 text-sm font-bold text-black">
-                      <span aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${r.is_open ? 'bg-green-500' : 'bg-neutral-300'}`} />
+                      <span aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${r.is_open ? 'bg-[#FFC400]' : 'bg-neutral-300'}`} />
                       {r.name}
                     </p>
                     <p className="truncate-1 text-[11px] text-neutral-400">{r.city || r.slug}</p>

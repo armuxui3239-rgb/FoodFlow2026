@@ -169,7 +169,7 @@ export default function AdminOrderDetailPage() {
                       value={nextStatus}
                       onChange={(e) => setNextStatus(e.target.value)}
                       aria-label="เลือกสถานะใหม่"
-                      className="h-10 rounded-2xl border border-line bg-white px-3 text-sm outline-none focus:border-black"
+                      className="h-10 rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                     >
                       <option value="">— เลือกสถานะใหม่ —</option>
                       {options.map((s) => (
@@ -323,7 +323,7 @@ export default function AdminOrderDetailPage() {
                 onChange={(e) => setCancelReason(e.target.value)}
                 rows={3}
                 placeholder="เช่น ร้านปิดกะทันหัน ลูกค้าขอยกเลิก"
-                className="w-full rounded-2xl border border-line bg-white px-3 py-2 text-sm outline-none focus:border-black"
+                className="w-full rounded-2xl border border-line bg-neutral-50 px-3 py-2 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
           )}

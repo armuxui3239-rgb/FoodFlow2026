@@ -176,7 +176,7 @@ export default function AdminUserDetailPage() {
                       {detail.lastOrders.map((o) => (
                         <tr key={o.id} className="border-t border-line">
                           <td className="px-4 py-2.5">
-                            <Link href={`/admin/orders/${o.id}`} className="font-mono text-xs font-bold text-black hover:underline">{o.order_code}</Link>
+                            <Link href={`/admin/orders/${o.id}`} className="text-xs font-bold text-black hover:underline">{o.order_code}</Link>
                           </td>
                           <td className="hidden max-w-40 truncate-1 px-4 py-2.5 text-neutral-500 sm:table-cell">{o.restaurantName}</td>
                           <td className="px-4 py-2.5">

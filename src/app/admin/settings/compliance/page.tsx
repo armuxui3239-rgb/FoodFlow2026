@@ -423,7 +423,7 @@ export default function AdminCompliancePage() {
             inputMode={f.kind === 'number' ? 'numeric' : undefined}
             placeholder={f.placeholder ?? (f.kind === 'number' ? `0 (${f.unit})` : undefined)}
             aria-label={`${f.label} (${f.key})${f.unit ? ` หน่วย ${f.unit}` : ''}`}
-            className="h-11 flex-1 rounded-2xl border border-line bg-white px-4 text-sm text-black outline-none focus:border-black"
+            className="h-11 flex-1 rounded-2xl border border-line bg-neutral-50 px-4 text-sm text-black outline-none focus:border-[#FFC400]"
           />
           {f.kind === 'number' && <span className="flex h-11 items-center text-xs text-neutral-400">{f.unit}</span>}
           <button
@@ -484,7 +484,7 @@ export default function AdminCompliancePage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <ShieldCheck className="h-5 w-5" aria-hidden /> ข้อกำหนด / ความเป็นส่วนตัว
@@ -556,7 +556,7 @@ export default function AdminCompliancePage() {
                         value={drafts[s.key] ?? ''}
                         onChange={(e) => setDraft(s.key, e.target.value)}
                         aria-label={`ค่าของ ${s.key}`}
-                        className="h-11 flex-1 rounded-2xl border border-line bg-white px-4 text-sm text-black outline-none focus:border-black"
+                        className="h-11 flex-1 rounded-2xl border border-line bg-neutral-50 px-4 text-sm text-black outline-none focus:border-[#FFC400]"
                       />
                       <button
                         onClick={() => void saveOne(s.key)}

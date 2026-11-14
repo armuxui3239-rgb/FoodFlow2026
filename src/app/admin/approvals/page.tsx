@@ -141,7 +141,7 @@ export default function AdminApprovalsPage() {
                       <button
                         onClick={() => void patch(r, { approvalStatus: 'suspended', isOpen: false })}
                         disabled={busyId === r.id}
-                        className="rounded-full bg-red-50 px-3 py-1.5 text-[11px] font-bold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                        className="rounded-full border border-red-200 bg-white px-3 py-1.5 text-[11px] font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
                       >
                         ระงับร้าน
                       </button>

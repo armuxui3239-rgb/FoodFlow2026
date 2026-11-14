@@ -138,7 +138,7 @@ export default function AdminPromotionDetailPage() {
                   </Link>
                   <button
                     onClick={() => setDeleteOpen(true)}
-                    className="flex h-10 items-center gap-1.5 rounded-full bg-red-50 px-4 text-xs font-bold text-red-600 transition-colors hover:bg-red-100"
+                    className="flex h-10 items-center gap-1.5 rounded-full border border-red-200 bg-white px-4 text-xs font-bold text-red-600 transition-colors hover:bg-red-50"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden /> ลบ
                   </button>
@@ -218,7 +218,7 @@ export default function AdminPromotionDetailPage() {
             <AlertDialogAction
               onClick={(e) => { e.preventDefault(); void remove(); }}
               disabled={deleting}
-              className="rounded-full bg-red-600 text-white disabled:opacity-50"
+              className="rounded-full border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50"
             >
               {deleting ? 'กำลังลบ…' : 'ลบคูปอง'}
             </AlertDialogAction>

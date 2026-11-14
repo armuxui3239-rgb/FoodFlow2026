@@ -50,7 +50,7 @@ export default function AdminAiMonitorPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <Bot className="h-5 w-5" aria-hidden /> ติดตามระบบ AI
@@ -93,7 +93,7 @@ export default function AdminAiMonitorPage() {
               </div>
               <div className="rounded-3xl border border-line bg-white p-4 shadow-sm">
                 <p className="text-[11px] font-semibold text-neutral-400">สำเร็จ</p>
-                <p className="mt-1 text-xl font-bold text-green-600">{num(data.totals.success)}</p>
+                <p className="mt-1 text-xl font-bold text-emerald-600">{num(data.totals.success)}</p>
               </div>
               <div className="rounded-3xl border border-line bg-white p-4 shadow-sm">
                 <p className="text-[11px] font-semibold text-neutral-400">ผิดพลาด</p>

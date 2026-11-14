@@ -93,7 +93,7 @@ export default function AdminSupportPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-4 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-4 px-4 py-5">
         <div className="flex items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <LifeBuoy className="h-5 w-5" aria-hidden /> ซัพพอร์ตลูกค้า
@@ -115,7 +115,7 @@ export default function AdminSupportPage() {
               aria-selected={tab === t.key}
               onClick={() => setTab(t.key)}
               className={`flex h-9 shrink-0 items-center rounded-full px-3.5 text-xs font-bold transition-colors ${
-                tab === t.key ? 'bg-[#FFC400] text-black' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
+                tab === t.key ? 'bg-black text-[#FFC400]' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
               }`}
             >
               {t.label}

@@ -40,7 +40,7 @@ function localToIso(v: string): string | null {
 }
 
 const inputCls =
-  'h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm text-black outline-none focus:border-black';
+  'h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm text-black outline-none focus:border-[#FFC400]';
 const labelCls = 'mb-1 block text-xs font-semibold text-neutral-500';
 
 /** หน้าแก้ไขโปรโมชั่น — ดึงค่าเดิมมาเติมฟอร์ม แล้วบันทึกด้วย PATCH */
@@ -161,7 +161,7 @@ export default function AdminPromotionEditPage() {
 
           <label className="block">
             <span className={labelCls}>คำอธิบาย</span>
-            <textarea value={form.description} onChange={(e) => set({ description: e.target.value })} rows={2} className="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm text-black outline-none focus:border-black" />
+            <textarea value={form.description} onChange={(e) => set({ description: e.target.value })} rows={2} className="w-full rounded-2xl border border-line bg-neutral-50 px-4 py-3 text-sm text-black outline-none focus:border-[#FFC400]" />
           </label>
 
           <div className="grid gap-3 sm:grid-cols-2">

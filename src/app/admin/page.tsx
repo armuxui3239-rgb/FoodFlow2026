@@ -78,7 +78,7 @@ export default function AdminPortalPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">
         {/* หัวข้อหน้า + ปุ่มรีเฟรช */}
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-lg font-bold text-black">ภาพรวมทั้งระบบ</h1>
@@ -137,12 +137,12 @@ export default function AdminPortalPage() {
                 <tbody>
                   {orders.map((o) => (
                     <tr key={o.id} className="border-t border-line">
-                      <td className="px-4 py-2.5 font-mono text-xs font-bold text-black">{o.order_code}</td>
+                      <td className="px-4 py-2.5 text-xs font-bold text-black">{o.order_code}</td>
                       <td className="max-w-40 truncate-1 px-4 py-2.5">{o.restaurantName}</td>
                       <td className="hidden max-w-32 truncate-1 px-4 py-2.5 text-neutral-500 sm:table-cell">{o.customerName}</td>
                       <td className="px-4 py-2.5">
                         <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                          o.status === 'paid' ? 'bg-[#FFC400] text-black' : ['delivered', 'completed'].includes(o.status) ? 'bg-black text-white' : o.status === 'cancelled' ? 'bg-red-50 text-red-600' : 'bg-neutral-100 text-neutral-700'
+                          o.status === 'paid' ? 'bg-[#FFC400] text-black' : ['delivered', 'completed'].includes(o.status) ? 'bg-black text-[#FFC400]' : o.status === 'cancelled' ? 'bg-red-50 text-red-600' : 'bg-neutral-100 text-neutral-700'
                         }`}>
                           {STATUS_TH[o.status] ?? o.status}
                         </span>

@@ -141,7 +141,7 @@ export default function AdminRestaurantDetailPage() {
                     <button
                       onClick={() => void patch({ approvalStatus: 'suspended', isOpen: false })}
                       disabled={busy}
-                      className="rounded-full bg-red-50 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                      className="rounded-full border border-red-200 bg-white px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
                     >
                       ระงับร้าน
                     </button>
@@ -231,7 +231,7 @@ export default function AdminRestaurantDetailPage() {
                       {detail.orders.map((o) => (
                         <tr key={o.id} className="border-t border-line">
                           <td className="px-4 py-2.5">
-                            <Link href={`/admin/orders/${o.id}`} className="font-mono text-xs font-bold text-black hover:underline">{o.order_code}</Link>
+                            <Link href={`/admin/orders/${o.id}`} className="text-xs font-bold text-black hover:underline">{o.order_code}</Link>
                           </td>
                           <td className="hidden max-w-40 truncate-1 px-4 py-2.5 text-neutral-500 sm:table-cell">{o.customerName}</td>
                           <td className="px-4 py-2.5">

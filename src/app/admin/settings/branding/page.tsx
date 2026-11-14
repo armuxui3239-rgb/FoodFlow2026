@@ -241,7 +241,7 @@ export default function AdminBrandingPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <Palette className="h-5 w-5" aria-hidden /> ตั้งค่าแบรนด์
@@ -330,7 +330,7 @@ export default function AdminBrandingPage() {
                         inputMode={f.kind === 'tel' ? 'tel' : undefined}
                         placeholder={f.placeholder}
                         aria-label={`${f.label} (${f.key})`}
-                        className="h-11 flex-1 rounded-2xl border border-line bg-white px-4 text-sm text-black outline-none focus:border-black"
+                        className="h-11 flex-1 rounded-2xl border border-line bg-neutral-50 px-4 text-sm text-black outline-none focus:border-[#FFC400]"
                       />
                       {isColor && (
                         <input
@@ -338,7 +338,7 @@ export default function AdminBrandingPage() {
                           value={colorOk ? (drafts[f.key] ?? '').trim() : FALLBACK_PRIMARY}
                           onChange={(e) => setDraft(f.key, e.target.value.toUpperCase())}
                           aria-label={`เลือก${f.label}`}
-                          className="h-11 w-12 shrink-0 cursor-pointer rounded-2xl border border-line bg-white p-1"
+                          className="h-11 w-12 shrink-0 cursor-pointer rounded-2xl border border-line bg-neutral-50 p-1"
                         />
                       )}
                       <button
@@ -386,7 +386,7 @@ export default function AdminBrandingPage() {
                       value={drafts[s.key] ?? ''}
                       onChange={(e) => setDraft(s.key, e.target.value)}
                       aria-label={`ค่าของ ${s.key}`}
-                      className="h-11 flex-1 rounded-2xl border border-line bg-white px-4 text-sm text-black outline-none focus:border-black"
+                      className="h-11 flex-1 rounded-2xl border border-line bg-neutral-50 px-4 text-sm text-black outline-none focus:border-[#FFC400]"
                     />
                     <button
                       onClick={() => void saveOne(s.key)}

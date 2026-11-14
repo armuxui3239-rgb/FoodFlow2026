@@ -74,7 +74,7 @@ export default function AdminOrdersPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">
         {/* หัวข้อหน้า */}
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-lg font-bold text-black">ออเดอร์ทั้งหมด</h1>
@@ -113,7 +113,7 @@ export default function AdminOrdersPage() {
               aria-selected={tab === t.key}
               onClick={() => setTab(t.key)}
               className={`flex h-9 shrink-0 items-center rounded-full px-3.5 text-xs font-bold transition-colors ${
-                tab === t.key ? 'bg-[#FFC400] text-black' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
+                tab === t.key ? 'bg-black text-[#FFC400]' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
               }`}
             >
               {t.label}
@@ -160,7 +160,7 @@ export default function AdminOrdersPage() {
               <li key={o.id} className={i > 0 ? 'border-t border-line' : ''}>
                 <Link href={`/admin/orders/${o.id}`} className="flex flex-wrap items-center gap-2 px-4 py-3 transition-colors hover:bg-neutral-50">
                   <div className="min-w-0 flex-1 sm:flex-none sm:w-32">
-                    <p className="truncate-1 font-mono text-xs font-bold text-black">#{o.order_code}</p>
+                    <p className="truncate-1 text-xs font-bold text-black">#{o.order_code}</p>
                     <p className="flex items-center gap-1 text-[11px] text-neutral-400">
                       <Clock className="h-3 w-3" aria-hidden />
                       {new Date(o.created_at).toLocaleString('th-TH', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
@@ -175,7 +175,7 @@ export default function AdminOrdersPage() {
                       o.status === 'paid'
                         ? 'bg-[#FFC400] text-black'
                         : ['delivered', 'completed'].includes(o.status)
-                          ? 'bg-black text-white'
+                          ? 'bg-black text-[#FFC400]'
                           : ['cancelled', 'refunded'].includes(o.status)
                             ? 'bg-red-50 text-red-600'
                             : 'bg-neutral-100 text-neutral-700'

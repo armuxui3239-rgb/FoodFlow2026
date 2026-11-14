@@ -115,30 +115,30 @@ export default function AdminPromotionsPage() {
             <div className="grid grid-cols-2 gap-3">
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-neutral-500">โค้ด (ภาษาอังกฤษตัวใหญ่)</span>
-                <input value={form.code} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))} placeholder="เช่น SONGKRAN50" className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+                <input value={form.code} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))} placeholder="เช่น SONGKRAN50" className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-neutral-500">ชื่อโปรโมชั่น (ไทย)</span>
-                <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="เช่น ลด 50% สงกรานต์" className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+                <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="เช่น ลด 50% สงกรานต์" className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-neutral-500">ประเภท</span>
-                <select value={form.type} onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-white px-3 text-sm outline-none focus:border-black">
+                <select value={form.type} onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]">
                   <option value="percentage">ลดเปอร์เซ็นต์ (%)</option>
                   <option value="fixed">ลดเป็นจำนวนเงิน (บาท)</option>
                 </select>
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-neutral-500">{form.type === 'percentage' ? 'มูลค่า (%)' : 'มูลค่า (บาท)'}</span>
-                <input type="number" min={1} value={form.value} onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+                <input type="number" min={1} value={form.value} onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-neutral-500">ยอดขั้นต่ำ (บาท)</span>
-                <input type="number" min={0} value={form.minOrderBaht} onChange={(e) => setForm((f) => ({ ...f, minOrderBaht: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+                <input type="number" min={0} value={form.minOrderBaht} onChange={(e) => setForm((f) => ({ ...f, minOrderBaht: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-neutral-500">ลดสูงสุด (บาท — สำหรับ %)</span>
-                <input type="number" min={0} value={form.maxDiscountBaht} onChange={(e) => setForm((f) => ({ ...f, maxDiscountBaht: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-black" />
+                <input type="number" min={0} value={form.maxDiscountBaht} onChange={(e) => setForm((f) => ({ ...f, maxDiscountBaht: e.target.value }))} className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]" />
               </label>
             </div>
             <button onClick={() => void create()} disabled={saving || !form.code.trim()} className="btn-brand h-11 w-full text-sm disabled:opacity-50">

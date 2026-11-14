@@ -72,7 +72,7 @@ export default function AdminDriversPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <Bike className="h-5 w-5" aria-hidden /> ไรเดอร์ทั้งหมด
@@ -108,7 +108,7 @@ export default function AdminDriversPage() {
               aria-selected={filter === f.key}
               onClick={() => setFilter(f.key)}
               className={`flex h-9 items-center rounded-full px-3.5 text-xs font-bold transition-colors ${
-                filter === f.key ? 'bg-[#FFC400] text-black' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
+                filter === f.key ? 'bg-black text-[#FFC400]' : 'bg-neutral-100 text-neutral-600 hover:bg-[#FFF4CC]'
               }`}
             >
               {f.label}
@@ -143,13 +143,13 @@ export default function AdminDriversPage() {
                 >
                   <span
                     aria-label={d.is_online ? 'ออนไลน์' : 'ออฟไลน์'}
-                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${d.is_online ? 'bg-green-500' : 'bg-neutral-300'}`}
+                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${d.is_online ? 'bg-[#FFC400]' : 'bg-neutral-300'}`}
                   />
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-1.5 truncate-1 text-sm font-bold text-black">
                       {d.user?.full_name ?? 'ไรเดอร์'}
                       {d.is_verified && (
-                        <BadgeCheck className="h-4 w-4 shrink-0 text-green-600" aria-label="ยืนยันแล้ว" />
+                        <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-600" aria-label="ยืนยันแล้ว" />
                       )}
                     </p>
                     <p className="truncate-1 text-[11px] text-neutral-400">

@@ -105,7 +105,7 @@ export default function AdminSettingsPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <AdminHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-5">
         <div className="flex items-center justify-between gap-2">
           <h1 className="flex items-center gap-2 text-lg font-bold text-black">
             <SettingsIcon className="h-5 w-5" aria-hidden /> ตั้งค่าแพลตฟอร์ม
@@ -170,7 +170,7 @@ export default function AdminSettingsPage() {
                         value={drafts[s.key] ?? ''}
                         onChange={(e) => setDrafts((d) => ({ ...d, [s.key]: e.target.value }))}
                         aria-label={`ค่าของ ${s.key}`}
-                        className="h-11 flex-1 rounded-2xl border border-line bg-white px-4 text-sm text-black outline-none focus:border-black"
+                        className="h-11 flex-1 rounded-2xl border border-line bg-neutral-50 px-4 text-sm text-black outline-none focus:border-[#FFC400]"
                       />
                       <button
                         onClick={() => void save(s.key)}

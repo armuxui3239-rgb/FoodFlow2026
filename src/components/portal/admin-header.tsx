@@ -45,7 +45,7 @@ export function AdminHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-      <div className="mx-auto w-full max-w-6xl px-4">
+      <div className="mx-auto w-full max-w-5xl px-4">
         <div className="flex h-14 items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#FFC400] text-black">
@@ -102,7 +102,7 @@ export function AdminSubHeader({
 }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4">
+      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-2 px-4">
         <div className="flex min-w-0 items-center gap-2">
           <Link
             href={backHref}
@@ -153,7 +153,7 @@ export function AdminSubShell({
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <AdminSubHeader title={title} subtitle={subtitle} backHref={backHref} Icon={Icon} right={right} />
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-5">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">{children}</main>
       <AdminFooter />
     </div>
   );
