@@ -86,7 +86,7 @@ Docker:  deployments/sms-gateway (เก็บถาวร — ไม่ใช�
 | `NEXT_PUBLIC_SUPABASE_URL` | .env | realtime ฝั่ง client |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | .env | realtime ฝั่ง client |
 | `NEXT_PUBLIC_CALLS_ENABLED` | `true` | เปิดหน้าโทร |
-| `PROMPTPAY_ID` | ⚠ เจ้าของ | **ต้องใส่เลขพร้อมเพย์จริงก่อนเปิดใช้จริง** — ไม่ใส่ = ระบบใช้เบอร์ตัวอย่าง 0812345678 เงินไม่ถึงบัญชีจริง |
+| `PROMPTPAY_ID` | ⚠ เจ้าของ | **ใส่แล้ว (2026-11-15 — เก็บชนิด sensitive บน Vercel อ่านกลับไม่ได้)** — เลขจริงไม่ลง repo เพราะเป็นข้อมูลส่วนบุคคล |
 
 ไม่ต้องใส่บน Vercel: `DATABASE_URL`/`DIRECT_URL` (ใช้เฉพาะสคริปต์ในเครื่อง) · `NEXT_PUBLIC_MAP_PMTILES_URL` (ไม่ใส่ = ใช้ OpenFreeMap ผ่าน proxy ในตัว)
 
@@ -100,7 +100,7 @@ Docker:  deployments/sms-gateway (เก็บถาวร — ไม่ใช�
 
 - [ ] `/api/restaurants`, `/api/menu/popular`, `/api/promotions` ตอบ 200
 - [ ] สมัครใหม่จริง 1 บัญชี: รหัส 6 หลักขึ้นในแอป **และลงช่องให้อัตโนมัติ** → ตั้ง PIN ได้
-- [ ] ตั้ง `PROMPTPAY_ID` เป็นเลขพร้อมเพย์จริงแล้ว (ไม่ใช่ 0812345678 ตัวอย่าง)
+- [x] ตั้ง `PROMPTPAY_ID` เป็นเลขพร้อมเพย์จริงแล้ว (2026-11-15 — ทดสอบสแกนจริง 1 ครั้งเมื่อเปิดขาย)
 - [ ] สร้างออเดอร์ → QR พร้อมเพย์แสดง → ยอดถูกต้อง (สตางค์)
 - [ ] แผนที่โหลด tiles ได้ + มี attribution OSM
 - [ ] ไม่มีคีย์ service ปรากฏใน HTML/JS ที่ส่งถึง client
