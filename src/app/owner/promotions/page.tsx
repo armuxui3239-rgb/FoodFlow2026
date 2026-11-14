@@ -123,7 +123,7 @@ export default function OwnerPromotionsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-lg bg-black px-2 py-1 text-xs font-bold tracking-wider text-[#FFC400]">
+                        <span className="rounded-full bg-black px-2 py-1 text-xs font-bold tracking-wider text-[#FFC400]">
                           {p.code}
                         </span>
                         <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${st.cls}`}>{st.label}</span>

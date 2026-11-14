@@ -218,7 +218,7 @@ function OrderSection({
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-black">#{o.order_code}</span>
                   <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                    o.status === 'paid' ? 'bg-[#FFC400] text-black' : ['delivered', 'completed'].includes(o.status) ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700'
+                    o.status === 'paid' ? 'bg-[#FFC400] text-black' : ['delivered', 'completed'].includes(o.status) ? 'bg-black text-[#FFC400]' : 'bg-neutral-100 text-neutral-700'
                   }`}>
                     {STATUS_TH[o.status] ?? o.status}
                   </span>

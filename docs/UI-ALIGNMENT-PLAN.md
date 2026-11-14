@@ -75,7 +75,7 @@
 - 2.5 สีนอกพาเลต (green/red-600/red-100 พื้น) → พาเลตคุณ
 - รายชื่อหน้าแบ่งชุดย่อยตามผลจัดอันดับ (หนักสุด: promotions/new, promotions, export-jobs, page, support/[id], settings/compliance, orders/[id], logs, drivers/[id])
 
-### เฟส 3 — ร้านค้า 20 หน้า
+### เฟส 3 — ร้านค้า 20 หน้า — ✅ เสร็จ 2026-11-14 (max-w-5xl orders, ช่องกรอกเพิ่มพื้น neutral-50 8 ไฟล์, ชิปโปร rounded-lg→เม็ด ×2, ป้ายสถานะดำ-เหลือง ×3, ปุ่มแดง→outline ×2 + ไอคอนทำลาย ×1, ฟองแชทคงขาวบนดำตามดีไซน์ลูกค้า, ui/button ได้ token เฟส 1 ครอบ; หลักฐาน: tsc 0, lint 0, build ผ่าน, qa-smoke 42/42, ตรวจภาพ /owner/orders ด้วยบัญชีร้านจริง)
 - rounded-lg ชิปโปร → rounded-full · ui/button 2 หน้า · 6xl 2 จุด · สีนอกพาเลต owner/menu · ฟอร์มโฟกัสดำ
 - ชุดหนักสุด: orders, menu/[id]/edit, promotions(+[id]), menu/categories, staff
 

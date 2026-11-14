@@ -241,7 +241,7 @@ export default function OwnerCategoriesPage() {
                         <AlertDialogCancel className="rounded-full">ยกเลิก</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => void remove()}
-                          className="rounded-full bg-red-600 text-white hover:bg-red-700"
+                          className="rounded-full border border-red-200 text-red-600 hover:bg-red-50"
                         >
                           ลบหมวดหมู่
                         </AlertDialogAction>
@@ -270,7 +270,7 @@ export default function OwnerCategoriesPage() {
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 maxLength={100}
                 placeholder="เช่น อาหารจานเดียว"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
             <label className="block">
@@ -280,7 +280,7 @@ export default function OwnerCategoriesPage() {
                 onChange={(e) => setForm((f) => ({ ...f, sortOrder: e.target.value }))}
                 type="number"
                 inputMode="numeric"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
             <div className="flex items-center justify-between rounded-2xl bg-neutral-50 px-4 py-3">

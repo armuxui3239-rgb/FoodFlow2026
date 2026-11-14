@@ -72,7 +72,7 @@ export default function OwnerProfileSettingsPage() {
     }
   };
 
-  const inputCls = 'h-11 w-full rounded-2xl border border-line px-4 text-sm outline-none focus:border-[#FFC400]';
+  const inputCls = 'h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]';
 
   return (
     <OwnerSubShell
@@ -164,7 +164,7 @@ export default function OwnerProfileSettingsPage() {
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-neutral-500">ช่วงราคา</span>
-              <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} className={`${inputCls} bg-white`}>
+              <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} className={`${inputCls} bg-neutral-50`}>
                 <option value="$">$ — ราคาประหยัด</option>
                 <option value="$$">$$ — ราคาปานกลาง</option>
                 <option value="$$$">$$$ — ราคาพรีเมียม</option>

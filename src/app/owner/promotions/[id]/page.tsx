@@ -138,7 +138,7 @@ export default function OwnerPromotionDetailPage() {
             {/* สรุปคูปอง */}
             <section className="rounded-3xl border border-line p-4" aria-label="สรุปคูปอง">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-lg bg-black px-3 py-1.5 text-sm font-bold tracking-wider text-[#FFC400]">
+                <span className="rounded-full bg-black px-3 py-1.5 text-sm font-bold tracking-wider text-[#FFC400]">
                   {promo.code}
                 </span>
                 <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${

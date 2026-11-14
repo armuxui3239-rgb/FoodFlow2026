@@ -81,7 +81,7 @@ export default function OwnerOrderBoardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4">
+        <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-2 px-4">
           <Link
             href="/owner"
             aria-label="ย้อนกลับ"
@@ -102,7 +102,7 @@ export default function OwnerOrderBoardPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-4 px-4 py-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-4 px-4 py-5">
         {denied && (
           <p role="alert" className="rounded-2xl bg-[#FFF4CC] px-4 py-3 text-sm font-semibold text-black">
             หน้านี้สำหรับเจ้าของร้านเท่านั้น กรุณาเข้าสู่ระบบด้วยบัญชีร้านค้า
@@ -159,7 +159,7 @@ export default function OwnerOrderBoardPage() {
                             </div>
                             <Link href={`/owner/orders/${o.id}`} className="mt-1 block">
                               <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                                o.status === 'paid' ? 'bg-[#FFC400] text-black' : ['delivered', 'completed'].includes(o.status) ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700'
+                                o.status === 'paid' ? 'bg-[#FFC400] text-black' : ['delivered', 'completed'].includes(o.status) ? 'bg-black text-[#FFC400]' : 'bg-neutral-100 text-neutral-700'
                               }`}>
                                 {STATUS_TH[o.status] ?? o.status}
                               </span>

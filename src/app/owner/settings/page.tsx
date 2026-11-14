@@ -139,7 +139,7 @@ export default function OwnerSettingsPage() {
                 </span>
                 <input
                   type="number" min={0} value={minOrder} onChange={(e) => setMinOrder(e.target.value)}
-                  className="h-11 w-full rounded-2xl border border-line px-4 text-sm outline-none focus:border-[#FFC400]"
+                  className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
               <label className="block">
@@ -148,7 +148,7 @@ export default function OwnerSettingsPage() {
                 </span>
                 <input
                   type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                  className="h-11 w-full rounded-2xl border border-line px-4 text-sm outline-none focus:border-[#FFC400]"
+                  className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
               <label className="block">
@@ -157,7 +157,7 @@ export default function OwnerSettingsPage() {
                 </span>
                 <input
                   type="number" min={5} max={180} value={prep} onChange={(e) => setPrep(e.target.value)}
-                  className="h-11 w-full rounded-2xl border border-line px-4 text-sm outline-none focus:border-[#FFC400]"
+                  className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
             </section>

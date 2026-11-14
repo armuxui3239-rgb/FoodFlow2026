@@ -127,7 +127,7 @@ export default function OwnerRevenuePage() {
                     </div>
                     <span
                       className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                        p.status === 'pending' ? 'bg-[#FFF4CC] text-black' : 'bg-black text-white'
+                        p.status === 'pending' ? 'bg-[#FFF4CC] text-black' : 'bg-black text-[#FFC400]'
                       }`}
                     >
                       {p.status === 'pending' ? 'รอตั้งเวลา' : 'เข้าบัญชีแล้ว'}

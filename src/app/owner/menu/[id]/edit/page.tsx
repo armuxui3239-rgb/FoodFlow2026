@@ -177,7 +177,7 @@ export default function OwnerMenuEditPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 maxLength={200}
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 
@@ -187,7 +187,7 @@ export default function OwnerMenuEditPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="mt-1 w-full rounded-2xl border border-line px-3 py-2 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 w-full rounded-2xl border border-line bg-neutral-50 px-3 py-2 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 
@@ -202,7 +202,7 @@ export default function OwnerMenuEditPage() {
                   min="0"
                   step="1"
                   inputMode="numeric"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
               <label className="block">
@@ -211,7 +211,7 @@ export default function OwnerMenuEditPage() {
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   required
-                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-white px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 >
                   <option value="">— เลือกหมวดหมู่ —</option>
                   {categories.map((c) => (
@@ -229,7 +229,7 @@ export default function OwnerMenuEditPage() {
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 type="url"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 
@@ -257,7 +257,7 @@ export default function OwnerMenuEditPage() {
                   <button
                     type="button"
                     disabled={deleting}
-                    className="flex h-12 w-14 shrink-0 items-center justify-center rounded-2xl bg-red-50 text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50"
+                    className="flex h-12 w-14 shrink-0 items-center justify-center rounded-2xl border border-red-200 bg-white text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
                     aria-label="ลบเมนูนี้"
                   >
                     <Trash2 className="h-5 w-5" aria-hidden />
@@ -274,7 +274,7 @@ export default function OwnerMenuEditPage() {
                     <AlertDialogCancel className="rounded-full">ยกเลิก</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => void remove()}
-                      className="rounded-full bg-red-600 text-white hover:bg-red-700"
+                      className="rounded-full border border-red-200 text-red-600 hover:bg-red-50"
                     >
                       ลบเมนู
                     </AlertDialogAction>

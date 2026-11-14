@@ -156,7 +156,7 @@ export default function OwnerPromotionEditPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 maxLength={255}
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 
@@ -197,7 +197,7 @@ export default function OwnerPromotionEditPage() {
                   min="0"
                   step={type === 'percentage' ? '1' : '0.01'}
                   inputMode="decimal"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
               <label className="block">
@@ -208,7 +208,7 @@ export default function OwnerPromotionEditPage() {
                   type="number"
                   min="0"
                   inputMode="numeric"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
             </div>
@@ -223,7 +223,7 @@ export default function OwnerPromotionEditPage() {
                   min="0"
                   inputMode="numeric"
                   placeholder="เว้นว่าง = ไม่จำกัด"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
             )}
@@ -237,7 +237,7 @@ export default function OwnerPromotionEditPage() {
                   type="number"
                   min="1"
                   inputMode="numeric"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
               <label className="block">
@@ -249,7 +249,7 @@ export default function OwnerPromotionEditPage() {
                   min="1"
                   inputMode="numeric"
                   placeholder="เว้นว่าง = ไม่จำกัด"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
             </div>
@@ -260,7 +260,7 @@ export default function OwnerPromotionEditPage() {
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
                 type="date"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 

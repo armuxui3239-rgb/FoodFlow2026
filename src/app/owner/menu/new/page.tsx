@@ -121,7 +121,7 @@ export default function OwnerMenuNewPage() {
                 required
                 maxLength={200}
                 placeholder="เช่น ข้าวมันไก่พิเศษ"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 
@@ -132,7 +132,7 @@ export default function OwnerMenuNewPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
                 placeholder="อธิบายเมนูสั้น ๆ"
-                className="mt-1 w-full rounded-2xl border border-line px-3 py-2 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 w-full rounded-2xl border border-line bg-neutral-50 px-3 py-2 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 
@@ -148,7 +148,7 @@ export default function OwnerMenuNewPage() {
                   step="1"
                   inputMode="numeric"
                   placeholder="50"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
               <label className="block">
@@ -158,7 +158,7 @@ export default function OwnerMenuNewPage() {
                   onChange={(e) => setSortOrder(e.target.value)}
                   type="number"
                   inputMode="numeric"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
             </div>
@@ -169,7 +169,7 @@ export default function OwnerMenuNewPage() {
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 required
-                className="mt-1 h-11 w-full rounded-2xl border border-line bg-white px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               >
                 <option value="">— เลือกหมวดหมู่ —</option>
                 {categories.map((c) => (
@@ -187,7 +187,7 @@ export default function OwnerMenuNewPage() {
                 onChange={(e) => setImageUrl(e.target.value)}
                 type="url"
                 placeholder="https://..."
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
 

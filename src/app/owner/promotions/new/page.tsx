@@ -106,7 +106,7 @@ export default function OwnerPromotionNewPage() {
                 required
                 maxLength={50}
                 placeholder="เช่น WELCOME50"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm uppercase outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm uppercase outline-none focus:border-[#FFC400]"
               />
             </label>
             <label className="block">
@@ -116,7 +116,7 @@ export default function OwnerPromotionNewPage() {
                 onChange={(e) => setName(e.target.value)}
                 maxLength={255}
                 placeholder="เช่น ลูกค้าใหม่รับส่วนลด"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
           </div>
@@ -159,7 +159,7 @@ export default function OwnerPromotionNewPage() {
                 min="0"
                 step={type === 'percentage' ? '1' : '0.01'}
                 inputMode="decimal"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
             <label className="block">
@@ -170,7 +170,7 @@ export default function OwnerPromotionNewPage() {
                 type="number"
                 min="0"
                 inputMode="numeric"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
           </div>
@@ -185,7 +185,7 @@ export default function OwnerPromotionNewPage() {
                 min="0"
                 inputMode="numeric"
                 placeholder="เว้นว่าง = ไม่จำกัด"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
           )}
@@ -199,7 +199,7 @@ export default function OwnerPromotionNewPage() {
                 type="number"
                 min="1"
                 inputMode="numeric"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
             <label className="block">
@@ -210,7 +210,7 @@ export default function OwnerPromotionNewPage() {
                 type="number"
                 min="1"
                 inputMode="numeric"
-                className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
               />
             </label>
           </div>
@@ -222,7 +222,7 @@ export default function OwnerPromotionNewPage() {
               onChange={(e) => setExpiresAt(e.target.value)}
               type="date"
               min={new Date().toISOString().slice(0, 10)}
-              className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+              className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
             />
           </label>
 

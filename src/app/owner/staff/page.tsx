@@ -288,7 +288,7 @@ export default function OwnerStaffPage() {
                   type="email"
                   required
                   placeholder="name@example.com"
-                  className="mt-1 h-11 w-full rounded-2xl border border-line px-3 text-sm outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm outline-none focus:border-[#FFC400]"
                 />
               </label>
               <label className="block">
@@ -296,7 +296,7 @@ export default function OwnerStaffPage() {
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black outline-none focus:border-[#FFC400]"
+                  className="mt-1 h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black outline-none focus:border-[#FFC400]"
                 >
                   {Object.entries(ROLE_TH)
                     .filter(([k]) => k !== 'owner')
