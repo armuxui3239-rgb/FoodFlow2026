@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   ChevronLeft,
@@ -18,10 +19,12 @@ import { api } from '@/lib/client';
 const REMEMBER_KEY = 'ft_remember';
 const PIN_FIELD = 'h-12 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-center text-lg font-bold tracking-[0.4em] outline-none focus:border-[#FFC400]';
 
-/** หน้าความปลอดภัย — จดจำการเข้าสู่ระบบ (localStorage) + เปลี่ยน PIN + ตัวเลือกไบโอเมตริก/2FA ที่ยังไม่เปิดใช้งาน */
+/** หน้าความปลอดภัย — จดจำการเข้าสู่ระบบ (localStorage) + เปลี่ยน PIN + ลบบัญชี (PDPA) */
 export default function SecuritySettingsPage() {
+  const router = useRouter();
   const [remember, setRemember] = useState(true);
   const [ready, setReady] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
   const [oldPin, setOldPin] = useState('');
   const [newPin, setNewPin] = useState('');
@@ -51,6 +54,19 @@ export default function SecuritySettingsPage() {
       setPinErr(e instanceof Error ? e.message : 'เปลี่ยน PIN ไม่สำเร็จ');
     } finally {
       setChanging(false);
+    }
+  };
+
+  // ลบบัญชี (PDPA) — ยืนยัน 2 ชั้นแล้วปิดบัญชี + ลบข้อมูลส่วนบุคคล
+  const deleteAccount = async () => {
+    if (!window.confirm('ยืนยันลบบัญชี? ข้อมูลส่วนบุคคลจะถูกลบทันทีและย้อนคืนไม่ได้')) return;
+    if (!window.confirm('ยืนยันอีกครั้ง — การลบบัญชีไม่สามารถย้อนคืนได้จริง ๆ หรือไม่?')) return;
+    setDeleting(true);
+    try {
+      await api('/api/auth/delete-account', { method: 'POST' });
+      router.replace('/login');
+    } catch {
+      setDeleting(false);
     }
   };
 
@@ -233,6 +249,24 @@ export default function SecuritySettingsPage() {
         <p className="px-2 text-center text-[11px] leading-relaxed text-neutral-400">
           PIN ใช้สำหรับยืนยันการชำระเงินและเข้าสู่ระบบอย่างรวดเร็ว — อย่าบอก PIN ให้ผู้อื่น
         </p>
+      </section>
+
+      {/* ลบบัญชี — สิทธิ์ลบข้อมูลส่วนบุคคลตาม PDPA (v4 ข้อ 11) */}
+      <section aria-label="ลบบัญชี" className="space-y-2 rounded-3xl border border-red-200 bg-white p-4">
+        <p className="text-sm font-bold text-red-600">ลบบัญชี</p>
+        <p className="text-xs leading-relaxed text-neutral-400">
+          ปิดบัญชีและลบข้อมูลส่วนบุคคลทันที (ชื่อ/อีเมล/เบอร์/ที่อยู่/ร้านโปรด/PIN) —
+          บันทึกธุรกรรมเก็บแบบไม่ระบุตัวตนตามภาระกฎหมาย ย้อนคืนไม่ได้ อ่านรายละเอียดในนโยบายความเป็นส่วนตัว
+        </p>
+        <button
+          type="button"
+          onClick={() => void deleteAccount()}
+          disabled={deleting}
+          data-testid="delete-account"
+          className="h-11 w-full rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+        >
+          {deleting ? 'กำลังลบบัญชี…' : 'ลบบัญชีของฉัน'}
+        </button>
       </section>
 
       {/* สถานะว่างเชิงตรรกะ: ไม่มีข้อมูลที่ต้องโหลดจากเซิร์ฟเวอร์ จึงไม่มีสถานะ error — แสดงคำแนะนำความปลอดภัยแทน */}
