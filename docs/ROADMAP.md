@@ -12,7 +12,7 @@ P1 = ความครบถ้วนของวงจรธุรกิจ, P
 | 2 | เติมเวลาเปิด-ปิดอีก 14 ร้าน (7 วัน/ร้าน) | ✅ เสร็จ | scripts/fix-p0-data.mjs (insert 154 แถวครบ) |
 | 3 | เติมเมนูให้หมวด "ทานเล่น/เครื่องดื่ม" ทุกร้าน | ✅ เสร็จ | scripts/fix-p0-data.mjs (catalog 18 เมนู) |
 | 4 | seed ออเดอร์เดินวงจรครบทุกสถานะ + ผูกไรเดอร์ | ✅ เสร็จ | scripts/fix-p0-data.mjs (9 ออเดอร์ FULL_CHAIN) |
-| 5 | ตั้ง preferred_locale = th ทุกบัญชี + เปลี่ยนอีเมล foodflow.vn | ⏳ ค้าง 1 คลิก | สคริปต์แก้อีเมลแล้ว; ต้องรัน `deployments/sql/add_th_locale.sql` ใน SQL Editor ก่อน (ALTER TYPE ทำผ่าน REST ไม่ได้ — รอเจ้าของโปรเจค) |
+| 5 | ตั้ง preferred_locale = th ทุกบัญชี + เปลี่ยนอีเมล foodflow.vn | ✅ เสร็จ | ALTER TYPE LocaleCode ADD 'th' ผ่าน pg ตรง (DIRECT_URL) + UPDATE 123 บัญชี = th + USER_LOCALE_DEFAULT=th ใน env · อีเมล foodflow.vn = 0 (2026-11-14) |
 | 6 | เชื่อมคูปองเข้า checkout — หักเงินจริง + บันทึก promotion_usages | ✅ เสร็จ | /api/promotions/validate + /api/orders (CHANGELOG 0.2.0) + แก้บั๊กหน่วยเงิน fixed 100 เท่า (2026-11-14) |
 | 7 | seed menu_item_options/option_values | ✅ เสร็จ | scripts/seed-menu-options-faq.mjs → 88 กลุ่ม (ขนาด+ท็อปปิ้ง) ครบ 2 เมนูแรกของ 22 ร้าน (ตรวจ count=exact 88) |
 | 8 | สร้างบัญชีเจ้าของร้านอีก 14 ร้าน + restaurant_profiles | ✅ เสร็จ | scripts/fix-p0-data.mjs (22/22 ร้านมีเจ้าของ) |
@@ -23,8 +23,8 @@ P1 = ความครบถ้วนของวงจรธุรกิจ, P
 - ✅ customer_profiles default address + ที่อยู่ทุกลูกค้า (fix-p0-data.mjs)
 - ✅ platform_settings seed ค่าระบบ (scripts/seed-portal-data.mjs — 25 แถวจริง)
 - ✅ rag_documents นำ FAQ 15 ข้อขึ้นฐานความรู้ (scripts/seed-menu-options-faq.mjs — 15 แถว, embedding ปล่อย null ตามหลักไม่ปลอมข้อมูล)
-- ⏳ ระบบสะสมแต้มจริงตอนสั่งซื้อ (ตอนนี้มีหน้าแสดง + ข้อมูล seed; ยังไม่เขียน loyalty_transactions ตอน POST /api/orders)
-- ⏳ ทำความสะอาดออเดอร์ทดสอบยอด ฿1–฿5 (รอนโยบายข้อมูลทดสอบจากเจ้าของ)
+- ✅ ระบบสะสมแต้มจริง — 1 แต้ม/ออเดอร์จบสมบูรณ์ (lib/loyalty.ts + hook ตอนแอดมินปิด 'completed' · กันเขียนซ้ำ · พังไม่รบกวนออเดอร์ · โมเดลเดียวกับ seed) — พิสูจน์: qa-smoke ออเดอร์ FT2611143066 ได้ 1 แต้มจริง (2026-11-14)
+- ✅ ออเดอร์ทดสอบยอด ฿1–฿5 = 0 แถว (ตรวจจริงด้วย scripts/audit-db-truth.mjs — ไม่มีค้าง)
 - ✅ สถานะระหว่างทาง + หน้าติดตามแผนที่เส้นทาง (มีครบ)
 
 ## P2 — ส่วนขยาย

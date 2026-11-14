@@ -3,6 +3,16 @@
 รูปแบบตาม [Keep a Changelog](https://keepachangelog.com/th/1.1.0/)
 และกำหนดเวอร์ชันตาม [Semantic Versioning](https://semver.org/lang/th/)
 
+## [0.7.2] — 2026-11-14 (ตรวจความจริงทั้งโปรเจกต์ + ปิด P0 locale + แต้มสะสมจริง)
+
+### เพิ่ม (Added)
+- **ระบบสะสมแต้มจริง (P1)**: 1 แต้ม/ออเดอร์ที่จบสมบูรณ์ — `lib/loyalty.ts` + hook ตอนแอดมินปิด 'completed' (กันเขียนซ้ำต่อออเดอร์ · พังไม่รบกวนการเปลี่ยนสถานะ · โมเดลเดียวกับข้อมูล seed) — พิสูจน์: qa-smoke ออเดอร์ FT2611143066 ได้ 1 แต้มจริง, ไม่มีออเดอร์ได้แต้มซ้ำ
+- `scripts/audit-db-truth.mjs` — ตรวจความจริงฐานข้อมูลรวมจุด (enum/RLS/ตารางหมวด D/loyalty/locale — อ่านอย่างเดียว)
+
+### เสร็จ (Done) — งานค้างที่เคยรอเจ้าของ
+- **P0 #5**: เปิด LocaleCode 'th' ผ่าน pg ตรง (DIRECT_URL) + ตั้ง preferred_locale='th' ครบ **123 บัญชี** + `USER_LOCALE_DEFAULT=th` (สมัครใหม่ = th)
+- ผลตรวจความจริง: RLS 64/65 ตาราง (ครบตามดีไซน์) · ตารางหมวด D มีข้อมูลจริงครบ (dispatch 76/refund 11/payout 5/outbox 27/shift 8/GPS 1) · ออเดอร์ทดสอบ ฿1–฿5 = 0 · qa-all **120/120** · grep บริการบุคคลที่สาม = 0 · นับจริง 109 หน้า/136 API
+
 ## [0.7.1] — 2026-11-14 (เปิดใช้งานจริงครั้งแรก: OTP ตามนิยามเจ้าของ + โทรต่อได้จริงบนมือถือ + เส้นทาง Vercel)
 
 ### เปลี่ยน (Changed)
@@ -76,7 +86,7 @@
 - ความปลอดภัย RLS/rate limit/cookie/PDPA เสร็จในเฟส 9 · หมุน key รอเจ้าของ (docs/KEY-ROTATION.md) · ~~FCM~~/~~LiveKit~~ ยกเลิกตามนโยบายจบในระบบ (ดู OPEN-SOURCE-PLAN.md)
 
 ### รอเจ้าของโปรเจค 1 คลิก
-- รัน `deployments/sql/add_th_locale.sql` ใน SQL Editor (ALTER TYPE ทำผ่าน REST ไม่ได้) แล้วตั้งภาษาไทยให้ผู้ใช้ทุกคน
+- ~~รัน `deployments/sql/add_th_locale.sql`~~ **เสร็จแล้ว** (0.7.2: รันผ่าน pg ตรง + ตั้ง th ทุกบัญชี 123 ราย + USER_LOCALE_DEFAULT=th)
 
 ## [0.5.0] — 2026-11-14
 

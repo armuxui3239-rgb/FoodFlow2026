@@ -80,6 +80,7 @@ Docker:  deployments/sms-gateway (เก็บถาวร — ไม่ใช�
 | `SUPABASE_SERVICE_KEY` | .env | server เท่านั้น — ห้ามขึ้น client |
 | `SESSION_SECRET` | .env | ลายเซ็น session cookie |
 | `VERIFICATION_DELIVERY` | `internal_code` | **ห้าม**ใส่ `dev_console` — production ปฏิเสธเริ่มระบบ (instrumentation) |
+| `USER_LOCALE_DEFAULT` | `th` | ภาษาเริ่มต้นของบัญชีใหม่ (ฐาน production เปิด 'th' ใน enum แล้ว — 2026-11-14) |
 | `NEXT_PUBLIC_SUPABASE_URL` | .env | realtime ฝั่ง client |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | .env | realtime ฝั่ง client |
 | `NEXT_PUBLIC_CALLS_ENABLED` | `true` | เปิดหน้าโทร |
