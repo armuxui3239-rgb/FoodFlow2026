@@ -167,7 +167,7 @@ export default function DriverVehiclePage() {
                   inputMode="text"
                   data-testid="vehicle-license"
                   placeholder="เช่น 11-2-1234567-8"
-                  className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                  className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                 />
               </label>
               <label className="block space-y-1">
@@ -178,7 +178,7 @@ export default function DriverVehiclePage() {
                   maxLength={30}
                   data-testid="vehicle-plate"
                   placeholder="เช่น 1กก 1234"
-                  className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm uppercase text-black placeholder:text-neutral-300 placeholder:normal-case"
+                  className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm uppercase text-black placeholder:text-neutral-300 placeholder:normal-case"
                 />
               </label>
               <button

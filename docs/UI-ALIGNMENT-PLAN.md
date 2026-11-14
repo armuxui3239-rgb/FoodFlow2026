@@ -79,7 +79,7 @@
 - rounded-lg ชิปโปร → rounded-full · ui/button 2 หน้า · 6xl 2 จุด · สีนอกพาเลต owner/menu · ฟอร์มโฟกัสดำ
 - ชุดหนักสุด: orders, menu/[id]/edit, promotions(+[id]), menu/categories, staff
 
-### เฟส 4 — ไรเดอร์ 17 หน้า
+### เฟส 4 — ไรเดอร์ 17 หน้า — ✅ เสร็จ 2026-11-14 (การ์ดดำ 4 จุด: เอา text-white หลักออก + ป้าย white/50-70 → neutral-400 + ตัวเลขรอง → เหลือง, ชิป resolved → ดำ-เหลือง, ช่องกรอกพื้นขาว → neutral-50 16 จุด/6 ไฟล์ (onboarding/kyc/settings/bank/trips); ฟองแชทคงขาวบนดำตามดีไซน์ลูกค้า; ตรวจแล้ว: ไม่มี max-w-6xl/rounded-lg/สีนอกพาเลตเหลือ; หลักฐาน: tsc 0, lint 0, build ผ่าน, qa-smoke 42/42, ตรวจภาพ /driver/ratings ด้วยบัญชีไรเดอร์จริง)
 - 4.1 5 หน้าป้ายขาวบนดำ → ธีมดำของคุณ (label `text-neutral-400`, ตัวเลข `text-[#FFC400]`): trips/[id] (หนักสุด), ratings, tips, kyc, support
 - 4.2 ฟอร์ม bank ตามมาตรฐาน · select สไตล์
 

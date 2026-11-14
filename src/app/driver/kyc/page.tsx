@@ -135,11 +135,11 @@ export default function DriverKycPage() {
               </section>
             )}
             {status === 'approved' && (
-              <section aria-label="สถานะ" className="rounded-3xl border border-line bg-black p-5 text-white">
+              <section aria-label="สถานะ" className="rounded-3xl border border-line bg-black p-5">
                 <p className="flex items-center gap-2 text-sm font-bold text-[#FFC400]">
                   <BadgeCheck className="h-5 w-5" aria-hidden /> ยืนยันตัวตนเรียบร้อยแล้ว
                 </p>
-                <p className="mt-1 text-xs text-white/70">บัญชีธนาคารรับรายได้ของคุณพร้อมใช้งาน</p>
+                <p className="mt-1 text-xs text-neutral-400">บัญชีธนาคารรับรายได้ของคุณพร้อมใช้งาน</p>
               </section>
             )}
             {status === 'rejected' && (
@@ -165,7 +165,7 @@ export default function DriverKycPage() {
                     maxLength={30}
                     data-testid="kyc-license"
                     placeholder="เช่น 11-2-1234567-8"
-                    className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                    className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                   />
                 </label>
                 <label className="block space-y-1">
@@ -176,7 +176,7 @@ export default function DriverKycPage() {
                     maxLength={30}
                     data-testid="kyc-plate"
                     placeholder="เช่น 1กก 1234"
-                    className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                    className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                   />
                 </label>
                 <label className="block space-y-1">
@@ -187,7 +187,7 @@ export default function DriverKycPage() {
                     inputMode="url"
                     data-testid="kyc-idcard-url"
                     placeholder="https://..."
-                    className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                    className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                   />
                 </label>
                 <label className="block space-y-1">
@@ -198,7 +198,7 @@ export default function DriverKycPage() {
                     inputMode="url"
                     data-testid="kyc-license-url"
                     placeholder="https://..."
-                    className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                    className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                   />
                 </label>
                 <label className="flex items-start gap-2 rounded-2xl bg-neutral-50 px-3 py-3">

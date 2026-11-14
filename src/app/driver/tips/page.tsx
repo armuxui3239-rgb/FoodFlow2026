@@ -54,7 +54,7 @@ export default function DriverTipsPage() {
       <main className="mx-auto w-full max-w-5xl flex-1 space-y-4 px-4 py-5">
         {error && <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
 
-        <section aria-label="ทิปรวม" className="rounded-3xl bg-black p-6 text-white">
+        <section aria-label="ทิปรวม" className="rounded-3xl bg-black p-6">
           <p className="flex items-center gap-2 text-sm text-[#FFC400]">
             <HeartHandshake className="h-5 w-5" aria-hidden /> ทิปที่ได้รับทั้งหมด
           </p>
@@ -63,7 +63,7 @@ export default function DriverTipsPage() {
           ) : (
             <p className="mt-1 text-5xl font-bold text-[#FFC400]">{baht(totalSatang)}</p>
           )}
-          <p className="mt-2 text-xs text-white/60">โอนเข้าบัญชีค่าเริ่มต้นพร้อมรายได้ค่าส่ง</p>
+          <p className="mt-2 text-xs text-neutral-400">โอนเข้าบัญชีค่าเริ่มต้นพร้อมรายได้ค่าส่ง</p>
         </section>
 
         <section aria-label="ประวัติทิป">

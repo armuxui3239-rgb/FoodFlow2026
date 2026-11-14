@@ -146,7 +146,7 @@ export default function DriverSettingsPage() {
                   onChange={(e) => setPlate(e.target.value)}
                   maxLength={30}
                   data-testid="settings-plate"
-                  className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black"
+                  className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black"
                 />
               </label>
               <label className="block space-y-1">
@@ -156,7 +156,7 @@ export default function DriverSettingsPage() {
                   onChange={(e) => setLicense(e.target.value)}
                   maxLength={30}
                   data-testid="settings-license"
-                  className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black"
+                  className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black"
                 />
               </label>
               <label className="block space-y-1">
@@ -167,7 +167,7 @@ export default function DriverSettingsPage() {
                   inputMode="numeric"
                   maxLength={2}
                   data-testid="settings-radius"
-                  className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black"
+                  className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black"
                 />
               </label>
               <button

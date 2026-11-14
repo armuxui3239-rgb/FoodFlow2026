@@ -58,7 +58,7 @@ export default function DriverRatingsPage() {
         {error && <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
 
         {/* การ์ดคะแนนเฉลี่ย */}
-        <section aria-label="คะแนนเฉลี่ย" className="rounded-3xl bg-black p-6 text-white">
+        <section aria-label="คะแนนเฉลี่ย" className="rounded-3xl bg-black p-6">
           <p className="flex items-center gap-2 text-sm text-[#FFC400]">
             <Star className="h-5 w-5" aria-hidden /> คะแนนเฉลี่ยของคุณ
           </p>
@@ -66,10 +66,10 @@ export default function DriverRatingsPage() {
             <div className="mt-2 h-10 w-24 animate-pulse rounded-2xl bg-neutral-800" />
           ) : (
             <p className="mt-1 text-5xl font-bold text-[#FFC400]">
-              {average.toFixed(1)} <span className="text-lg text-white/70">/ 5.0</span>
+              {average.toFixed(1)} <span className="text-lg text-neutral-400">/ 5.0</span>
             </p>
           )}
-          <p className="mt-2 text-xs text-white/60">จากรีวิวการจัดส่ง {total} รายการ</p>
+          <p className="mt-2 text-xs text-neutral-400">จากรีวิวการจัดส่ง {total} รายการ</p>
         </section>
 
         {/* รายการรีวิว */}

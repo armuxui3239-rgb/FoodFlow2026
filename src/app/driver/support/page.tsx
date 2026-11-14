@@ -28,7 +28,7 @@ const ISSUES: { value: string; label: string }[] = [
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   open: { label: 'กำลังดำเนินการ', cls: 'bg-[#FFF4CC] text-black' },
   in_progress: { label: 'กำลังดำเนินการ', cls: 'bg-[#FFF4CC] text-black' },
-  resolved: { label: 'แก้ไขแล้ว', cls: 'bg-black text-white' },
+  resolved: { label: 'แก้ไขแล้ว', cls: 'bg-black text-[#FFC400]' },
   closed: { label: 'ปิดเรียบร้อย', cls: 'bg-neutral-100 text-neutral-500' },
 };
 

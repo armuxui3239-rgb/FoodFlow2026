@@ -187,7 +187,7 @@ export default function DriverDocumentsPage() {
                         inputMode="url"
                         data-testid={`doc-url-${item.type}`}
                         placeholder="https://..."
-                        className="h-11 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                        className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                       />
                       <span className="block text-[11px] text-neutral-400">วางลิงก์รูปภาพ (https://)</span>
                     </label>
@@ -206,7 +206,7 @@ export default function DriverDocumentsPage() {
                   maxLength={30}
                   data-testid="documents-license"
                   placeholder="เช่น 11-2-1234567-8"
-                  className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                  className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                 />
               </label>
               <label className="block space-y-1">
@@ -217,7 +217,7 @@ export default function DriverDocumentsPage() {
                   maxLength={30}
                   data-testid="documents-plate"
                   placeholder="เช่น 1กก 1234"
-                  className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm uppercase text-black placeholder:text-neutral-300 placeholder:normal-case"
+                  className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm uppercase text-black placeholder:text-neutral-300 placeholder:normal-case"
                 />
               </label>
               <p className="text-[11px] leading-relaxed text-neutral-400">

@@ -216,7 +216,7 @@ export default function DriverTripPage() {
         ) : data ? (
           <>
             {/* สรุปงาน */}
-            <section aria-label="สรุปงาน" className="rounded-3xl bg-black p-5 text-white">
+            <section aria-label="สรุปงาน" className="rounded-3xl bg-black p-5">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-lg font-bold text-[#FFC400]">#{data.order.code}</span>
                 <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-bold text-[#FFC400]">
@@ -225,16 +225,16 @@ export default function DriverTripPage() {
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
                 <div>
-                  <p className="font-bold text-white">{data.task.distanceKm ? `${Number(data.task.distanceKm).toFixed(1)} กม.` : '-'}</p>
-                  <p className="text-white/50">ระยะทาง</p>
+                  <p className="font-bold text-[#FFC400]">{data.task.distanceKm ? `${Number(data.task.distanceKm).toFixed(1)} กม.` : '-'}</p>
+                  <p className="text-neutral-400">ระยะทาง</p>
                 </div>
                 <div>
-                  <p className="font-bold text-white">{fmt(data.task.pickedUpAt)}</p>
-                  <p className="text-white/50">รับของ</p>
+                  <p className="font-bold text-[#FFC400]">{fmt(data.task.pickedUpAt)}</p>
+                  <p className="text-neutral-400">รับของ</p>
                 </div>
                 <div>
-                  <p className="font-bold text-white">{fmt(data.task.deliveredAt)}</p>
-                  <p className="text-white/50">ส่งถึง</p>
+                  <p className="font-bold text-[#FFC400]">{fmt(data.task.deliveredAt)}</p>
+                  <p className="text-neutral-400">ส่งถึง</p>
                 </div>
               </div>
             </section>
@@ -458,7 +458,7 @@ export default function DriverTripPage() {
                         inputMode="decimal"
                         data-testid="tip-custom"
                         placeholder="เช่น 75"
-                        className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                        className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
                       />
                     </label>
                     {tipErr && <p role="alert" className="text-xs font-bold text-red-600">{tipErr}</p>}

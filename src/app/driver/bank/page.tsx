@@ -183,7 +183,7 @@ export default function DriverBankPage() {
                 value={bankCode}
                 onChange={(e) => setBankCode(e.target.value)}
                 data-testid="bank-select"
-                className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black"
+                className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black"
               >
                 {BANKS.map((b) => (
                   <option key={b.code} value={b.code}>{b.name}</option>
@@ -199,7 +199,7 @@ export default function DriverBankPage() {
                 maxLength={20}
                 data-testid="bank-account-number"
                 placeholder="เช่น 1234567890"
-                className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
               />
             </label>
             <label className="block space-y-1">
@@ -210,7 +210,7 @@ export default function DriverBankPage() {
                 maxLength={60}
                 data-testid="bank-holder-name"
                 placeholder="เช่น สมชาย ใจดี"
-                className="h-12 w-full rounded-2xl border border-line bg-white px-3 text-sm text-black placeholder:text-neutral-300"
+                className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black placeholder:text-neutral-300"
               />
             </label>
             <div className="flex gap-2">
