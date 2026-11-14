@@ -52,7 +52,7 @@ export default function RegisterPage() {
           <Phone className="h-8 w-8 text-black" aria-hidden />
         </span>
         <p className="text-center text-sm text-ink-soft">
-          ยืนยันเบอร์โทรด้วยรหัส OTP 6 หลัก ที่ส่งทาง SMS ถึงคุณ (หมดอายุ 5 นาที)
+          ยืนยันเบอร์โทรด้วยรหัสยืนยัน 6 หลัก ที่ระบบสร้างให้คุณในแอปโดยตรง (หมดอายุ 10 นาที)
         </p>
       </div>
 

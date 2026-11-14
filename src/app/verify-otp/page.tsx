@@ -42,6 +42,14 @@ export default function VerifyOtpPage() {
     return () => clearInterval(t);
   }, [cooldown]);
 
+  // OTP ของเรา: รหัสที่ระบบสร้างเองลงช่องให้อัตโนมัติทันที (internal_code — ไม่มีการส่ง SMS)
+  useEffect(() => {
+    if (!flow?.devCode) return;
+    if (flow.deliveryChannel === 'internal_code' || flow.deliveryChannel === 'dev_console') {
+      setDigits(['', '', '', '', '', ''].map((_, i) => flow.devCode?.[i] ?? ''));
+    }
+  }, [flow]);
+
   const setDigit = (i: number, v: string) => {
     const clean = v.replace(/\D/g, '').slice(-1);
     const next = [...digits];
@@ -137,32 +145,25 @@ export default function VerifyOtpPage() {
           <ShieldCheck className="h-7 w-7 text-black" aria-hidden />
         </span>
         <p className="text-sm text-ink-soft">
-          ระบบส่งรหัสไปที่ <span className="font-bold text-ink">{flow.phoneMasked}</span>
+          ระบบสร้างรหัสยืนยัน 6 หลักสำหรับเบอร์ <span className="font-bold text-ink">{flow.phoneMasked}</span> ให้คุณแล้ว
         </p>
       </div>
 
-      {/* แจ้งช่องทางรับรหัส — internal_code แสดงรหัสในระบบทันที (นโยบายจบในระบบ ไม่มีการส่ง SMS) */}
+      {/* OTP ของเรา: รหัสที่ระบบสร้างเอง ลงช่องให้อัตโนมัติแล้ว — ไม่มีการส่ง SMS (นโยบายจบในระบบ) */}
       {(flow.deliveryChannel === 'dev_console' || flow.deliveryChannel === 'internal_code') && flow.devCode ? (
-        <button
-          type="button"
-          onClick={() => {
-            setDigits(['', '', '', '', '', ''].map((_, i) => flow.devCode?.[i] ?? ''));
-            inputs.current[5]?.focus();
-          }}
-          className="mb-5 flex w-full items-start gap-2 rounded-2xl bg-[#FFF4CC] px-4 py-3 text-start text-sm text-ink"
-        >
+        <div className="mb-5 flex w-full items-start gap-2 rounded-2xl bg-[#FFF4CC] px-4 py-3 text-sm text-ink">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            รหัสยืนยันภายในระบบของคุณ:{' '}
+            รหัสยืนยันของคุณ:{' '}
             <span className="font-bold tracking-[0.3em]">{flow.devCode}</span>
-            <span className="block text-xs text-ink-soft">กดเพื่อกรอกโค้ดอัตโนมัติ (ระบบไม่ส่ง SMS — แสดงในแอปเท่านั้น)</span>
+            <span className="block text-xs text-ink-soft">ระบบลงรหัสในช่องให้อัตโนมัติแล้ว — ตรวจทานแล้วกดยืนยันได้เลย (ไม่มีการส่ง SMS)</span>
           </span>
-        </button>
+        </div>
       ) : (
         <div className="mb-5 flex items-start gap-2 rounded-2xl bg-[#FFF4CC] px-4 py-3 text-sm text-ink">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            ระบบสร้างรหัสยืนยัน 6 หลักแล้ว — กรอกรหัสที่ได้รับ (หมดอายุ 5 นาที)
+            ระบบสร้างรหัสยืนยัน 6 หลักแล้ว — กรอกรหัสที่ได้รับ (หมดอายุ 10 นาที)
           </span>
         </div>
       )}
