@@ -24,7 +24,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     restaurant?.phone && restaurant.phone.replace(/\D/g, '').length >= 9
       ? restaurant.phone
       : FALLBACK_PROMPTPAY;
-  const payload = promptPayPayload(target, order.total);
+  const payload = promptPayPayload(target, order.total, process.env.PROMPTPAY_BANK_CODE);
   const qrImage = await QRCode.toDataURL(payload, { width: 320, margin: 1 });
   return Response.json({ qrImage, payload, amount: order.total });
 }

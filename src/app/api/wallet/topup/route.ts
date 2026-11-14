@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   });
 
   const target = process.env.PROMPTPAY_ID || FALLBACK_PROMPTPAY;
-  const payload = promptPayPayload(target, valueSatang);
+  const payload = promptPayPayload(target, valueSatang, process.env.PROMPTPAY_BANK_CODE);
   const qrDataUrl = await QRCode.toDataURL(payload, { width: 320, margin: 1 });
 
   return Response.json(

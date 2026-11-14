@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
   let qrImage: string | null = null;
   let payload: string | null = null;
   if (pm === 'promptpay') {
-    payload = promptPayPayload(promptPayTarget, total);
+    payload = promptPayPayload(promptPayTarget, total, process.env.PROMPTPAY_BANK_CODE);
     qrImage = await QRCode.toDataURL(payload, { width: 320, margin: 1 });
   }
   return Response.json(
