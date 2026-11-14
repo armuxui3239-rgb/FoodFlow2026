@@ -5,7 +5,8 @@ import { currentUser, jsonError } from '@/lib/api-user';
 import { promptPayPayload } from '@/lib/promptpay';
 import QRCode from 'qrcode';
 
-const ALLOWED_AMOUNTS = [50, 100, 200, 300, 500, 1000]; // หน่วยบาท (input จากผู้ใช้)
+const MIN_TOPUP_BAHT = 1;
+const MAX_TOPUP_BAHT = 50000;
 // ใช้เบอร์พร้อมเพย์จาก env PROMPTPAY_ID ก่อน ถ้าไม่มีใช้ fallback จาก env เดียวกับ orders/route.ts
 const FALLBACK_PROMPTPAY = process.env.PROMPTPAY_FALLBACK_TARGET ?? '0812345678';
 
@@ -15,10 +16,10 @@ export async function POST(req: NextRequest) {
   if (!user) return jsonError('กรุณาเข้าสู่ระบบ', 401);
 
   const { amount } = (await req.json().catch(() => ({}))) as { amount?: number };
-  if (!ALLOWED_AMOUNTS.includes(Number(amount))) {
-    return jsonError('จำนวนเงินไม่ถูกต้อง กรุณาเลือก 50, 100, 200, 300, 500 หรือ 1,000 บาท', 400);
-  }
   const value = Number(amount);
+  if (!Number.isInteger(value) || value < MIN_TOPUP_BAHT || value > MAX_TOPUP_BAHT) {
+    return jsonError('จำนวนเงินต้องเป็นจำนวนเต็มระหว่าง 1–50,000 บาท', 400);
+  }
   const valueSatang = value * 100; // มาตรฐานฐานข้อมูล: เก็บเงินเป็นสตางค์เสมอ
 
   const [row] = await sbInsert<{ id: string; amount_delta: number }>('wallet_transactions', {

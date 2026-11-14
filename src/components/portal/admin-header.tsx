@@ -17,6 +17,7 @@ import {
   Store,
   User,
   Users,
+  Wallet,
   Bike,
 } from 'lucide-react';
 import { useSession } from '@/lib/client';
@@ -30,6 +31,7 @@ const NAV: { href: string; label: string; Icon: typeof Shield }[] = [
   { href: '/admin/orders', label: 'ออเดอร์', Icon: ClipboardList },
   { href: '/admin/drivers', label: 'ไรเดอร์', Icon: Bike },
   { href: '/admin/promotions', label: 'โปรโมชั่น', Icon: Bell },
+  { href: '/admin/topups', label: 'เติมเงิน', Icon: Wallet },
   { href: '/admin/reports', label: 'รายงาน', Icon: FileBarChart },
   { href: '/admin/analytics', label: 'วิเคราะห์', Icon: BarChart3 },
   { href: '/admin/support', label: 'ซัพพอร์ต', Icon: User },

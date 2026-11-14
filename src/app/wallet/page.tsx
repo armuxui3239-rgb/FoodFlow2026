@@ -25,6 +25,7 @@ interface WalletTx {
 const TX_STATUS_TH: Record<string, string> = {
   pending: 'รอดำเนินการ',
   completed: 'สำเร็จ',
+  rejected: 'ถูกปฏิเสธ',
   failed: 'ไม่สำเร็จ',
   cancelled: 'ยกเลิก',
   refunded: 'คืนเงินแล้ว',
