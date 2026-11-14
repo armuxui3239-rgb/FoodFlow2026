@@ -1,11 +1,12 @@
 import { NextRequest } from 'next/server';
 import { requireRole } from '@/lib/portal';
-import { sbUpdate } from '@/lib/supabase';
+import { sbUpdate, sbList, sbInsert } from '@/lib/supabase';
 import { jsonError } from '@/lib/api-user';
 
 /**
  * PATCH /api/driver/location — ไรเดอร์ส่งพิกัดปัจจุบัน { lat, lng }
  * เขียนลง driver_profiles.current_lat/current_lng เพื่อให้ลูกค้าติดตามไรเดอร์สด
+ * และระหว่างจัดส่งจริง (picked_up/delivering) บันทึก driver_location_history (REMAINING-WORK D6)
  */
 export async function PATCH(req: NextRequest) {
   const user = await requireRole('driver');
@@ -34,6 +35,24 @@ export async function PATCH(req: NextRequest) {
     { current_lat: lat, current_lng: lng },
   );
   if (!updated) return jsonError('ยังไม่มีโปรไฟล์ไรเดอร์สำหรับบัญชีนี้', 404);
+
+  // D6: เก็บประวัติพิกัดเฉพาะระหว่างจัดส่งจริง (กัน table bloat — งานปกติไม่เก็บทุก 15 วินาที)
+  try {
+    const activeTask = await sbList<{ order_id: string | null }>(
+      'delivery_tasks',
+      { driver_id: `eq.${user.id}`, status: 'in.(picked_up,delivering)', select: 'order_id', limit: '1' },
+    );
+    if (activeTask.length > 0) {
+      await sbInsert('driver_location_history', {
+        driver_id: user.id,
+        location: `SRID=4326;POINT(${lng} ${lat})`,
+        order_id: activeTask[0].order_id,
+        recorded_at: new Date().toISOString(),
+      });
+    }
+  } catch (e) {
+    console.error('location history error:', e);
+  }
 
   return Response.json({ ok: true });
 }

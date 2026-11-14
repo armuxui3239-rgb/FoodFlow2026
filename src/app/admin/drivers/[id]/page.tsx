@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { api, baht, STATUS_COLOR, STATUS_TH, useSession } from '@/lib/client';
+import { AdminDriverPayoutsSection } from '@/components/admin-driver-payouts-section';
 
 interface DriverDetail {
   profile: {
@@ -307,6 +308,9 @@ export default function AdminDriverDetailPage() {
             </section>
           </>
         )}
+
+        {/* การจ่ายเงินรายได้ (D5) — บันทึกการโอน + ยืนยันโอนแล้ว */}
+        <AdminDriverPayoutsSection driverId={id} />
       </main>
 
       {/* ยืนยันอนุมัติ/ปฏิเสธ KYC */}

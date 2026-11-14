@@ -327,9 +327,191 @@ export default function OwnerStaffPage() {
         </DialogContent>
       </Dialog>
 
+      {/* เวรทำงาน (D4) — ตารางเวรรายพนักงาน จัดการได้จากหน้านี้ */}
+      <OwnerShiftsSection profiles={staff.filter((s) => s.isActive).map((s) => ({ id: s.id, name: s.name }))} />
+
       <footer className="mt-auto border-t border-line bg-white pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 text-center text-xs text-neutral-400">
         © {new Date().getFullYear()} ฟู๊ด ธันเดอร์ — พอร์ทัลร้านค้า
       </footer>
     </div>
+  );
+}
+
+interface ShiftRow {
+  id: string;
+  restaurantProfileId: string;
+  staffName: string;
+  startsAt: string;
+  endsAt: string;
+  status: string;
+  note: string | null;
+}
+
+/** ส่วนเวรทำงาน (D4) — สร้างเวร / ปิดเวร / ยกเลิก (status: scheduled/completed/cancelled) */
+function OwnerShiftsSection({ profiles }: { profiles: { id: string; name: string }[] }) {
+  const [rows, setRows] = useState<ShiftRow[] | null>(null);
+  const [profileId, setProfileId] = useState('');
+  const [startsAt, setStartsAt] = useState('');
+  const [endsAt, setEndsAt] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState('');
+
+  const load = useCallback(() => {
+    api<{ data: ShiftRow[] }>('/api/owner/shifts')
+      .then((r) => setRows(r.data ?? []))
+      .catch((e: Error) => setError(e.message));
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const create = async () => {
+    setBusy('new');
+    setError('');
+    try {
+      await api('/api/owner/shifts', {
+        method: 'POST',
+        body: JSON.stringify({ restaurantProfileId: profileId, startsAt: new Date(startsAt).toISOString(), endsAt: new Date(endsAt).toISOString(), note }),
+      });
+      setProfileId('');
+      setStartsAt('');
+      setEndsAt('');
+      setNote('');
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const markStatus = async (id: string, status: 'completed' | 'cancelled') => {
+    setBusy(id);
+    setError('');
+    try {
+      await api(`/api/owner/shifts/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const th = (iso: string) =>
+    new Date(iso).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Bangkok' });
+
+  return (
+    <section aria-label="เวรทำงาน" className="space-y-3 rounded-3xl border border-line bg-white p-4">
+      <p className="text-sm font-bold text-black">เวรทำงานพนักงาน</p>
+      {error && <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
+
+      {profiles.length === 0 ? (
+        <p className="text-xs text-neutral-400">ยังไม่มีพนักงานที่ตอบรับเชิญ — เพิ่มพนักงานก่อนจึงจะสร้างเวรได้</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <select
+              value={profileId}
+              onChange={(e) => setProfileId(e.target.value)}
+              aria-label="พนักงาน"
+              className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black outline-none focus:border-[#FFC400]"
+            >
+              <option value="">— เลือกพนักงาน —</option>
+              {profiles.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+            <input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="หมายเหตุ (ถ้ามี)"
+              aria-label="หมายเหตุเวร"
+              className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]"
+            />
+            <label className="flex items-center gap-2 rounded-2xl border border-line bg-neutral-50 px-3 text-xs text-neutral-500">
+              เริ่ม
+              <input
+                type="datetime-local"
+                value={startsAt}
+                onChange={(e) => setStartsAt(e.target.value)}
+                aria-label="เวลาเริ่มเวร"
+                className="h-9 w-full bg-transparent text-sm text-black outline-none"
+              />
+            </label>
+            <label className="flex items-center gap-2 rounded-2xl border border-line bg-neutral-50 px-3 text-xs text-neutral-500">
+              สิ้นสุด
+              <input
+                type="datetime-local"
+                value={endsAt}
+                onChange={(e) => setEndsAt(e.target.value)}
+                aria-label="เวลาสิ้นสุดเวร"
+                className="h-9 w-full bg-transparent text-sm text-black outline-none"
+              />
+            </label>
+          </div>
+          <button
+            type="button"
+            onClick={() => void create()}
+            disabled={busy === 'new' || !profileId || !startsAt || !endsAt}
+            className="btn-brand h-11 w-full text-sm"
+          >
+            {busy === 'new' ? 'กำลังสร้าง…' : 'สร้างเวร'}
+          </button>
+        </>
+      )}
+
+      {rows === null ? (
+        <div className="h-32 animate-pulse rounded-3xl bg-neutral-100" />
+      ) : rows.length === 0 ? (
+        <p className="text-xs text-neutral-400">ยังไม่มีเวรที่บันทึกไว้</p>
+      ) : (
+        <div className="overflow-hidden rounded-3xl border border-line">
+          {rows.map((s) => (
+            <div key={s.id} className="flex flex-wrap items-center gap-2 border-t border-line px-4 py-3 first:border-t-0">
+              <div className="min-w-0 flex-1">
+                <p className="truncate-1 text-sm font-bold text-black">{s.staffName}</p>
+                <p className="truncate-1 text-[11px] text-neutral-400">
+                  {th(s.startsAt)} → {th(s.endsAt)}{s.note ? ` · ${s.note}` : ''}
+                </p>
+              </div>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                  s.status === 'scheduled'
+                    ? 'bg-[#FFF4CC] text-black'
+                    : s.status === 'completed'
+                      ? 'bg-black text-[#FFC400]'
+                      : 'border border-red-200 bg-white text-red-600'
+                }`}
+              >
+                {s.status === 'scheduled' ? 'รอทำเวร' : s.status === 'completed' ? 'ทำแล้ว' : 'ยกเลิก'}
+              </span>
+              {s.status === 'scheduled' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => void markStatus(s.id, 'completed')}
+                    disabled={busy === s.id}
+                    className="shrink-0 rounded-full bg-black px-3 py-1.5 text-[11px] font-bold text-[#FFC400] disabled:opacity-50"
+                  >
+                    ปิดเวร
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void markStatus(s.id, 'cancelled')}
+                    disabled={busy === s.id}
+                    className="shrink-0 rounded-full border border-red-200 bg-white px-3 py-1.5 text-[11px] font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                  >
+                    ยกเลิก
+                  </button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

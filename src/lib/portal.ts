@@ -42,7 +42,7 @@ export async function getOwnerRestaurant(userId: string): Promise<OwnerProfile |
   return { userId, restaurantId: rst.id, restaurantName: rst.name, isOpen: rst.is_open };
 }
 
-/** บันทึกประวัติการเปลี่ยนสถานะออเดอร์ (order_status_history) */
+/** บันทึกประวัติการเปลี่ยนสถานะออเดอร์ (order_status_history) + เขียนเหตุการณ์ลง outbox (D7) */
 export async function pushStatusHistory(orderId: string, status: string, changedBy: string, note?: string) {
   await sbInsert('order_status_history', {
     order_id: orderId,
@@ -50,6 +50,12 @@ export async function pushStatusHistory(orderId: string, status: string, changed
     changed_by: changedBy,
     ...(note ? { note } : {}),
   });
+  try {
+    const { enqueueOutboxEvent } = await import('@/lib/outbox');
+    await enqueueOutboxEvent(orderId, 'status_changed', { status, changedBy });
+  } catch {
+    // outbox พังต้องไม่ทำให้การเปลี่ยนสถานะล้ม
+  }
 }
 
 /** สถานะถัดไปที่ร้านอนุญาต — กันกระโดดข้ามลำดับ */

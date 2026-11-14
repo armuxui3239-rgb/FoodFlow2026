@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Bike, PackageCheck, Star, Wallet } from 'lucide-react';
 import { api, baht } from '@/lib/client';
+import { DriverPayoutsSection } from '@/components/driver-payouts-section';
 
 interface Earnings {
   totalEarningsSatang: number;
@@ -101,6 +102,9 @@ export default function DriverEarningsPage() {
             </p>
           </>
         )}
+
+        {/* การจ่ายเงิน (D5) — ประวัติโอนรายได้จากศูนย์ควบคุม */}
+        <DriverPayoutsSection />
       </main>
 
       <footer className="mt-auto border-t border-line bg-white pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 text-center text-xs text-neutral-400">
