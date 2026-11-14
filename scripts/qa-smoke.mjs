@@ -138,8 +138,16 @@ async function main() {
   check('driver online', r.status === 200);
   r = await api('/api/driver/location', { method: 'PATCH', body: { lat: 13.7563, lng: 100.5018 }, cookie: driverCookie });
   check('driver GPS ingest', r.status === 200 && r.json?.ok === true);
-  r = await api('/api/driver/tasks', { method: 'POST', body: { orderId, action: 'accept' }, cookie: driverCookie });
-  check('driver accept (atomic claim — ได้ driver_id จริง)', r.status === 200, JSON.stringify(r.json).slice(0, 150));
+  // D3: รับงานผ่านข้อเสนออัตโนมัติ (dispatch) ก่อน — ถ้าไรเดอร์คนนี้ไม่ได้ถูกเสนอ ค่อยดึงจากกองสาธารณะ
+  r = await api('/api/driver/dispatch', { cookie: driverCookie });
+  const myOffer = (r.json?.data ?? []).find((o) => o.orderId === orderId);
+  if (myOffer) {
+    r = await api(`/api/driver/dispatch/${myOffer.id}`, { method: 'POST', body: { action: 'accept' }, cookie: driverCookie });
+    check('driver accept ผ่าน dispatch offer (D3)', r.status === 200, JSON.stringify(r.json).slice(0, 150));
+  } else {
+    r = await api('/api/driver/tasks', { method: 'POST', body: { orderId, action: 'accept' }, cookie: driverCookie });
+    check('driver accept (pool claim)', r.status === 200, JSON.stringify(r.json).slice(0, 150));
+  }
   r = await api('/api/driver/tasks', { method: 'POST', body: { orderId, action: 'pickup' }, cookie: driverCookie });
   check('driver pickup', r.status === 200);
   r = await api('/api/driver/tasks', { method: 'POST', body: { orderId, action: 'deliver' }, cookie: driverCookie });

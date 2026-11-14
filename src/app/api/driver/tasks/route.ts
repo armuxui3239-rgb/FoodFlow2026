@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { requireRole, pushStatusHistory, DRIVER_TRANSITIONS } from '@/lib/portal';
+import { expireStaleOffers } from '@/lib/dispatch';
 import { sbList, sbOne, sbUpdate, sbInsert } from '@/lib/supabase';
 import { jsonError } from '@/lib/api-user';
 
@@ -20,18 +21,29 @@ interface TaskRow {
   status: string;
 }
 
-/** GET /api/driver/tasks — งานพร้อมรับ (ร้านพร้อมส่ง ยังไม่มีคนรับ) + งานของฉันที่กำลังทำ */
+/** GET /api/driver/tasks — งานพร้อมรับ (ร้านพร้อมส่ง ยังไม่มีคนรับ และไม่ได้อยู่ในรอบเสนองาน) + งานของฉัน */
 export async function GET(_req: NextRequest) {
   const user = await requireRole('driver');
   if (!user) return jsonError('เฉพาะไรเดอร์เท่านั้น', 403);
 
-  const available = await sbList<OrderRow>('orders', {
+  // D3: ยกเลิกข้อเสนอที่หมดอายุก่อน (lazy) — งานที่ยังมีข้อเสนอค้างอยู่จะไม่โผล่ในกองสาธารณะ
+  await expireStaleOffers();
+  const pendingOffers = await sbList<{ order_id: string }>('dispatch_offers', {
+    status: 'eq.pending',
+    expires_at: `gte.${new Date().toISOString()}`,
+    select: 'order_id',
+    limit: '200',
+  });
+  const offeredOrderIds = new Set(pendingOffers.map((o) => o.order_id));
+
+  const allAvailable = await sbList<OrderRow>('orders', {
     status: 'eq.ready_for_pickup',
     driver_id: 'is.null',
     select: 'id,order_code,status,driver_id,delivery_fee,delivery_address_id,restaurant_id,created_at',
     order: 'created_at.asc',
     limit: '30',
   });
+  const available = allAvailable.filter((o) => !offeredOrderIds.has(o.id));
   const mine = await sbList<OrderRow>('orders', {
     driver_id: `eq.${user.id}`,
     status: 'in.(driver_assigned,picked_up,delivering)',

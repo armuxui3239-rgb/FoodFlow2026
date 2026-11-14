@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { requireRole, getOwnerRestaurant, pushStatusHistory, OWNER_TRANSITIONS } from '@/lib/portal';
+import { dispatchOrderToDrivers } from '@/lib/dispatch';
 import { sbOne, sbUpdate, sbList } from '@/lib/supabase';
 import { jsonError } from '@/lib/api-user';
 
@@ -38,7 +39,18 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (!updated) return jsonError('สถานะถูกเปลี่ยนไปก่อนแล้ว กรุณารีเฟรช', 409);
 
   await pushStatusHistory(id, next, user.id, `ร้าน ${owner.restaurantName} ดำเนินการ`);
-  return Response.json({ ok: true, status: updated.status });
+
+  // D3: พร้อมส่ง → เสนองานอัตโนมัติให้ไรเดอร์ออนไลน์ (dispatch_offers) — พังไม่รบกวนการเปลี่ยนสถานะ
+  let dispatched = 0;
+  if (next === 'ready_for_pickup') {
+    try {
+      dispatched = await dispatchOrderToDrivers(id);
+    } catch (e) {
+      console.error('dispatch error:', e);
+    }
+  }
+
+  return Response.json({ ok: true, status: updated.status, dispatched });
 }
 
 /** GET รายละเอียดออเดอร์เดียว (ของร้านฉัน) */

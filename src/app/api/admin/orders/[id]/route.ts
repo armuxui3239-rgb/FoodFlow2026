@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { requireRole, pushStatusHistory } from '@/lib/portal';
+import { dispatchOrderToDrivers } from '@/lib/dispatch';
 import { sbList, sbOne, sbUpdate, sbHeaders } from '@/lib/supabase';
 import { jsonError } from '@/lib/api-user';
 
@@ -197,5 +198,15 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     ...(isCancel ? { cancelled_reason: reason!.trim() } : {}),
   });
 
-  return Response.json({ ok: true, order: updated });
+  // D3: พร้อมส่ง → เสนองานอัตโนมัติให้ไรเดอร์ออนไลน์ — พังไม่รบกวนการเปลี่ยนสถานะ
+  let dispatched = 0;
+  if (status === 'ready_for_pickup') {
+    try {
+      dispatched = await dispatchOrderToDrivers(id);
+    } catch (e) {
+      console.error('dispatch error:', e);
+    }
+  }
+
+  return Response.json({ ok: true, order: updated, dispatched });
 }

@@ -21,9 +21,11 @@ import {
   Settings,
   ShieldCheck,
   Star,
+  Timer,
   UserRound,
   Wallet,
   PackageCheck,
+  Zap,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { api, baht, STATUS_TH } from '@/lib/client';
@@ -70,6 +72,21 @@ export default function DriverPortalPage() {
   const [error, setError] = useState('');
   const [tick, setTick] = useState(0);
   const [lastGpsAt, setLastGpsAt] = useState<number | null>(null);
+  // ข้อเสนองานอัตโนมัติ (D3) — ระบบเสนอให้ไรเดอร์ออนไลน์ที่มี GPS คนแรกที่รับชนะ
+  const [offers, setOffers] = useState<
+    {
+      id: string;
+      orderId: string;
+      orderCode: string;
+      restaurantName: string;
+      restaurantAddress: string;
+      dropoffAddress: string;
+      dropoffLabel: string | null;
+      deliveryFee: number;
+      distanceKm: number | null;
+      expiresInSec: number;
+    }[]
+  >([]);
 
   const load = useCallback(() => {
     Promise.all([
@@ -93,6 +110,32 @@ export default function DriverPortalPage() {
     const t = setInterval(() => setTick((x) => x + 1), 12000);
     return () => clearInterval(t);
   }, []);
+
+  // โหลดข้อเสนองาน (D3) พร้อมกับรอบรีเฟรช — เฉพาะเมื่อเปิดรับงาน
+  const loadDispatch = useCallback(() => {
+    if (!(me?.driver.is_online ?? false)) {
+      setOffers([]);
+      return;
+    }
+    api<{ data: typeof offers }>('/api/driver/dispatch')
+      .then((r) => setOffers(r.data ?? []))
+      .catch(() => setOffers([]));
+  }, [me]);
+
+  useEffect(loadDispatch, [loadDispatch, tick]);
+
+  const answerDispatch = async (offerId: string, action: 'accept' | 'reject') => {
+    setBusy(true);
+    setError('');
+    try {
+      await api(`/api/driver/dispatch/${offerId}`, { method: 'POST', body: JSON.stringify({ action }) });
+      setTick((x) => x + 1);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const setOnline = async (next: boolean) => {
     setBusy(true);
@@ -207,6 +250,53 @@ export default function DriverPortalPage() {
             aria-label="เปิดปิดรับงาน"
           />
         </section>
+
+        {/* ข้อเสนองานอัตโนมัติ (D3) — ระบบเสนอให้ไรเดอร์ออนไลน์ คนแรกที่รับชนะ */}
+        {online && offers.length > 0 && (
+          <section aria-label="ข้อเสนองานพิเศษ" className="space-y-3">
+            <h2 className="flex items-center gap-2 text-sm font-bold text-black">
+              <Timer className="h-4 w-4 text-black" aria-hidden />
+              งานเสนอพิเศษ ({offers.length}) — รับได้คนแรกเท่านั้น
+            </h2>
+            {offers.map((o) => (
+              <div key={o.id} className="space-y-2 rounded-3xl border-2 border-black bg-[#FFC400]/10 p-4" data-testid={`dispatch-offer-${o.orderCode}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate-1 text-sm font-bold text-black">#{o.orderCode}</p>
+                  <span className="flex shrink-0 items-center gap-1 rounded-full bg-black px-2 py-0.5 text-[11px] font-bold text-[#FFC400]">
+                    <Timer className="h-3 w-3" aria-hidden /> {o.expiresInSec} วิ
+                  </span>
+                </div>
+                <p className="truncate-1 text-xs text-neutral-500">ร้าน: {o.restaurantName} — {o.restaurantAddress}</p>
+                <p className="truncate-1 text-xs text-neutral-500">
+                  ส่ง: {o.dropoffLabel ? `${o.dropoffLabel} · ` : ''}{o.dropoffAddress}
+                </p>
+                <div className="flex items-center gap-3 text-xs text-neutral-500">
+                  {o.distanceKm != null && <span>ระยะจากคุณ ~{o.distanceKm} กม.</span>}
+                  <span>ค่าส่ง {baht(o.deliveryFee)}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void answerDispatch(o.id, 'accept')}
+                    disabled={busy}
+                    data-testid={`dispatch-accept-${o.orderCode}`}
+                    className="btn-brand h-11 flex-1 text-sm"
+                  >
+                    <Zap className="mr-1 inline h-4 w-4" aria-hidden /> รับงานนี้
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void answerDispatch(o.id, 'reject')}
+                    disabled={busy}
+                    className="h-11 flex-1 rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                  >
+                    ปฏิเสธ
+                  </button>
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
 
         {/* สถิติ */}
         <section aria-label="สถิติของฉัน" className="grid grid-cols-3 gap-3">
