@@ -204,7 +204,7 @@ export default function NotificationsPage() {
                   </div>
                   {!n.is_read && (
                     <span
-                      className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-[#FFC400]"
+                      className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-red-500"
                       aria-label="ยังไม่ได้อ่าน"
                     />
                   )}

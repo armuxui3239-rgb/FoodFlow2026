@@ -134,7 +134,7 @@ export default function OwnerNotificationsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <p className={`truncate-1 text-sm font-bold ${n.is_read ? 'text-neutral-500' : 'text-black'}`}>{n.title}</p>
-                      {!n.is_read && <span className="h-2 w-2 shrink-0 rounded-full bg-[#FFC400]" aria-label="ยังไม่อ่าน" />}
+                      {!n.is_read && <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" aria-label="ยังไม่อ่าน" />}
                     </div>
                     {n.body && <p className={`mt-0.5 truncate-1 text-xs ${n.is_read ? 'text-neutral-400' : 'text-neutral-500'}`}>{n.body}</p>}
                     <p className="mt-1 text-[11px] text-neutral-300">{relTime(n.created_at)}</p>

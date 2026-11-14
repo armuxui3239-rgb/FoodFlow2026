@@ -112,7 +112,7 @@ export default function DriverNotificationsPage() {
                 >
                   <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                      n.is_read ? 'bg-neutral-100 text-neutral-400' : 'bg-black text-[#FFC400]'
+                      n.is_read ? 'bg-neutral-100 text-neutral-400' : 'bg-red-500 text-white'
                     }`}
                   >
                     <Bell className="h-4.5 w-4.5" aria-hidden />
