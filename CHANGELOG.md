@@ -10,6 +10,13 @@
 - **ปุ่มลบบัญชี (PDPA) พัง 500 มาตลอด**: `cart_items` ไม่มีคอลัมน์ `user_id` (เชื่อมผ่าน `cart_id`) → ลบ items ผ่าน `cart_id in.(…)` ก่อนลบ carts — พิสูจน์ end-to-end จริงบน production (สมัคร → ลบ → anonymize → ล็อกอินไม่ได้อีก)
 - ข้อความล้าสมัย 2 จุด: แคตตาล็อก integrations + ปุ่มโทรยังอ้าง "รอเซิร์ฟเวอร์ LiveKit" ทั้งที่โทรใช้ได้แล้ว (WebRTC P2P)
 
+### แก้ไข (Fixed) — ปิดช่อง session ไม่เพิกถอน (medium) จาก workflow
+- **logout / เปลี่ยน PIN / ลบบัญชี ไม่เพิกถอน session ฝั่งเซิร์ฟเวอร์** — session เป็น stateless HMAC ไม่มี revoke: cookie ที่ถูกขโมย/จำไว้ใช้ได้จริงทั้งอ่านและเขียนจนครบ 7 วัน (ผู้ยืนยันอิสระพิสูจน์สร้างออเดอร์ด้วย cookie หลัง logout ได้) → เพิ่ม `users.session_version` (migration เพิ่มล้วน): logout/เปลี่ยน PIN/ลบบัญชี ยกเวอร์ชัน → cookie เก่าตายทันทีทุกอุปกรณ์ · เปลี่ยน PIN ออก session ใหม่ให้เครื่องปัจจุบัน · currentUser ตรวจ is_active + เวอร์ชันทุกคำขอ — พิสูจน์บน production แล้ว (cookie หลัง logout → user:null)
+- จัดลำดับหน้าคืนเงินใช้สถานะ `'pending'` ที่ CHECK constraint ห้ามเกิด (dead code) → `'manual_review'` รอตรวจขึ้นก่อนจริง
+- PATCH driver notifications เมิน body เงียบ ๆ → อ่าน `{isRead}` จริง
+- chat session ปิดแล้วยังอ่าน/โพสต์ได้ → GET/POST ตรวจ is_active (409)
+- เอกสาร TRACEABILITY แก้อ้างอิง marker ที่ไม่มี (§9/§10 → ขั้น 6) + บันทึกยิงสด chat/sessions · ring 200
+
 ### แก้ไข (Fixed) — บั๊ก high 3 ตัวจาก workflow ตรวจฟังก์ชันครบทุกกลุ่ม (พิสูจน์ทั้ง dev + production แล้ว)
 - **เพิ่มที่อยู่ 500 เสมอ**: POST /api/addresses ใส่ `location: null` ทั้งที่คอลัมน์ geography NOT NULL → ใช้พิกัดที่ส่งมา หรือจุดกลางกรุงเทพฯ เป็นค่าตั้งต้น (ระบุสัจจะ) + ลำดับ default แบบ insert ก่อน-ตั้งทีหลัง กัน default เดิมหาย + รองรับ unique index "หนึ่ง default ต่อคน"
 - **ประวัติโอนเงินร้านว่างเสมอ**: /api/owner/revenue คิวรี payout_ledger ด้วย restaurant id ทั้งที่ระบบเขียนด้วย user id ของเจ้าของ → คิวรีด้วย user.id ตรงฝั่งเขียน — ร้านเห็นประวัติโอนครบแล้ว
