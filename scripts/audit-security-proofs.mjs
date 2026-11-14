@@ -56,8 +56,12 @@ for (let i = 0; i < 25; i++) {
 }
 check(`ยิง 25 ครั้ง → เจอ 429 จริง (${got429} ครั้ง)`, got429 > 0, `รหัสที่ได้: ${codes.slice(0, 10).join(',')}${codes.length > 10 ? '…' : ''}`);
 
-// ── 3) PDPA ลบบัญชีจริง (IP สด — ไม่โดนโควตาของข้อ 2) ──
+// ── 3) PDPA ลบบัญชีจริง (รอโควตา IP คืนก่อน — บน Vercel บังคับใช้ IP จริง ปลอมไม่ได้) ──
 console.log('\n3) PDPA ลบบัญชีจริง — สมัครใหม่ → ลบ → เข้าระบบอีกไม่ได้');
+if (isProd) {
+  console.log('  ⏳ รอ 70 วินาที ให้ขีดจำกัดต่อ IP รีเซ็ต (ผลของข้อ 2 ยิงเกินขีดไว้ตั้งใจ)');
+  await new Promise((r) => setTimeout(r, 70000));
+}
 const stamp = Date.now().toString().slice(-8);
 const phone = `091${stamp}`.slice(0, 10);
 const email = `pdpa${stamp}@foodthunder.co.th`;
