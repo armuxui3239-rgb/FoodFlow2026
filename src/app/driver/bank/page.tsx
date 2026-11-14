@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Banknote, Landmark, Plus, Star, Trash2 } from 'lucide-react';
 import { api } from '@/lib/client';
+import { THAI_BANKS, bankLogoFor } from '@/lib/banks';
 
 interface BankRow {
   id: string;
@@ -13,17 +14,6 @@ interface BankRow {
   accountHolderName: string;
   isDefault: boolean;
 }
-
-const BANKS = [
-  { code: 'SCB', name: 'ไทยพาณิชย์ (SCB)' },
-  { code: 'KBANK', name: 'กสิกรไทย (KBANK)' },
-  { code: 'KTB', name: 'กรุงไทย (KTB)' },
-  { code: 'BBL', name: 'กรุงเทพ (BBL)' },
-  { code: 'TTB', name: 'ทหารไทยธนชาต (TTB)' },
-  { code: 'BAY', name: 'กรุงศรีอยุธยา (BAY)' },
-  { code: 'GSB', name: 'ออมสิน (GSB)' },
-  { code: 'BAAC', name: 'เพื่อการเกษตร (BAAC)' },
-];
 
 /** หน้าบัญชีธนาคารของไรเดอร์ — รับโอนรายได้ (driver_bank_accounts จริง) */
 export default function DriverBankPage() {
@@ -52,7 +42,7 @@ export default function DriverBankPage() {
     setBusy(true);
     setError('');
     try {
-      const bank = BANKS.find((b) => b.code === bankCode);
+      const bank = THAI_BANKS.find((b) => b.code === bankCode);
       await api('/api/driver/bank', {
         method: 'POST',
         body: JSON.stringify({
@@ -140,9 +130,17 @@ export default function DriverBankPage() {
           <ul className="overflow-hidden rounded-3xl border border-line bg-white">
             {rows.map((r, i) => (
               <li key={r.id} className={`flex items-center gap-3 px-4 py-4 ${i > 0 ? 'border-t border-line' : ''}`}>
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF4CC]">
-                  <Landmark className="h-5 w-5 text-black" aria-hidden />
-                </span>
+                {bankLogoFor(r.bankName) ? (
+                  <img
+                    src={bankLogoFor(r.bankName) as string}
+                    alt={r.bankName}
+                    className="h-10 w-10 shrink-0 rounded-xl bg-[#FFF4CC] object-contain p-1"
+                  />
+                ) : (
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF4CC]">
+                    <Landmark className="h-5 w-5 text-black" aria-hidden />
+                  </span>
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="truncate-1 text-sm font-bold text-black">
                     {r.bankName} {r.isDefault && <span className="ml-1 rounded-full bg-black px-2 py-0.5 text-[10px] font-bold text-[#FFC400]">ค่าเริ่มต้น</span>}
@@ -177,19 +175,28 @@ export default function DriverBankPage() {
 
         {showForm ? (
           <section aria-label="เพิ่มบัญชีใหม่" className="space-y-3 rounded-3xl border border-line bg-white p-4">
-            <label className="block space-y-1">
-              <span className="text-xs font-bold text-black">ธนาคาร</span>
-              <select
-                value={bankCode}
-                onChange={(e) => setBankCode(e.target.value)}
-                data-testid="bank-select"
-                className="h-12 w-full rounded-2xl border border-line bg-neutral-50 px-3 text-sm text-black"
-              >
-                {BANKS.map((b) => (
-                  <option key={b.code} value={b.code}>{b.name}</option>
+            <div className="space-y-1">
+              <span className="text-xs font-bold text-black">เลือกธนาคาร (โลโก้จริง)</span>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4" data-testid="bank-select">
+                {THAI_BANKS.map((b) => (
+                  <button
+                    key={b.code}
+                    type="button"
+                    onClick={() => setBankCode(b.code)}
+                    aria-label={b.name}
+                    aria-pressed={bankCode === b.code}
+                    className={`flex flex-col items-center gap-1.5 rounded-2xl border p-2 transition-colors ${
+                      bankCode === b.code
+                        ? 'border-[#FFC400] bg-[#FFF4CC]'
+                        : 'border-line bg-white hover:bg-neutral-50'
+                    }`}
+                  >
+                    <img src={b.logo} alt={b.name} className="h-7 max-w-full object-contain" />
+                    <span className="w-full truncate-1 text-center text-[10px] font-semibold text-black">{b.name}</span>
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+            </div>
             <label className="block space-y-1">
               <span className="text-xs font-bold text-black">เลขบัญชี (8–16 หลัก)</span>
               <input

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/client';
+import { THAI_BANKS } from '@/lib/banks';
 
 interface BankInfo {
   bank_name: string | null;
@@ -61,18 +62,31 @@ export function AdminRestaurantBankSection({ restaurantId }: { restaurantId: str
         <>
           {msg && <p role="status" className="rounded-2xl bg-[#FFF4CC] px-4 py-3 text-sm text-black">{msg}</p>}
           {error && <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="space-y-1">
+            <span className="text-[11px] font-bold text-black">เลือกธนาคาร (โลโก้จริง)</span>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4" data-testid="admin-restaurant-bank-select">
+              {THAI_BANKS.map((b) => (
+                <button
+                  key={b.code}
+                  type="button"
+                  onClick={() => setBankName(b.name)}
+                  aria-label={b.name}
+                  aria-pressed={bankName === b.name}
+                  className={`flex flex-col items-center gap-1.5 rounded-2xl border p-2 transition-colors ${
+                    bankName === b.name
+                      ? 'border-[#FFC400] bg-[#FFF4CC]'
+                      : 'border-line bg-white hover:bg-neutral-50'
+                  }`}
+                >
+                  <img src={b.logo} alt={b.name} className="h-7 max-w-full object-contain" />
+                  <span className="w-full truncate-1 text-center text-[10px] font-semibold text-black">{b.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
             <label className="block space-y-1">
-              <span className="text-[11px] font-bold text-black">ธนาคาร</span>
-              <input
-                value={bankName}
-                onChange={(e) => setBankName(e.target.value)}
-                aria-label="ชื่อธนาคารของร้าน"
-                className="h-11 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-sm outline-none focus:border-[#FFC400]"
-              />
-            </label>
-            <label className="block space-y-1">
-              <span className="text-[11px] font-bold text-black">เลขบัญชี</span>
+              <span className="text-[11px] font-bold text-black">เลขบัญชี (8–16 หลัก)</span>
               <input
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value.replace(/[^\d\s-]/g, ''))}
