@@ -20,6 +20,7 @@ import {
   Bike,
 } from 'lucide-react';
 import { useSession } from '@/lib/client';
+import { BrandLogo } from '@/components/brand-logo';
 
 /** เมนูนำทางของศูนย์ควบคุมผู้ดูแลระบบ */
 const NAV: { href: string; label: string; Icon: typeof Shield }[] = [
@@ -48,9 +49,7 @@ export function AdminHeader() {
       <div className="mx-auto w-full max-w-5xl px-4">
         <div className="flex h-14 items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#FFC400] text-black">
-              <Shield className="h-5 w-5" aria-hidden />
-            </span>
+            <BrandLogo />
             <div className="min-w-0">
               <p className="truncate-1 text-sm font-bold text-black">ศูนย์ควบคุมผู้ดูแลระบบ</p>
               <p className="text-[11px] text-neutral-400">{user ? `ผู้ดูแล: ${user.fullName}` : 'ฟู๊ด ธันเดอร์'}</p>

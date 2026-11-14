@@ -18,6 +18,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { api, useSession } from '@/lib/client';
+import { BrandLogo } from '@/components/brand-logo';
 
 /** เมนูนำทางของพอร์ทัลร้านค้า — ครบทุกหน้าตาม docs/PAGE-MAP.md */
 const NAV: { href: string; label: string; Icon: typeof Store }[] = [
@@ -50,9 +51,7 @@ export function OwnerHeader() {
       <div className="mx-auto w-full max-w-5xl px-4">
         <div className="flex h-14 items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#FFC400] text-black">
-              <Store className="h-5 w-5" aria-hidden />
-            </span>
+            <BrandLogo />
             <div className="min-w-0">
               <p className="truncate-1 text-sm font-bold text-black">{name || 'พอร์ทัลร้านค้า'}</p>
               <p className="text-[11px] text-neutral-400">มุมมองเจ้าของร้าน{user ? ` · ${user.fullName}` : ''}</p>

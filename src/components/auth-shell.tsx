@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Zap } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 
 interface AuthShellProps {
   /** หัวข้อ — เว้นได้สำหรับหน้าที่จัดองค์ประกอบเอง (เช่น welcome) */
@@ -39,9 +40,7 @@ export function AuthShell({ title, subtitle, backHref, children, centered }: Aut
         {children}
       </main>
       <div className="flex justify-center pb-4" aria-hidden>
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand">
-          <Zap className="h-5 w-5 text-black" aria-hidden />
-        </span>
+        <BrandLogo />
       </div>
     </div>
   );

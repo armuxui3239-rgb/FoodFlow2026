@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import { Home, ReceiptText, ShoppingBag, User, Zap } from 'lucide-react';
+import { Home, ReceiptText, ShoppingBag, User } from 'lucide-react';
 import { useCart, useSession } from '@/lib/client';
+import { BrandLogo } from '@/components/brand-logo';
 
 const TABS = [
   { href: '/', label: 'หน้าแรก', icon: Home },
@@ -37,9 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2" aria-label="ฟู๊ด ธันเดอร์ หน้าแรก">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FFC400] text-black">
-              <Zap className="h-5 w-5" aria-hidden />
-            </span>
+            <BrandLogo />
             <span className="truncate-1 text-lg font-bold text-black">ฟู๊ด ธันเดอร์</span>
           </Link>
           <div className="flex items-center gap-2">
