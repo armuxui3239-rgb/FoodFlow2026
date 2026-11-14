@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* ดีไซน์ของเจ้าของเป็น light-only — บังคับ dark: เป็นแบบ class (.dark) เพื่อไม่ให้ media query
+   ของระบบปฏิบัติการทำให้ primitive ของ shadcn แสดงสีมืดเอง (ถ้าอนุมัติ Dark Mode ภายหลัง ให้เพิ่ม class .dark) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
@@ -10,6 +14,21 @@
   --line: #f1f1f4;
   --card: #ffffff;
   --radius: 1rem;
+  /* โทเคนของ shadcn primitives — ผูกกับภาษาดีไซน์ของเจ้าของ (UI-ALIGNMENT-PLAN เฟส 1)
+     ปุ่ม/สวิตช์เปิด = ดำพื้นเหลืองตัว · accent/secondary = #FFF4CC · destructive = แดง 600 · เส้นขอบ/ริง = line/เหลือง */
+  --primary: #0a0a0a;
+  --primary-foreground: #ffc400;
+  --secondary: #fff4cc;
+  --secondary-foreground: #0a0a0a;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #fff4cc;
+  --accent-foreground: #0a0a0a;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --ring: #ffc400;
 }
 
 @theme inline {
@@ -20,6 +39,23 @@
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--ring);
   --font-sans: var(--font-prompt), ui-sans-serif, system-ui, sans-serif;
 }
 
