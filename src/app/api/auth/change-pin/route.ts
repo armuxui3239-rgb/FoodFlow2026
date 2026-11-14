@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { sbOne, sbUpdate } from '@/lib/supabase';
 import { currentUser, jsonError } from '@/lib/api-user';
 import { isWeakPin } from '@/lib/auth-flow';
+import { serializeSession, sessionCookieValue } from '@/lib/session';
 
 interface PinPrefs {
   pin_hash?: string;
@@ -80,10 +81,12 @@ export async function POST(req: NextRequest) {
 
     const now = new Date().toISOString();
     const newHash = bcrypt.hashSync(newPin, 12);
+    const newVer = (session.ver ?? 0) + 1; // ยกเวอร์ชัน — cookie ทุกอุปกรณ์อื่นเพิกถอนหลังเปลี่ยน PIN
     await sbUpdate('users', { id: `eq.${user.id}` }, {
       password_hash: newHash,
       failed_login_count: 0,
       locked_until: null,
+      session_version: newVer,
       updated_at: now,
     });
     if (profile) {
@@ -95,7 +98,13 @@ export async function POST(req: NextRequest) {
       await sbUpdate('customer_profiles', { user_id: `eq.${user.id}` }, { preferences: prefs });
     }
 
-    return Response.json({ ok: true });
+    const res = Response.json({ ok: true });
+    // ออก session ใหม่ (เวอร์ชันใหม่) ให้เครื่องปัจจุบัน — อุปกรณ์อื่นต้องล็อกอินใหม่
+    res.headers.append(
+      'Set-Cookie',
+      sessionCookieValue(serializeSession({ id: user.id, email: session.email, role: 'customer', fullName: session.fullName, ver: newVer })),
+    );
+    return res;
   } catch (err) {
     console.error('change-pin error:', err);
     return jsonError('เปลี่ยน PIN ไม่สำเร็จ กรุณาลองใหม่', 500);

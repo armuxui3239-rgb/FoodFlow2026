@@ -38,6 +38,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     select: 'id,user_id,type,is_active',
   });
   if (!session) return jsonError('ไม่พบบทสนทนา', 404);
+  if (!session.is_active) return jsonError('บทสนทนานี้ปิดแล้ว', 409);
 
   const messages = await listMessages(session.id);
   return Response.json({ data: messages });
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     select: 'id,user_id,type,is_active',
   });
   if (!session) return jsonError('ไม่พบบทสนทนา', 404);
+  if (!session.is_active) return jsonError('บทสนทนานี้ปิดแล้ว ไม่สามารถส่งข้อความได้', 409);
 
   const { content } = (await req.json().catch(() => ({}))) as { content?: string };
   const text = typeof content === 'string' ? content.trim() : '';

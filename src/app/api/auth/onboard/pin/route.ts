@@ -102,6 +102,7 @@ export async function POST(req: NextRequest) {
       email: flow.email,
       role: 'customer',
       fullName: flow.fullName,
+      ver: 0, // บัญชีใหม่ — session_version เริ่มที่ 0
     };
     const res = Response.json({ ok: true, next: redirect });
     res.headers.append('Set-Cookie', sessionCookieValue(serializeSession(session)));

@@ -38,8 +38,8 @@
 | ไรเดอร์ออนไลน์/รับงาน/GPS/ส่ง | /driver/* | api/driver/* (location ทุก 15 วิ) | fix-p0 (5 ไรเดอร์+GPS) | qa-smoke §5-7 ✓ |
 | ติดตาม + แผนที่ + **ETA ค่าประมาณ** | /orders/[id]/tracking · /map | api/orders/[id]/tracking·map + lib/geo | พิกัดร้าน/จุดส่ง | จริง: 1.4 กม. → ~4 นาที ✓ (แจ้ง "ไม่ใช่เส้นทางถนนจริง") |
 | รีวิวร้าน/อารมณ์ | /orders/[id]/rate | api/orders/[id]/review | reviews 176 | qa-smoke §8 ✓ |
-| แชทลูกค้า–ไรเดอร์ (Supabase Broadcast) | ใน /orders/[id] · /driver/trips/[id] | api/orders/[id]/chat · lib/realtime | — | qa-smoke §9 ✓ (คนแปลกหน้า 401) |
-| โทรเสียง/วิดีโอ WebRTC P2P | /calls/[room] | api/calls/* · lib/calls | — | qa-smoke §10 ✓ |
+| แชทลูกค้า–ไรเดอร์ (Supabase Broadcast) | ใน /orders/[id] · /driver/trips/[id] | api/orders/[id]/chat · lib/realtime | — | qa-smoke ขั้น 6 ✓ (คนแปลกหน้า 401) · chat/sessions+ring ยิงสด 200 (2026-11-15) |
+| โทรเสียง/วิดีโอ WebRTC P2P | /calls/[room] | api/calls/* · lib/calls | — | qa-smoke ขั้น 6 ✓ (token+ring 200) |
 | แอดมินควบคุมทั้งระบบ | /admin/** (29 หน้า) | api/admin/** | seed-portal + phase7 | qa-smoke §11-13 ✓ |
 | ออกรายงาน/ส่งออก/audit | /admin/reports · logs · exports | api/admin/exports · audit-logs | admin_audit_logs | qa-smoke + verify-topup §9 ✓ |
 

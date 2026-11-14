@@ -8,6 +8,8 @@ export interface SessionUser {
   email: string;
   role: string;
   fullName: string;
+  /** เวอร์ชัน session ของบัญชี ณ ตอนลงชื่อ — logout/เปลี่ยน PIN/ลบบัญชี ยกเวอร์ชัน เพื่อเพิกถอน session เก่า */
+  ver: number;
 }
 
 function sign(value: string): string {

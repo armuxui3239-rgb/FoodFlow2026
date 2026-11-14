@@ -29,7 +29,8 @@ export async function GET(_req: NextRequest) {
       'id,order_id,amount,kind,reason,method,status,requested_by,created_at,users!payment_refund_requests_requested_by_fkey(full_name,email),orders(order_code,status)',
   });
 
-  const pending = rows.filter((r) => r.status === 'pending');
-  const rest = rows.filter((r) => r.status !== 'pending');
+  // สถานะจริงตาม CHECK constraint: manual_review = รอตรวจ (เดิมใช้ 'pending' ซึ่ง CHECK ห้ามเกิด — dead code)
+  const pending = rows.filter((r) => r.status === 'manual_review');
+  const rest = rows.filter((r) => r.status !== 'manual_review');
   return Response.json({ data: [...pending, ...rest] });
 }

@@ -12,6 +12,7 @@ interface DbUser {
   is_active: boolean;
   failed_login_count: number;
   locked_until: string | null;
+  session_version: number;
 }
 
 const MAX_FAILED = 5;
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
   const user = await sbOne<DbUser>('users', {
     email: `eq.${email.trim().toLowerCase()}`,
-    select: 'id,email,password_hash,full_name,role,is_active,failed_login_count,locked_until',
+    select: 'id,email,password_hash,full_name,role,is_active,failed_login_count,locked_until,session_version',
   });
 
   if (user?.locked_until && new Date(user.locked_until).getTime() > Date.now()) {
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
     locked_until: null,
     updated_at: new Date().toISOString(),
   });
-  const session = { id: user.id, email: user.email, role: user.role, fullName: user.full_name };
+  const session = { id: user.id, email: user.email, role: user.role, fullName: user.full_name, ver: user.session_version ?? 0 };
   const res = Response.json({ user: session });
   res.headers.append('Set-Cookie', sessionCookieValue(serializeSession(session)));
   return res;

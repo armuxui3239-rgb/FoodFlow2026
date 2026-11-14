@@ -13,6 +13,7 @@ interface DbUser {
   password_hash: string | null;
   failed_login_count: number;
   locked_until: string | null;
+  session_version: number;
 }
 
 interface PinPrefs {
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
       role: 'eq.customer',
       is_active: 'eq.true',
       phone_verified_at: 'not.is.null',
-      select: 'id,email,phone,full_name,is_active,password_hash,failed_login_count,locked_until',
+      select: 'id,email,phone,full_name,is_active,password_hash,failed_login_count,locked_until,session_version',
     });
     const user = users[0];
     if (!user) {
@@ -115,6 +116,7 @@ export async function POST(req: NextRequest) {
       email: user.email,
       role: 'customer',
       fullName: user.full_name ?? '',
+      ver: user.session_version ?? 0,
     };
     const maxAge = remember ? 60 * 60 * 24 * 30 : undefined;
     const res = Response.json({

@@ -34,6 +34,7 @@ export async function POST() {
       phone_verified_at: null,
       failed_login_count: 0,
       locked_until: null,
+      session_version: (user.ver ?? 0) + 1, // เพิกถอน session ทุกอุปกรณ์ทันทีหลังลบบัญชี
       updated_at: new Date().toISOString(),
     });
 
