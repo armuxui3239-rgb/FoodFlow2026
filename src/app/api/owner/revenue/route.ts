@@ -64,7 +64,8 @@ export async function GET(_req: NextRequest) {
 
   const payouts = await sbList<PayoutRow>('payout_ledger', {
     recipient_type: 'eq.restaurant',
-    recipient_id: `eq.${owner.restaurantId}`,
+    // payout_ledger.recipient_id เก็บ user_id ของเจ้าของ (ฝั่งเขียน: admin/restaurants/[id]/payouts)
+    recipient_id: `eq.${user.id}`,
     select: 'id,order_id,amount,currency,status,settled_at,created_at',
     order: 'created_at.desc',
     limit: '30',

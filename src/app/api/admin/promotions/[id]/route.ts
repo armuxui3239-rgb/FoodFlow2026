@@ -166,7 +166,8 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (b.expiresAt !== undefined) patch.expires_at = b.expiresAt;
   if (b.isActive !== undefined) {
     patch.is_active = b.isActive;
-    patch.status = b.isActive ? 'active' : 'inactive';
+    // PromotionStatus enum: draft/scheduled/active/paused/expired/archived — ปิดใช้งาน = 'paused' ('inactive' ไม่มีใน enum)
+    patch.status = b.isActive ? 'active' : 'paused';
   }
   if (Object.keys(patch).length === 0) return jsonError('ไม่มีข้อมูลที่จะแก้', 400);
 

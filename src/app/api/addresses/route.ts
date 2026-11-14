@@ -15,6 +15,8 @@ interface AddressInput {
   label?: string;
   addressLine?: string;
   isDefault?: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 /** ตรวจและทำความสะอาดข้อมูลที่อยู่ — คืนข้อความผิดพลาดถ้าไม่ผ่าน */
@@ -44,7 +46,7 @@ export async function GET() {
   return Response.json({ data: rows });
 }
 
-/** POST — เพิ่มที่อยู่ใหม่ (ถ้าตั้งเป็นค่าเริ่มต้น จะเคลียร์อันเดิมก่อน) */
+/** POST — เพิ่มที่อยู่ใหม่ (ถ้าตั้งเป็นค่าเริ่มต้น จะเคลียร์อันอื่นหลัง insert สำเร็จ) */
 export async function POST(req: NextRequest) {
   const user = await currentUser();
   if (!user) return jsonError('กรุณาเข้าสู่ระบบ', 401);
@@ -53,15 +55,30 @@ export async function POST(req: NextRequest) {
   const v = validate(body);
   if (typeof v === 'string') return jsonError(v, 400);
 
-  if (body.isDefault) await clearDefault(user.id);
+  // คอลัมน์ location เป็น geography NOT NULL (โซ่ delivery_tasks อ่านค่านี้ต่อ) — ใช้พิกัดที่ส่งมา
+  // ถ้าไม่มีใช้จุดกลางกรุงเทพฯ เป็นค่าตั้งต้นที่ประมาณ (ระบุสัจจะเหมือน ETA)
+  const lat = Number(body.lat);
+  const lng = Number(body.lng);
+  const hasCoords = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+  const location = hasCoords
+    ? `SRID=4326;POINT(${lng} ${lat})`
+    : 'SRID=4326;POINT(100.5018 13.7563)';
 
   const [row] = await sbInsert<AddressRow>('addresses', {
     user_id: user.id,
     label: v.label,
     address_line: v.addressLine,
-    location: null, // แผนที่ยังไม่เชื่อม — ว่างไว้ก่อน
-    is_default: Boolean(body.isDefault),
+    location,
+    // insert แบบไม่ default ก่อนเสมอ — DB มี unique index "หนึ่ง default ต่อคน" แล้วตั้งทีหลัง
+    is_default: false,
     created_at: new Date().toISOString(),
   });
-  return Response.json({ data: row });
+  if (!row) return jsonError('เพิ่มที่อยู่ไม่สำเร็จ', 500);
+
+  // ตั้งค่าเริ่มต้น "หลัง" insert สำเร็จ: เคลียร์ของเดิม → ตั้งแถวใหม่
+  if (body.isDefault) {
+    await clearDefault(user.id);
+    await sbUpdate('addresses', { id: `eq.${row.id}` }, { is_default: true });
+  }
+  return Response.json({ data: { ...row, is_default: Boolean(body.isDefault) } });
 }
