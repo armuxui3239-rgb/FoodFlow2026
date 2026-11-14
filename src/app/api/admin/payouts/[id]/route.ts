@@ -4,7 +4,7 @@ import { sbOne, sbUpdate, sbHeaders } from '@/lib/supabase';
 import { jsonError } from '@/lib/api-user';
 
 /** PATCH /api/admin/payouts/[id] — ยืนยันโอนเงินจริง (mark settled) body: { batchId? }
- *  ป้องกัน mark ซ้ำ: status ต้องยัง pending (D5) */
+ *  ใช้ได้ทุกผู้รับ (driver/restaurant) — ป้องกัน mark ซ้ำ: status ต้องยัง pending (D5 + โอนรายได้ร้าน) */
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
     const admin = await requireRole('admin');
@@ -13,10 +13,9 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     const { id } = await ctx.params;
     const { batchId } = (await req.json().catch(() => ({}))) as { batchId?: string };
 
-    const payout = await sbOne<{ id: string; status: string }>('payout_ledger', {
+    const payout = await sbOne<{ id: string; status: string; recipient_type: string }>('payout_ledger', {
       id: `eq.${id}`,
-      recipient_type: 'eq.driver',
-      select: 'id,status',
+      select: 'id,status,recipient_type',
     });
     if (!payout) return jsonError('ไม่พบรายการจ่ายเงินนี้', 404);
     if (payout.status !== 'pending') return jsonError('รายการนี้ยืนยันโอนไปแล้ว', 409);
@@ -41,7 +40,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
         headers: { ...sbHeaders(), Prefer: 'return=minimal' },
         body: JSON.stringify([{
           admin_id: admin.id,
-          action: 'driver_payout.settled',
+          action: 'payout.settled',
           target_type: 'payout_ledger',
           target_id: payout.id,
           ip_address: (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || '0.0.0.0',

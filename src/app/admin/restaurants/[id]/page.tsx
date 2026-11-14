@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, MapPin, Phone, Star, Store, TrendingUp, Wallet } from 'lucide-react';
 import { api, baht, STATUS_COLOR, STATUS_TH, useSession } from '@/lib/client';
+import { AdminRestaurantBankSection } from '@/components/admin-restaurant-bank-section';
+import { AdminRestaurantPayoutsSection } from '@/components/admin-restaurant-payouts-section';
 
 interface Detail {
   restaurant: {
@@ -250,6 +252,10 @@ export default function AdminRestaurantDetailPage() {
                 </div>
               )}
             </section>
+
+            {/* บัญชีธนาคารรับรายได้ (แอดมินแก้ได้ + audit) + การจ่ายเงินรายได้ให้ร้าน */}
+            <AdminRestaurantBankSection restaurantId={id} />
+            <AdminRestaurantPayoutsSection restaurantId={id} />
           </>
         )}
       </main>

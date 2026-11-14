@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { BadgeCheck, Clock, Phone, Wallet } from 'lucide-react';
 import { api, baht } from '@/lib/client';
 import { OwnerSubShell } from '@/components/portal/owner-header';
+import { RestaurantPayoutsSection } from '@/components/restaurant-payouts-section';
 
 interface Summary {
   gross: number;
@@ -100,6 +101,9 @@ export default function OwnerRevenuePage() {
             </div>
             <BadgeCheck className="ml-auto h-5 w-5 shrink-0 text-[#FFC400]" aria-hidden />
           </section>
+
+          {/* ประวัติการโอนรายได้จากศูนย์ควบคุม */}
+          <RestaurantPayoutsSection />
 
           {/* รายการตั้งเวลารับเงิน */}
           <section aria-label="รายการตั้งเวลารับเงิน">

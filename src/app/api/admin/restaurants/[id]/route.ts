@@ -59,10 +59,13 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     min_order_amount: number;
     prep_time_avg_minutes: number;
     created_at: string;
+    bank_name: string | null;
+    bank_account_number: string | null;
+    bank_account_name: string | null;
   }>('restaurants', {
     id: `eq.${id}`,
     select:
-      'id,name,slug,description,logo_url,address_line,city,district,phone,cuisine_types,price_range,rating,total_reviews,is_open,is_active,approval_status,min_order_amount,prep_time_avg_minutes,created_at',
+      'id,name,slug,description,logo_url,address_line,city,district,phone,cuisine_types,price_range,rating,total_reviews,is_open,is_active,approval_status,min_order_amount,prep_time_avg_minutes,created_at,bank_name,bank_account_number,bank_account_name',
   });
   if (!restaurant) return jsonError('ไม่พบร้านนี้', 404);
 
@@ -122,10 +125,13 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const admin = await requireRole('admin');
   if (!admin) return jsonError('เฉพาะผู้ดูแลระบบเท่านั้น', 403);
   const { id } = await ctx.params;
-  const { approvalStatus, isActive, isOpen } = (await req.json().catch(() => ({}))) as {
+  const { approvalStatus, isActive, isOpen, bankName, bankAccountNumber, bankAccountName } = (await req.json().catch(() => ({}))) as {
     approvalStatus?: string;
     isActive?: boolean;
     isOpen?: boolean;
+    bankName?: string;
+    bankAccountNumber?: string;
+    bankAccountName?: string;
   };
 
   const patch: Record<string, unknown> = {};
@@ -137,6 +143,18 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   }
   if (typeof isActive === 'boolean') patch.is_active = isActive;
   if (typeof isOpen === 'boolean') patch.is_open = isOpen;
+  // บัญชีธนาคารรับรายได้ (แอดมินแก้ให้ร้านได้ — ถูกบันทึกใน audit log โดยอัตโนมัติ)
+  if (bankName !== undefined || bankAccountNumber !== undefined || bankAccountName !== undefined) {
+    const name = (bankName ?? '').trim();
+    const number = (bankAccountNumber ?? '').replace(/[\s-]/g, '');
+    const holder = (bankAccountName ?? '').trim();
+    if (!name) return jsonError('กรุณาระบุชื่อธนาคาร', 400);
+    if (!/^\d{8,16}$/.test(number)) return jsonError('เลขบัญชีต้องเป็นตัวเลข 8–16 หลัก', 400);
+    if (holder.length < 3) return jsonError('กรุณาระบุชื่อเจ้าของบัญชี', 400);
+    patch.bank_name = name;
+    patch.bank_account_number = number;
+    patch.bank_account_name = holder;
+  }
   if (Object.keys(patch).length === 0) return jsonError('ไม่มีข้อมูลที่จะแก้', 400);
 
   const before = await sbOne<{ approval_status: string; is_active: boolean; is_open: boolean }>('restaurants', {

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Clock, Phone, Power, Save, Store } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { api } from '@/lib/client';
+import { RestaurantBankSection } from '@/components/restaurant-bank-section';
 
 interface HourRow {
   id: string;
@@ -161,6 +162,9 @@ export default function OwnerSettingsPage() {
                 />
               </label>
             </section>
+
+            {/* บัญชีธนาคารรับรายได้ (เจ้าของจัดการเอง) */}
+            <RestaurantBankSection />
 
             {/* เวลาเปิดรายวัน */}
             <section className="rounded-3xl border border-line p-4" aria-label="เวลาเปิดทำการ">
