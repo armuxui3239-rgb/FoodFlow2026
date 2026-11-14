@@ -62,7 +62,9 @@ Docker:  deployments/sms-gateway (เก็บถาวร — ไม่ใช�
 
 แผนฟรี Hobby: ไม่ต้องบัตรเครดิต · รันไทม์ของเราเรียก Supabase ผ่าน REST ทั้งหมด (ไม่มีการต่อฐานข้อมูลแบบ TCP) — เหมาะกับ serverless โดยตรง · หลังจากนี้ทุกครั้งที่ push ไป `main` = deploy อัตโนมัติ
 
-### 4.1 เส้นทาง 8 ขั้น (ครั้งแรก ≈10 นาที)
+**สถานะจริง 2026-11-14: deploy แล้วผ่าน MCP — โปรเจกต์ `foodflow2026` (prj_9pskzcRwpqX2rFByZozO2yp9g1fm) เชื่อม repo armuxui3239-rgb/FoodFlow2026 สาขา main · env ครบ 9 ตัว (คีย์ลับชนิด sensitive) · ปิด SSO protection โดเมนเปิดสาธารณะ · ทางเข้าครบ 6 เส้นทางบนโดเมนเดียว (/ ลูกค้า · /login+register รวม · /owner · /driver · /admin)** — โปรเจกต์เก่า `food-thunder` (prj_qSox1K1CHOUXzjhjK4yXkunuLb5b) เป็นโปรเจกต์เปล่าไม่มี deployment สร้างค้างจากช่วงเชื่อม GitHub ลบทิ้งได้ใน dashboard
+
+### 4.1 เส้นทาง 8 ขั้น (ครั้งแรก ≈10 นาที — ทำผ่าน MCP แทนแล้ว ตามบันทึกด้านบน)
 1. เปิด https://vercel.com → **Sign Up** → เลือก **Continue with GitHub** (ใช้บัญชี GitHub ที่มีอยู่) → อนุมัติสิทธิ์
 2. หน้า dashboard กด **Add New... → Project** → รายการจะเห็น repo `FoodFlow2026` → กด **Import**
 3. Framework Preset ขึ้น **Next.js** เอง — **ไม่ต้องแก้** Build/Install/Output ใด ๆ
