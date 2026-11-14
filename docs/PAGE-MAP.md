@@ -1,63 +1,83 @@
 # ผังหน้าใช้งานทั้งระบบ (Page Map) — ฟู๊ด ธันเดอร์ FoodFlow2026
 
-> หลักการ: วางแผนหน้าทั้งหมดตามลำดับวงจรธุรกิจจริง 4 บทบาท (ลูกค้า → ร้านค้า → ไรเดอร์ → แอดมิน)
-> ทุกหน้าต้อง "พร้อมใช้งานจริง" ไม่มีหน้าโชว์ (ห้ามหน้าจอมั่ว ต้องผูก API/ฐานข้อมูลจริง)
-> อ้างอิงแม่แบบเดิม 33 หน้า (ทุกหน้ายังอยู่ครบ — ตรวจจาก commit cf11d93 เทียบ HEAD วันที่ 2026-11-09)
+> หลักการ: ทุกหน้าต้อง "พร้อมใช้งานจริง" — ผูก API/ฐานข้อมูลจริง ไม่มีหน้าโชว์
+> อัปเดต 2026-11-14: นับจากไฟล์จริง `find src/app -name page.tsx` = **104 หน้า** + 109 API routes
+> ยืนยันครบเทียบแม่แบบต้นทาง 122 จอ (web 70 + mobile 52) — ทุกจอมีของเทียบเท่า (บางจอรวมเป็นหน้าเดียว เช่น login รวมศูนย์, chat→messages, vouchers→offers, loyalty→points)
+> แหล่งอ้างอิง: `_template-ref/FoodDelivery_App` (โอเพนซอร์ส MIT)
 
-## สถานะ: ✅ พร้อมใช้แล้ว | 🆕 สร้างใหม่ตามแผนนี้ | 🔜 เฟสถัดไป (P2 — ขึ้นกับโครงสร้างพื้นฐาน)
+## สถานะ: ✅ พร้อมใช้แล้ว (ตรวจ curl 200 + API จริง) | 🔜 งานระบบถัดไป (ตาม REMAINING-WORK.md หมวด D รอคำสั่งอนุมัติ)
 
-## เฟส 1 — ลูกค้า (Customer) 36 หน้า
+## เฟส 1 — ลูกค้า (Customer) 41 หน้า
 
-| # | หน้า | เส้นทาง | สถานะ |
-|---|---|---|---|
-| 1 | ออนบอร์ดสไลด์ภาพจริง | /onboarding/intro | ✅ |
-| 2 | ตั้งค่าหลังออนบอร์ด (ยินดีต้อนรับ/ตำแหน่ง/PIN/โปรไฟล์/ไบโอ) | /onboarding/welcome · location · pin · profile · biometric | ✅ |
-| 3 | สมัคร/ล็อกอิน/ยืนยัน OTP/ลืม PIN | /register · /login · /verify-otp · /forgot-pin | ✅ |
-| 4 | หน้าแรก (ร้านแนะนำ + โปรโมชั่น + ค้นหา) | / | ✅ |
-| 5 | ร้านทั้งหมด + ร้านเดี่ยว + ค้นหา | /restaurants · /restaurants/[id] · /search | ✅ |
-| 6 | ตะกร้า → ชำระเงิน PromptPay (คูปอง) | /cart · /checkout | ✅ |
-| 7 | ออเดอร์ทั้งหมด / รายออเดอร์ / ติดตาม / ให้คะแนน | /orders · /orders/[id] · /orders/[id]/tracking · /orders/[id]/rate | ✅ |
-| 7a | **แผนที่ติดตามไรเดอร์ (OSM)** | /orders/[id]/map | ✅ (v0.4) |
-| 8 | กระเป๋าเงิน + เติมเงิน | /wallet · /wallet/topup | ✅ |
-| 8a | **แต้มสะสม (loyalty_transactions จริง)** | /points | ✅ (v0.4) |
-| 9 | ที่อยู่/ร้านโปรด/ข้อความ/แจ้งเตือน/ข้อเสนอ/เชิญเพื่อน/ช่วยเหลือ/ภาษา/โปรไฟล์/ตั้งค่า | /addresses · /favorites · /messages · /notifications · /offers · /invite · /help · /language · /profile · /profile/edit · /settings* | ✅ |
+| หน้า | เส้นทาง | สถานะ |
+|---|---|---|
+| ออนบอร์ด 7 จอ (สไลด์/โปรไฟล์/แผนที่/แจ้งเตือน/PIN/ไบโอ/ยินดีต้อนรับ) | /onboarding/intro · profile · location · notification · pin · biometric · welcome | ✅ |
+| สมัคร/ล็อกอิน/OTP/ลืม PIN | /register · /login · /verify-otp · /forgot-pin | ✅ |
+| หน้าแรก (ร้านแนะนำ + โปรโมชัน + ค้นหา) | / | ✅ |
+| ร้านทั้งหมด + ร้านเดี่ยว + ตัวกรอง + ค้นหา | /restaurants · /restaurants/[id] · /restaurants/filters · /search | ✅ |
+| รายละเอียดเมนู + ตัวเลือก (ขนาด/ท็อปปิ้ง) | /food/[id] | ✅ |
+| ตะกร้า → ชำระเงิน PromptPay (คูปอง) | /cart · /checkout | ✅ |
+| ออเดอร์ / รายออเดอร์ / ติดตาม / แผนที่ / รีวิว | /orders · /orders/[id] · /tracking · /map · /rate | ✅ |
+| ทิปไรเดอร์ | ใน /orders/[id] (delivered/completed) | ✅ |
+| กระเป๋าเงิน + เติมเงิน | /wallet · /wallet/topup | ✅ |
+| แต้มสะสม / ข้อเสนอ / เชิญเพื่อน | /points · /offers · /invite | ✅ |
+| ที่อยู่ / ร้านโปรด / แชท / แจ้งเตือน | /addresses · /favorites · /messages · /messages/[id] · /notifications | ✅ |
+| ช่วยเหลือ / ภาษา / โปรไฟล์ / ตั้งค่า | /help · /language · /profile · /profile/edit · /settings · /settings/notifications · /settings/security | ✅ |
 
-## เฟส 2 — เจ้าของร้าน (Restaurant) 4 หน้า
+## เฟส 2 — เจ้าของร้าน (Restaurant) 20 หน้า
 
-| # | หน้า | เส้นทาง | สถานะ |
-|---|---|---|---|
-| 1 | แดชบอร์ดร้าน — รับออเดอร์ → ทำอาหาร → พร้อมส่ง | /owner | ✅ (v0.3) |
-| 2 | จัดการเมนู — เปิด/ปิดขายทีละเมนู | /owner/menu | ✅ (v0.3) |
-| 3 | **ตั้งค่าร้าน — เปิด/ปิดร้าน เวลาเปิด 7 วัน ขั้นต่ำ เบอร์โทร** | /owner/settings | ✅ (v0.4) |
-| 4 | **สถิติยอดขาย — กราฟ 7 วัน + เมนูขายดี** | /owner/stats | ✅ (v0.4) |
+| หน้า | เส้นทาง | สถานะ |
+|---|---|---|
+| แดชบอร์ด (สถิติวันนี้ + คิวออเดอร์ 4 ช่วง + ปุ่ม action) | /owner | ✅ |
+| คลังออเดอร์ (kanban 4 คอลัมน์) + รายละเอียดออเดอร์ | /owner/orders · /owner/orders/[id] | ✅ |
+| เมนู: กระดานเปิด/ปิดขาย · สร้าง · แก้ไข · หมวดหมู่ | /owner/menu · menu/new · menu/[id]/edit · menu/categories | ✅ |
+| โปรโมชัน: รายการ · สร้าง · รายละเอียด+สถิติ · แก้ไข | /owner/promotions · new · [id] · [id]/edit | ✅ |
+| รีวิว + ตอบรีวิว | /owner/reviews | ✅ |
+| แจ้งเตือนร้าน | /owner/notifications | ✅ |
+| พนักงาน + เชิญผ่านลิงก์ (5 บทบาท) | /owner/staff | ✅ |
+| analytics · insights · revenue (กำไร/ค่าคอม/จ่ายไรเดอร์) | /owner/analytics · /owner/insights · /owner/revenue | ✅ |
+| ตั้งค่าร้าน (เปิด-ปิด/เวลา/ขั้นต่ำ) + โปรไฟล์ร้าน | /owner/settings · /owner/settings/profile | ✅ |
+| สถิติยอดขาย 7 วัน | /owner/stats | ✅ |
 
-## เฟส 3 — ไรเดอร์ (Driver) 3 หน้า
+## เฟส 3 — ไรเดอร์ (Driver) 17 หน้า
 
-| # | หน้า | เส้นทาง | สถานะ |
-|---|---|---|---|
-| 1 | งานของฉัน — เปิดรับงาน รับงาน รับของ ส่งถึง | /driver | ✅ (v0.3) |
-| 2 | **ประวัติงานส่งสำเร็จ** | /driver/history | ✅ (v0.4) |
-| 3 | **รายได้ — รวม + รายวัน 7 วัน** | /driver/earnings | ✅ (v0.4) |
+| หน้า | เส้นทาง | สถานะ |
+|---|---|---|
+| งานของฉัน (เปิดรับ + GPS ส่งพิกัดทุก 15 วิ + ลิงก์ทริป) | /driver | ✅ |
+| สมัครไรเดอร์ 3 ขั้น (ข้อตกลง → ยานพาหนะ → เอกสาร) | /driver/onboarding/agreement · vehicle · documents | ✅ |
+| KYC + สถานะอนุมัติ | /driver/kyc | ✅ |
+| งานที่รับ (แผนที่เส้นทาง + รายงานทิป) | /driver/trips/[id] | ✅ |
+| รายได้ / ประวัติ / โบนัสแคมเปญ / คะแนน / ทิป | /driver/earnings · history · incentives · ratings · tips | ✅ |
+| แผนที่จุดน่ารับงาน (heatmap) | /driver/heatmap | ✅ |
+| บัญชีธนาคาร + RESTful [id] | /driver/bank (+ API) | ✅ |
+| โปรไฟล์ / แจ้งเตือน / ซัพพอร์ต / ตั้งค่า | /driver/profile · notifications · support · settings | ✅ |
 
-## เฟส 4 — ผู้ดูแลระบบ (Admin) 4 หน้า
+## เฟส 4 — ผู้ดูแลระบบ (Admin) 26 หน้า
 
-| # | หน้า | เส้นทาง | สถานะ |
-|---|---|---|---|
-| 1 | ศูนย์ควบคุม — ภาพรวม + ออเดอร์ล่าสุด + ร้านทั้งหมด | /admin | ✅ (v0.3) |
-| 2 | **จัดการผู้ใช้ — ค้นหา เปิด/ระงับบัญชี** | /admin/users | ✅ (v0.4) |
-| 3 | **จัดการคูปอง — เปิด/ปิด สร้างโค้ดใหม่** | /admin/promotions | ✅ (v0.4) |
-| 4 | **อนุมัติร้าน — อนุมัติ/ระงับร้าน** | /admin/approvals | ✅ (v0.4) |
+| หน้า | เส้นทาง | สถานะ |
+|---|---|---|
+| ศูนย์ควบคุม (KPI + ออเดอร์ + ร้าน) | /admin | ✅ |
+| ออเดอร์: รายการ (กรอง/ค้นหา/วันที่) + รายละเอียด (เปลี่ยนสถานะครบ + audit log) | /admin/orders · /admin/orders/[id] | ✅ |
+| ร้าน: รายการ + รายละเอียด (ควบคุมครบ + audit) | /admin/restaurants · /admin/restaurants/[id] | ✅ |
+| ไรเดอร์: รายการ (สถิติ/ตัวกรอง) + รายละเอียด (ตรวจ KYC + อนุมัติ/ปฏิเสธ) + แผนที่สด | /admin/drivers · [id] · drivers/map | ✅ |
+| ผู้ใช้: รายการ + รายละเอียด (ระงับ/เปิด + audit) | /admin/users · [id] | ✅ |
+| คูปอง: รายการ · สร้าง · รายละเอียด+สถิติ · แก้ไข | /admin/promotions · new · [id] · [id]/edit | ✅ |
+| รายงาน 7/30/90 วัน (CSV) + งานส่งออกไฟล์จริง | /admin/reports · /admin/export-jobs | ✅ |
+| บันทึกการทำงาน (audit logs + CSV) | /admin/logs | ✅ |
+| ซัพพอร์ต: คิว + ตั๋ว (แชท/แมโคร/สถานะ) | /admin/support · /admin/support/[id] | ✅ |
+| ตั้งค่า: รวม · แบรนด์ · ข้อกำหนด/PDPA · การเชื่อมต่อ | /admin/settings · settings/branding · settings/compliance · settings/integrations | ✅ |
+| วิเคราะห์ + AI monitor | /admin/analytics · /admin/ai-monitor | ✅ |
 
-## 🔜 เฟสถัดไป (P2 — ตาม ROADMAP ต้องมีโครงสร้างพื้นฐานเพิ่ม)
+## 🔜 งานระบบถัดไป (ตาม REMAINING-WORK.md หมวด D — รอคำสั่งอนุมัติ)
 
-- ระบบคืนเงิน (payment_refund_requests มีตารางแล้ว รอ flow อนุมัติ + webhook ผู้ให้บริการจ่าย)
-- FCM push จริง (user_fcm_tokens มีตารางแล้ว รอ Firebase project key)
-- LiveKit โทร/วิดีโอ (deployments/calls พร้อม รอเซิร์ฟเวอร์จริง — feature flag ปิดอยู่)
-- Dispatch offers แบบเสนองานอัตโนมัติ (dispatch_offers มีตารางแล้ว)
-- Staff shifts / KYC ไรเดอร์ / payout settlement
+- D3 dispatch offers เสนองานอัตโนมัติ (dispatch_offers มีข้อมูล 70 แถว ยังไม่มีโค้ดใช้)
+- D1 ระบบคืนเงิน (payment_refund_requests รอ flow อนุมัติ)
+- D4 เวรพนักงาน (staff_shifts) · D5 จ่ายเงินไรเดอร์ (payout_ledger) · D6 เก็บเส้นทางขับ (driver_location_history) · D7 realtime event pipeline
+- D2 FCM push (รอ Firebase project) · D8 LiveKit (รอเซิร์ฟเวอร์)
 
 ## กติกา
 
 1. เพิ่มหน้าใหม่ต้องอัปเดตตารางนี้ทุกครั้ง พร้อม commit
 2. หน้าไหนยังไม่มีข้อมูลจริงมาเลย → ไปเฟสถัดไป ห้ามทำหน้าลอย
 3. ทุกหน้าที่ "✅" ต้องผ่านการตรวจจริง (curl + เบราว์เซอร์) ก่อน push เสมอ
+   — รอบนี้ตรวจ curl 200 ครบหน้ารายการ/API; หน้ารายละเอียด (มี [id]) ผ่านการคอมไพล์ + API ตรวจแล้ว ให้ทดสอบบนเบราว์เซอร์ก่อน push จริง

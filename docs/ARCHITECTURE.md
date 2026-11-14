@@ -39,12 +39,12 @@
 ### 2.3 การยืนยันตัวตน (OTP + PIN)
 ```
 เบอร์โทร → POST /api/auth/otp/send ──→ สร้าง otp_codes (hash, TTL, จำกัดลอง)
-                                     └─→ ส่ง SMS ผ่าน android-sms-gateway
-                                          (self-hosted, โอเพนซอร์ส Apache-2.0)
-                                          dev = dev_console
+                                     └─→ รหัสภายในระบบ (internal_code):
+                                         แสดงรหัสในหน้า verify-otp ของแอปเรา
+                                         ไม่มีการส่ง SMS ออกภายนอก (นโยบายจบในระบบ 2026-11-14)
 เอา 6 หลัก → POST /api/auth/otp/verify ──→ session cookie
 ```
-- กฎ OTP: 6 หลัก, หมดอายุ, ผิด 5 ครั้งล็อก, จำกัดขอใหม่ (เอกสาร: SMS_GATEWAY_ANDROID_TH.md)
+- กฎ OTP: 6 หลัก, หมดอายุ, ผิด 5 ครั้งล็อก, จำกัดขอใหม่ · ช่องทาง = `internal_code` (ค่าเริ่มต้น — จบในระบบ)
 - PIN 6 หลักเก็บแบบ hash, มี forgot-pin ผ่าน OTP
 
 ### 2.4 วงจรคำสั่งซื้อ (Order Lifecycle)
@@ -67,7 +67,7 @@
 ### 2.6 บริการเสริม (deployments/)
 | บริการ | สถานะ | ไฟล์ |
 |---|---|---|
-| SMS Gateway (android-sms-gateway server) | พร้อมใช้ | `deployments/sms-gateway/` |
+| OTP รหัสยืนยัน | **จบในระบบ** (`internal_code` — แสดงรหัสในแอป ไม่ส่งออกภายนอก) | `src/lib/verification.ts` |
 | โทร/วิดีโอ (LiveKit + coturn) | โค้ดพร้อม, **ปิด feature flag** | `deployments/calls/` |
 
 ## 3. การไหลข้อมูลสำคัญ (Data Flows)

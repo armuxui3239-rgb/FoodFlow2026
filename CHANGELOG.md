@@ -5,10 +5,43 @@
 
 ## [Unreleased]
 
-### วางแผนไว้
-- เพิ่มตัวเลือกเมนู (ขนาด/ท็อปปิ้ง) — menu_item_options ยังว่าง
-- เพิ่มค่า `th` ใน enum `LocaleCode` ฝั่งฐานข้อมูล (ต้องรัน `ALTER TYPE "LocaleCode" ADD VALUE 'th';` บนแผงควบคุม Supabase) แล้วตั้งภาษาไทยให้ผู้ใช้ทุกคน
-- พอร์ทัลร้าน/ไรเดอร์/แอดมิน (บัญชีและข้อมูลพร้อมแล้ว ยังไม่มี UI ฝั่งหลังบ้าน)
+### เพิ่ม (Added) — วินัยตรวจสอบมาตรฐานมืออาชีพ (docs/QA-WORKFLOW.md)
+- ชุดทดสอบวงจรธุรกิจอัตโนมัติ `scripts/qa-smoke.mjs` — **42 ข้อ ผ่าน 100%** ครบ 4 บทบาท: สมัคร(รหัสภายใน)→ตั้งค่า→สั่ง→คูปอง→จ่าย→ร้าน/แอดมินเตรียม→ไรเดอร์รับจริง→ส่ง→รีวิว→ทิป→แชท→โทร→แอดมิน→data integrity — รันซ้ำได้
+- typecheck สะอาดครบโปรเจค ครั้งแรก (แก้ 8 จุด) · `next build` ผ่าน · tsconfig ตัด _template-ref/examples ออก
+
+### แก้ไข (Fixed) — จาก QA Smoke รอบแรก
+- **P0: `/api/promotions/validate` ผูกร้านไม่ตรงตะกร้า** — เคยบอกลูกค้าว่าคูปองใช้ได้ แล้วตอนสั่งจริงโดนปฏิเสธ → ดึงร้านจากตะกร้าจริงของผู้ใช้
+- **owner/settings เขียน field ผิด** (`opens_at`→`open_time`) — เคยทำเวลาเปิด-ปิดร้านโดนรีเซ็ตทุกครั้งที่บันทึก
+- login รองรับ `?next=` จริง (เดิมส่ง arg เกินแล้วถูกละเลิก) · support รายละเอียดออเดอร์ · attributionControl 2 จุด
+
+### วางแผนไว้ (รอคำสั่งอนุมัติ ตาม REMAINING-WORK.md หมวด D)
+- dispatch_offers เสนองานอัตโนมัติ (มีข้อมูล 70 แถว ยังไม่มีโค้ดใช้)
+- ระบบคืนเงิน · เวรพนักงาน · payout · เก็บเส้นทางขับ · realtime event pipeline
+- ความปลอดภัย (RLS/หมุน key — รอคำสั่ง) · ~~FCM~~/~~LiveKit~~ ยกเลิกตามนโยบายจบในระบบ (ดู OPEN-SOURCE-PLAN.md)
+
+### รอเจ้าของโปรเจค 1 คลิก
+- รัน `deployments/sql/add_th_locale.sql` ใน SQL Editor (ALTER TYPE ทำผ่าน REST ไม่ได้) แล้วตั้งภาษาไทยให้ผู้ใช้ทุกคน
+
+## [0.5.0] — 2026-11-14
+
+### เพิ่ม (Added) — พอร์ทัลครบทั้ง 4 บทบาท (104 หน้า / 109 API)
+- **แอดมิน +22 หน้า**: ออเดอร์+เปลี่ยนสถานะ · ร้าน+ควบคุม · ไรเดอร์+ตรวจ KYC+แผนที่สด · ผู้ใช้รายคน · คูปองครบวงจร · รายงาน 7/30/90 วัน · ส่งออกไฟล์จริง (CSV) · บันทึกการทำงาน (audit log ทุก mutation) · ซัพพอร์ต (คิว/ตั๋ว/แชท/แมโคร) · ตั้งค่า 4 หน้า (รวม/แบรนด์/ข้อกำหนด PDPA/การเชื่อมต่อ) · analytics · AI monitor — พร้อมแถบนำทางรวม
+- **ร้านค้า +16 หน้า**: คลังออเดอร์ (kanban) · เมนูสร้าง/แก้/ลบ+หมวดหมู่ · คูปองครบวงจร · รีวิว+ตอบ · พนักงาน+เชิญลิงก์ 5 บทบาท · แจ้งเตือน · analytics/insights/revenue · โปรไฟล์ร้าน
+- **ไรเดอร์ +9 หน้า**: สมัคร 3 ขั้น (ข้อตกลง→ยานพาหนะ→เอกสาร) · แผนที่ heatmap · notifications · profile · support · ทิปใน trip
+- **ลูกค้า**: ทิปไรเดอร์ (หน้าออเดอร์) · ตัวเลือกเมนูขนาด/ท็อปปิ้งเดินจริง (seed 88 กลุ่ม)
+- ติดตามไรเดอร์แบบสด: GPS ingest `/api/driver/location` + dashboard ส่งพิกัดทุก 15 วิ ผูกกับแผนที่ติดตาม
+
+### แก้ไข (Fixed)
+- **คูปอง fixed ผิดหน่วยเงิน 100 เท่า** (บาท/สตางค์) ทุกจุดสร้าง-แก้ไข
+- ค่าคอมในหน้า revenue ร้านผิด 100 เท่า (rate เป็น % แต่ไม่หาร)
+- enum ตามความจริงของ DB (ตรวจจาก OpenAPI): StaffRole 5 บทบาท, TicketIssueType 6, VehicleType 3, ExportJobStatus=queued, SupportMessageType=public_reply
+- replies route ลืม import sbOne · ปุ่มรีเฟรช reports ไม่ทำงาน · แผนที่ถูกสร้างซ้ำทุก render · settings บันทึกแล้วค่าเสีย type · สถานะงานส่งไรเดอร์แสดงคำอังกฤษดิบ
+
+### ข้อมูลตั้งต้น (Seeded)
+- platform_settings (25 แถว) · support_macros 4 · ตั๋วตัวอย่าง · แจ้งเตือนไรเดอร์ · menu_item_options 88 กลุ่ม · rag_documents FAQ 15 ข้อ (scripts/seed-portal-data.mjs, scripts/seed-menu-options-faq.mjs — idempotent)
+
+### เอกสาร
+- PAGE-MAP/ROADMAP/CHANGELOG/README ปรับให้ตรงความจริง (A1–A4 ตาม REMAINING-WORK.md)
 
 ## [0.2.0] — 2026-11-09
 

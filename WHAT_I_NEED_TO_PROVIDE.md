@@ -73,11 +73,14 @@ SUPABASE_JWT_SECRET=<JWT Secret จากหน้า Settings → API>
 
 ## ค่าที่จะใช้ภายหลัง (ตาม v3.1 ไม่เร่งตอนนี้)
 
-| ตัวแปร | ใช้เมื่อไร | หาจากไหน |
-| --- | --- | --- |
-| `SMS_GATE_URL` | เปิดใช้ SMS gateway จริงบน Railway | URL ที่ Railway ให้หลัง deploy `ghcr.io/android-sms-gateway/server:latest` |
-| `SMS_GATE_USER` / `SMS_GATE_PASSWORD` | คู่บัญชีที่สร้างบนแอป Android แล้วดูในหน้า Cloud/Private server ของแอป | แสดงในแอปบนมือถือ |
-| `MAP_TILE_URL` | เปลี่ยนไปใช้ tile server ของตัวเอง | โฮสต์ Protomaps/OpenMapTiles ของคุณ |
-| `LIVEKIT_URL` ฯลฯ | มีเซิร์ฟเวอร์ UDP/TLS แล้ว (รอเซิร์ฟเวอร์) | LiveKit self-host |
+> ⚠️ อัปเดต 2026-11-14 ตามนโยบาย "จบในระบบ บน Supabase เท่านั้น": **ยกเลิกทุกอย่างที่ต้องพึ่งแพลตฟอร์มภายนอก**
+> - OTP ใช้ `internal_code` — รหัสแสดงในแอป ไม่ต้องมี SMS_GATE_*/Railway/มือถืออีกต่อไป
+> - แผนที่ OSM+MapLibre ใช้ของที่มี (ทางเลือก PMTiles บน Storage เมื่อสั่ง)
 
-กฎเดิมยังยึด: production ห้ามเริ่มถ้า `VERIFICATION_DELIVERY=dev_console` — ต้องตั้ง `sms_gateway_selfhosted` และกรอก `SMS_GATE_*` ให้ครบก่อน
+| ตัวแปร | สถานะ |
+| --- | --- |
+| ~~`SMS_GATE_URL` / `SMS_GATE_USER` / `SMS_GATE_PASSWORD`~~ | ❌ ยกเลิก — ไม่ต้องหาแล้ว |
+| `MAP_TILE_URL` | ❌ ไม่จำเป็น — ใช้ tiles เปิดผ่าน proxy ของเรา (ทางเลือก PMTiles รอสั่ง) |
+| ~~`LIVEKIT_URL` ฯลฯ~~ | ❌ ยกเลิก — โทรใช้ WebRTC P2P + signaling บน Supabase (รอสั่งทำ) |
+
+กฎเดิมปรับ: production ใช้ `VERIFICATION_DELIVERY=internal_code` (ค่าเริ่มต้น) — ไม่ต้องตั้ง SMS_GATE_* อีกต่อไป

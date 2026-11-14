@@ -21,10 +21,10 @@ SUPABASE_URL=https://<ref>.supabase.co SBK=<service_role key> bun scripts/seed-t
 
 ## 1. สภาพแวดล้อม (Environments)
 
-| สภาพแวดล้อม | ฐานข้อมูล | การส่ง SMS | หมายเหตุ |
+| สภาพแวดล้อม | ฐานข้อมูล | การยืนยัน OTP | หมายเหตุ |
 |---|---|---|---|
-| development | Supabase โปรเจกต์ dev / รัน seed ใหม่ได้ | `dev_console` (พิมพ์ OTP ใน log) | ใช้เครื่องนักพัฒนา |
-| production | Supabase โปรเจกต์ production | `sms_gateway_selfhosted` | ห้ามมีข้อมูลจำลอง |
+| development | Supabase โปรเจกต์ dev / รัน seed ใหม่ได้ | `internal_code` (รหัสแสดงในแอป) | ใช้เครื่องนักพัฒนา |
+| production | Supabase โปรเจกต์ production | `internal_code` (ค่าเริ่มต้น — จบในระบบ) | ห้ามมีข้อมูลจำลอง |
 
 ## 2. ตัวแปรสภาพแวดล้อมที่ต้องมี (บังคับ 5 ค่า)
 
@@ -44,17 +44,14 @@ SUPABASE_URL=https://<ref>.supabase.co SBK=<service_role key> bun scripts/seed-t
 
 ```
 Vercel:  Customer App (repo นี้) · Admin Portal · Restaurant Portal
-Railway: บริการเสริมที่ต้องมี process ค้าง (job runner, SMS gateway)
-Docker:  deployments/sms-gateway  ·  deployments/calls (LiveKit — ปิด flag)
+Railway: ไม่จำเป็นตามนโยบายจบในระบบ (เดิม: job runner, SMS gateway — ยกเลิกแล้ว)
+Docker:  deployments/sms-gateway (เก็บถาวร — ไม่ใช้) · deployments/calls (LiveKit — แทนด้วย WebRTC รอสั่ง)
 ```
 
-### 3.1 SMS Gateway (self-hosted, โอเพนซอร์ส)
-```bash
-cd deployments/sms-gateway
-docker compose up -d        # server + MySQL
-```
-- App API URL ต้องเต็ม: `https://<โดเมน>/api/mobile/v1`
-- เอกสารฉบับเต็ม: `SMS_GATEWAY_ANDROID_TH.md`
+### 3.1 SMS Gateway (ยกเลิกการใช้งาน — ตามนโยบายจบในระบบ 2026-11-14)
+- OTP ใช้ช่องทาง `internal_code`: รหัสแสดงในหน้า verify-otp ของแอป ไม่มีการส่ง SMS ออกภายนอก
+- ไฟล์ `deployments/sms-gateway/` คงไว้เป็นข้อมูลอ้างอิงเท่านั้น — ไม่ต้อง deploy
+- เอกสารเดิม: `SMS_GATEWAY_ANDROID_TH.md` (เก็บถาวร)
 
 ### 3.2 โทร/วิดีโอ (LiveKit + coturn)
 - โค้ดและ compose พร้อมที่ `deployments/calls/`
@@ -70,7 +67,7 @@ docker compose up -d        # server + MySQL
 ## 5. การตรวจหลังเดปลอย (Post-deploy Checklist)
 
 - [ ] `/api/restaurants`, `/api/menu/popular`, `/api/promotions` ตอบ 200
-- [ ] เข้าสู่ระบบ OTP ได้จริง (ช่องทางตาม env)
+- [ ] เข้าสู่ระบบ OTP ได้จริง (internal_code — รหัสแสดงในแอป)
 - [ ] สร้างออเดอร์ → QR พร้อมเพย์แสดง → ยอดถูกต้อง (สตางค์)
 - [ ] แผนที่โหลด tiles ได้ + มี attribution OSM
 - [ ] ไม่มีคีย์ service ปรากฏใน HTML/JS ที่ส่งถึง client
