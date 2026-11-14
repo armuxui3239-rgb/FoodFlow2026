@@ -147,6 +147,24 @@ export default function OrderDetailPage() {
       .catch(() => setCancelReasons([]));
   }, [canCancel, cancelReasons.length]);
 
+  // คำขอคืนเงิน (D1) — สถานะล่าสุดของออเดอร์นี้ (ถ้าเคยขอ)
+  const refundable = ['paid', 'restaurant_pending', 'restaurant_accepted', 'preparing', 'ready_for_pickup'].includes(
+    order?.status ?? '',
+  );
+  const [refundStatus, setRefundStatus] = useState<string | null>(null);
+  const [refundStatusLoaded, setRefundStatusLoaded] = useState(false);
+  const [refundReason, setRefundReason] = useState('');
+  const [refundOpen, setRefundOpen] = useState(false);
+  useEffect(() => {
+    if (!refundable || refundStatusLoaded) return;
+    api<{ data: { status: string; reason: string } | null }>(`/api/orders/${id}/refund-request`)
+      .then((r) => {
+        setRefundStatus(r.data?.status ?? null);
+        setRefundStatusLoaded(true);
+      })
+      .catch(() => setRefundStatusLoaded(true));
+  }, [refundable, refundStatusLoaded, id]);
+
   /** ทิปไรเดอร์ — ใช้จำนวนที่พิมพ์เองถ้ามี ไม่งั้นใช้พรีเซ็ต */
   const sendTip = async () => {
     if (!order) return;
@@ -181,6 +199,23 @@ export default function OrderDetailPage() {
       setError((e as Error).message);
     } finally {
       setCanceling(false);
+    }
+  };
+
+  // ขอคืนเงิน (D1) — ส่งคำขอให้แอดมินตรวจ
+  const submitRefund = async () => {
+    setRefundStatus('sending');
+    try {
+      await api(`/api/orders/${id}/refund-request`, {
+        method: 'POST',
+        body: JSON.stringify({ reason: refundReason.trim() }),
+      });
+      setRefundStatus('manual_review');
+      setRefundOpen(false);
+    } catch (e) {
+      setRefundStatus(null);
+      setRefundOpen(false);
+      setError((e as Error).message);
     }
   };
 
@@ -273,6 +308,56 @@ export default function OrderDetailPage() {
                 {canceling ? 'กำลังยกเลิก...' : 'ยืนยันยกเลิกคำสั่งซื้อ'}
               </button>
             </div>
+          )}
+        </section>
+      )}
+
+      {/* ขอคืนเงิน (D1) — ออเดอร์ที่ชำระแล้ว ก่อนไรเดอร์ออกส่ง */}
+      {refundable && (
+        <section aria-label="ขอคืนเงิน" className="space-y-2 rounded-3xl border border-line bg-white p-4">
+          <p className="text-sm font-bold text-ink">ขอคืนเงิน</p>
+          {refundStatus === 'manual_review' ? (
+            <p className="rounded-2xl bg-[#FFF4CC] px-4 py-3 text-xs leading-relaxed text-black">
+              คำขอคืนเงินของคุณอยู่ระหว่างผู้ดูแลตรวจสอบ — เมื่ออนุมัติ เงินจะเข้ากระเป๋าเงินของคุณพร้อมการแจ้งเตือน
+            </p>
+          ) : refundStatus === 'completed' ? (
+            <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
+              คืนเงินแล้ว — ตรวจยอดได้ที่กระเป๋าเงิน
+            </p>
+          ) : refundOpen ? (
+            <>
+              <textarea
+                rows={2}
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                placeholder="อธิบายเหตุผลการขอคืนเงิน (อย่างน้อย 5 ตัวอักษร)"
+                className="w-full rounded-2xl border border-line bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-[#FFC400]"
+              />
+              <button
+                onClick={() => void submitRefund()}
+                disabled={refundReason.trim().length < 5}
+                data-testid="refund-submit"
+                className="btn-brand h-11 w-full text-sm"
+              >
+                ส่งคำขอคืนเงิน
+              </button>
+              <button
+                type="button"
+                onClick={() => setRefundOpen(false)}
+                className="h-8 w-full text-xs text-neutral-400 underline"
+              >
+                ยกเลิก
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setRefundOpen(true)}
+              data-testid="refund-open"
+              className="h-10 w-full rounded-full border border-red-200 bg-white text-xs font-bold text-red-600 hover:bg-red-50"
+            >
+              ขอคืนเงินจากคำสั่งซื้อนี้
+            </button>
           )}
         </section>
       )}
