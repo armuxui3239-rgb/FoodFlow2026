@@ -34,8 +34,21 @@ P1 = ความครบถ้วนของวงจรธุรกิจ, P
 - ✅ Driver Portal ครบ 17 หน้า (onboarding 3 ขั้น/KYC/heatmap/tips/trip map/notifications/profile/support)
 - ⏳ dispatch_offers เสนองานอัตโนมัติ (ตารางมี 70 แถว — รอคำสั่งอนุมัติทำ D3)
 - ⏳ ระบบคืนเงิน (payment_refund_requests — รอคำสั่ง)
-- ⏳ FCM push (รอ Firebase project) + realtime_outbox (รอคำสั่ง)
-- ⏳ เปิด LiveKit เมื่อมีเซิร์ฟเวอร์ (flag ปิดอยู่) · ⏳ payout_ledger · ⏳ driver_location_history · ⏳ ทดสอบโหลดบริการโอเพนซอร์ส
+- ~~FCM push~~ ยกเลิกตามนโยบายจบในระบบ — แจ้งเตือนในแอปแทน (เฟส 5) · ⏳ realtime_outbox (รอคำสั่ง)
+- ⏳ เปิด LiveKit เมื่อมีเซิร์ฟเวอร์ (flag ปิดอยู่ — ปัจจุบันใช้ WebRTC P2P ในระบบ) · ⏳ payout_ledger · ⏳ driver_location_history · ⏳ ทดสอบโหลดบริการโอเพนซอร์ส
+
+## เพิ่ม/เสร็จ 2026-11-14 (เฟส 5-8 ตาม UI-ALIGNMENT-PLAN)
+
+| งาน | สถานะ | หลักฐาน |
+|---|---|---|
+| UI ทั้งระบบเป็นภาษาดีไซน์เจ้าของ + token กลาง + โลโก้จริง + favicon | ✅ | เฟส 1-4 + commit 2e4c7ec (108 หน้า) |
+| เติมเงินครบวงจร: PIN→QR ในระบบ→สลิป Storage→แอดมินอนุมัติ+audit→เงินเข้า+แจ้งเตือน | ✅ | 37837b9 · verify-topup-flow 22/22 |
+| ชำระ 3 วิธี: กระเป๋าเงินหักจริง/COD/พร้อมเพย์ + ทิป ฿10 | ✅ | 0aee2a2 · verify-payments-flow 20/20 |
+| กฎ OTP/PIN ครบ v4 ข้อ 4 (TTL/caps/atomic/วันเกิด-เรียง/ล็อกซ้ำ×2/bcrypt12/password_hash) | ✅ | d0cd8dd · ทดสอบกฎจริง |
+| ลืม PIN ผ่านอนุมัติแอดมิน + หน้าจัดการ | ✅ | 8db0f36 · verify-pin-reset-flow 15/15 |
+| ETA ค่าประมาณ (แจ้งสัจจะ) + remnant บริการบุคคลที่สามหมด (grep=0) | ✅ | d0cd8dd · third-party-replacement.md |
+| Seed ข้อ 8: เมนู ≥8/ร้าน (24 ร้าน) + กาฬสินธุ์/ขอนแก่น + เหตุผลยกเลิกจัดการได้ + กระเป๋าเงินตัวอย่าง + รหัสทดสอบออก README | ✅ | 95ebb6f · seed-phase7.mjs (idempotent 2 รอบ) |
+| เอกสารส่งมอบ: TRACEABILITY + third-party-replacement + qa-all.sh | ✅ | เฟส 8 (0.6.0) |
 
 ## กติกาการใช้ Roadmap
 
