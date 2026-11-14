@@ -5,6 +5,7 @@ import { currentUser, jsonError } from '@/lib/api-user';
 
 interface PinPrefs {
   pin_hash?: string;
+  pin_set_at?: string;
   [key: string]: unknown;
 }
 
@@ -24,11 +25,12 @@ export async function POST(req: NextRequest) {
 
     const user = await sbOne<{
       id: string;
+      password_hash: string | null;
       failed_login_count: number;
       locked_until: string | null;
     }>('users', {
       id: `eq.${session.id}`,
-      select: 'id,failed_login_count,locked_until',
+      select: 'id,password_hash,failed_login_count,locked_until',
     });
     if (!user) return jsonError('ไม่พบบัญชีนี้ในระบบ', 404);
 
@@ -41,18 +43,25 @@ export async function POST(req: NextRequest) {
       user_id: `eq.${user.id}`,
       select: 'preferences',
     });
-    const pin_hash = profile?.preferences?.pin_hash;
+    // แหล่ง hash ของ PIN (เฟส 6): users.password_hash เป็นหลัก — บัญชีเก่า fallback ที่ preferences
+    const pin_hash =
+      profile?.preferences?.pin_set_at && user.password_hash
+        ? user.password_hash
+        : (profile?.preferences?.pin_hash ?? null);
     if (!pin_hash) return jsonError('ยังไม่ได้ตั้ง PIN', 409);
 
     if (!bcrypt.compareSync(pin, pin_hash)) {
       const count = (user.failed_login_count ?? 0) + 1;
       if (count >= MAX_FAILED) {
+        // ล็อกซ้ำนานขึ้นเมื่อถูกล็อกมาแล้วในชั่วโมงที่ผ่านมา (v4 ข้อ 4.5)
+        const recentLock = user.locked_until && Date.now() - new Date(user.locked_until).getTime() < 60 * 60 * 1000;
+        const lockMinutes = recentLock ? LOCK_MINUTES * 2 : LOCK_MINUTES;
         await sbUpdate('users', { id: `eq.${user.id}` }, {
           failed_login_count: 0,
-          locked_until: new Date(Date.now() + LOCK_MINUTES * 60000).toISOString(),
+          locked_until: new Date(Date.now() + lockMinutes * 60000).toISOString(),
           updated_at: new Date().toISOString(),
         });
-        return jsonError(`PIN ผิด ${MAX_FAILED} ครั้ง บัญชีถูกล็อก ${LOCK_MINUTES} นาที`, 423);
+        return jsonError(`PIN ผิด ${MAX_FAILED} ครั้ง บัญชีถูกล็อก ${lockMinutes} นาที`, 423);
       }
       await sbUpdate('users', { id: `eq.${user.id}` }, {
         failed_login_count: count,

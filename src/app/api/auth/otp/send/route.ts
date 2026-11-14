@@ -19,8 +19,10 @@ interface OtpRow {
   expires_at: string;
 }
 
-const OTP_TTL_SEC = 300;
-const RESEND_COOLDOWN_SEC = 55;
+const OTP_TTL_SEC = 600; // 10 นาที (v4 ข้อ 4.3)
+const RESEND_COOLDOWN_SEC = 60; // ขอใหม่ทุก 60 วินาที
+const MAX_SENDS_PER_HOUR = 5; // ต่อเบอร์
+const MAX_SENDS_PER_HOUR_IP = 10; // ต่อ IP
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,8 +57,9 @@ export async function POST(req: NextRequest) {
         select: 'id,email,phone,full_name,is_active,phone_verified_at',
       });
       if (active.length > 0) {
+        // ข้อความกลาง — ไม่เปิดเผยว่าเบอร์นี้มีบัญชีอยู่แล้ว (v4 ข้อ 4.3)
         return Response.json(
-          { error: 'เบอร์นี้สมัครไว้แล้ว กรุณาเข้าสู่ระบบด้วย PIN' },
+          { error: 'ข้อมูลนี้ไม่สามารถใช้สมัครได้ กรุณาเข้าสู่ระบบหรือตรวจสอบอีกครั้ง' },
           { status: 409 },
         );
       }
@@ -66,7 +69,10 @@ export async function POST(req: NextRequest) {
         select: 'id,email,phone,full_name,is_active,phone_verified_at',
       });
       if (byEmail.some((u) => u.phone !== phone)) {
-        return Response.json({ error: 'อีเมลนี้ถูกใช้แล้ว กรุณาใช้อีเมลอื่น' }, { status: 409 });
+        return Response.json(
+          { error: 'ไม่สามารถใช้อีเมลนี้สมัครได้ กรุณาใช้อีเมลอื่นหรือตรวจสอบอีกครั้ง' },
+          { status: 409 },
+        );
       }
       // สร้าง/ใช้บัญชีรอยืนยัน
       const pending = await sbList<DbUser>('users', {
@@ -104,7 +110,10 @@ export async function POST(req: NextRequest) {
         select: 'id,email,phone,full_name,is_active,phone_verified_at',
       });
       if (!users[0]) {
-        return Response.json({ error: 'ไม่พบบัญชีที่ผูกกับเบอร์นี้' }, { status: 404 });
+        return Response.json(
+          { error: 'ไม่สามารถขอรีเซ็ต PIN ได้ กรุณาตรวจสอบเบอร์โทรอีกครั้ง' },
+          { status: 404 },
+        );
       }
     }
 
@@ -117,6 +126,34 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'ไม่พบบัญชีผู้ใช้' }, { status: 500 });
     }
     const userId = owner[0].id;
+
+    // จำกัดการขอรหัส: สูงสุด 5 ครั้ง/ชั่วโมงต่อเบอร์ และ 10 ครั้ง/ชั่วโมงต่อ IP (v4 ข้อ 4.3)
+    const hourAgoIso = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const recentByUser = await sbList<{ id: string }>('otp_codes', {
+      user_id: `eq.${userId}`,
+      created_at: `gte.${hourAgoIso}`,
+      select: 'id',
+      limit: '100',
+    });
+    if (recentByUser.length >= MAX_SENDS_PER_HOUR) {
+      return Response.json(
+        { error: 'ขอรหัสบ่อยเกินไป (จำกัด 5 ครั้ง/ชั่วโมง) กรุณาลองใหม่ภายหลัง' },
+        { status: 429 },
+      );
+    }
+    const clientIp = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || '0.0.0.0';
+    const recentByIp = await sbList<{ id: string }>('otp_codes', {
+      ip: `eq.${clientIp}`,
+      created_at: `gte.${hourAgoIso}`,
+      select: 'id',
+      limit: '100',
+    });
+    if (recentByIp.length >= MAX_SENDS_PER_HOUR_IP) {
+      return Response.json(
+        { error: 'คำขอจากเครือข่ายนี้บ่อยเกินไป กรุณาลองใหม่ภายหลัง' },
+        { status: 429 },
+      );
+    }
 
     // จำกัดการส่งซ้ำ: อายุของ OTP ล่าสุดที่ยังใช้ได้ ต้องเกิน cooldown
     const live = await sbList<OtpRow>('otp_codes', {
@@ -154,9 +191,10 @@ export async function POST(req: NextRequest) {
     const [otp] = await sbInsert<{ id: string }>('otp_codes', {
       user_id: userId,
       purpose,
-      code_hash: bcrypt.hashSync(code, 10),
+      code_hash: bcrypt.hashSync(code, 12),
       expires_at: expiresAt,
       attempts: 0,
+      ip: clientIp,
     });
 
     // ส่งโค้ดผ่านช่องทางที่กำหนด (dev = dev_console, production = sms_gateway_selfhosted)

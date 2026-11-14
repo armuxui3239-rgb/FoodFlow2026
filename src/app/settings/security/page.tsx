@@ -13,13 +13,46 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { api } from '@/lib/client';
 
 const REMEMBER_KEY = 'ft_remember';
+const PIN_FIELD = 'h-12 w-full rounded-2xl border border-line bg-neutral-50 px-4 text-center text-lg font-bold tracking-[0.4em] outline-none focus:border-[#FFC400]';
 
-/** หน้าความปลอดภัย — จดจำการเข้าสู่ระบบ (localStorage) + ตัวเลือกไบโอเมตริก/2FA ที่ยังไม่เปิดใช้งาน */
+/** หน้าความปลอดภัย — จดจำการเข้าสู่ระบบ (localStorage) + เปลี่ยน PIN + ตัวเลือกไบโอเมตริก/2FA ที่ยังไม่เปิดใช้งาน */
 export default function SecuritySettingsPage() {
   const [remember, setRemember] = useState(true);
   const [ready, setReady] = useState(false);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [oldPin, setOldPin] = useState('');
+  const [newPin, setNewPin] = useState('');
+  const [confirmPin, setConfirmPin] = useState('');
+  const [changing, setChanging] = useState(false);
+  const [pinErr, setPinErr] = useState('');
+  const [pinMsg, setPinMsg] = useState('');
+
+  const submitPin = async () => {
+    if (newPin !== confirmPin) {
+      setPinErr('PIN ยืนยันไม่ตรงกัน');
+      return;
+    }
+    setChanging(true);
+    setPinErr('');
+    setPinMsg('');
+    try {
+      await api('/api/auth/change-pin', {
+        method: 'POST',
+        body: JSON.stringify({ oldPin, newPin }),
+      });
+      setPinMsg('เปลี่ยน PIN สำเร็จ');
+      setOldPin('');
+      setNewPin('');
+      setConfirmPin('');
+    } catch (e) {
+      setPinErr(e instanceof Error ? e.message : 'เปลี่ยน PIN ไม่สำเร็จ');
+    } finally {
+      setChanging(false);
+    }
+  };
 
   // อ่านค่าจดจำการเข้าสู่ระบบจาก localStorage (ต้องรอฝั่ง client ก่อน กัน hydration ไม่ตรง)
   useEffect(() => {
@@ -114,12 +147,89 @@ export default function SecuritySettingsPage() {
         </div>
       </div>
 
-      {/* เปลี่ยน PIN */}
-      <section aria-label="เปลี่ยน PIN" className="space-y-2">
-        <Link href="/forgot-pin" className="btn-brand flex h-12 w-full items-center justify-center gap-2 text-sm">
-          <KeyRound className="h-4 w-4" aria-hidden />
-          เปลี่ยน PIN
-        </Link>
+      {/* เปลี่ยน PIN — ต้องยืนยัน PIN เดิมก่อน (v4 ข้อ 4.5 / หน้าจอ 81) */}
+      <section aria-label="เปลี่ยน PIN" className="space-y-3 rounded-3xl border border-line bg-white p-4">
+        <p className="text-sm font-bold text-black">เปลี่ยน PIN</p>
+        {pinOpen ? (
+          <>
+            <input
+              type="password"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={6}
+              value={oldPin}
+              onChange={(e) => setOldPin(e.target.value.replace(/\D/g, ''))}
+              placeholder="PIN เดิม"
+              aria-label="PIN เดิม"
+              className={PIN_FIELD}
+            />
+            <input
+              type="password"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={6}
+              value={newPin}
+              onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
+              placeholder="PIN ใหม่ 6 หลัก"
+              aria-label="PIN ใหม่"
+              className={PIN_FIELD}
+            />
+            <input
+              type="password"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={6}
+              value={confirmPin}
+              onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
+              placeholder="ยืนยัน PIN ใหม่"
+              aria-label="ยืนยัน PIN ใหม่"
+              className={PIN_FIELD}
+            />
+            {pinErr && (
+              <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                {pinErr}
+              </p>
+            )}
+            {pinMsg && (
+              <p role="status" className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {pinMsg}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={() => void submitPin()}
+              disabled={changing || oldPin.length !== 6 || newPin.length !== 6 || confirmPin.length !== 6}
+              className="btn-brand h-12 w-full text-sm"
+            >
+              {changing ? 'กำลังเปลี่ยน…' : 'ยืนยันเปลี่ยน PIN'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPinOpen(false);
+                setPinErr('');
+                setPinMsg('');
+              }}
+              className="h-9 w-full text-xs text-neutral-400 underline"
+            >
+              ยกเลิก
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => setPinOpen(true)}
+              className="btn-brand flex h-12 w-full items-center justify-center gap-2 text-sm"
+            >
+              <KeyRound className="h-4 w-4" aria-hidden />
+              เปลี่ยน PIN
+            </button>
+            <Link href="/forgot-pin" className="block text-center text-xs text-neutral-400 underline">
+              ลืม PIN? — ขอรีเซ็ตผ่านรหัสยืนยัน
+            </Link>
+          </>
+        )}
         <p className="px-2 text-center text-[11px] leading-relaxed text-neutral-400">
           PIN ใช้สำหรับยืนยันการชำระเงินและเข้าสู่ระบบอย่างรวดเร็ว — อย่าบอก PIN ให้ผู้อื่น
         </p>

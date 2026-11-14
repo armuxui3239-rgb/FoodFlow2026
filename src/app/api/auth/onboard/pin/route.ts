@@ -3,11 +3,13 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 import { sbOne, sbUpdate, sbInsert } from '@/lib/supabase';
-import { PENDING_COOKIE, parsePending } from '@/lib/auth-flow';
+import { PENDING_COOKIE, parsePending, isWeakPin } from '@/lib/auth-flow';
 import { serializeSession, sessionCookieOptions, SESSION_COOKIE } from '@/lib/session';
 
 interface PinPrefs {
   pin_hash?: string;
+  pin_set_at?: string;
+  birth_date?: string;
   biometric_enabled?: boolean;
   [key: string]: unknown;
 }
@@ -31,16 +33,24 @@ export async function POST(req: NextRequest) {
     if (!pin || !/^\d{6}$/.test(pin)) {
       return Response.json({ error: 'PIN ต้องเป็นตัวเลข 6 หลัก' }, { status: 400 });
     }
-    if (/^(\d)\1{5}$/.test(pin)) {
-      return Response.json({ error: 'PIN ไม่ควรเป็นเลขซ้ำกันทั้ง 6 หลัก' }, { status: 400 });
-    }
-
-    const pin_hash = bcrypt.hashSync(pin, 10);
-    const pin_set_at = new Date().toISOString();
 
     const profile = await sbOne<CustomerProfile>('customer_profiles', {
       user_id: `eq.${flow.userId}`,
       select: 'id,user_id,preferences',
+    });
+
+    // ปฏิเสธ PIN ที่เดาง่าย: เลขซ้ำ / เรียงต่อเนื่อง / วันเกิดของผู้ใช้ (เก็บใน preferences.birth_date) — v4 ข้อ 4.5
+    const weak = isWeakPin(pin, profile?.preferences?.birth_date ?? null);
+    if (weak) {
+      return Response.json({ error: weak }, { status: 400 });
+    }
+
+    // bcrypt cost 12 + เก็บ hash หลักที่ users.password_hash (v4 ข้อ 4.2) — preferences เก็บคู่ไว้เพื่อบัญชีเดิม
+    const pin_hash = bcrypt.hashSync(pin, 12);
+    const pin_set_at = new Date().toISOString();
+    await sbUpdate('users', { id: `eq.${flow.userId}` }, {
+      password_hash: pin_hash,
+      updated_at: pin_set_at,
     });
     const prefs: PinPrefs = {
       ...(profile?.preferences ?? {}),

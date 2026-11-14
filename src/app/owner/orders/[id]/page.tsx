@@ -42,7 +42,6 @@ const PAYMENT_TH: Record<string, string> = {
   cash: 'เงินสดปลายทาง',
   promptpay: 'พร้อมเพย์',
   mock_wallet: 'กระเป๋าเงิน (ทดสอบ)',
-  sepay: 'ชำระผ่านธนาคาร',
 };
 
 // enum จริงของ chat_messages.sender_type: customer/driver/ai/system/restaurant/admin

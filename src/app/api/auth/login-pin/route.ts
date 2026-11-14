@@ -10,12 +10,14 @@ interface DbUser {
   phone: string | null;
   full_name: string | null;
   is_active: boolean;
+  password_hash: string | null;
   failed_login_count: number;
   locked_until: string | null;
 }
 
 interface PinPrefs {
   pin_hash?: string;
+  pin_set_at?: string;
   [key: string]: unknown;
 }
 
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
       role: 'eq.customer',
       is_active: 'eq.true',
       phone_verified_at: 'not.is.null',
-      select: 'id,email,phone,full_name,is_active,failed_login_count,locked_until',
+      select: 'id,email,phone,full_name,is_active,password_hash,failed_login_count,locked_until',
     });
     const user = users[0];
     if (!user) {
@@ -63,7 +65,12 @@ export async function POST(req: NextRequest) {
       user_id: `eq.${user.id}`,
       select: 'preferences',
     });
-    const pin_hash = profile?.preferences?.pin_hash;
+    // แหล่ง hash ของ PIN (เฟส 6): บัญชีที่ตั้ง PIN ใหม่ = users.password_hash (กำกับด้วย pin_set_at)
+    // บัญชีเก่าก่อนย้ายแหล่ง = customer_profiles.preferences.pin_hash
+    const pin_hash =
+      profile?.preferences?.pin_set_at && user.password_hash
+        ? user.password_hash
+        : (profile?.preferences?.pin_hash ?? null);
     if (!pin_hash) {
       return Response.json(
         { error: 'ยังไม่ได้ตั้ง PIN กรุณากด "ลืม PIN" เพื่อตั้งรหัสใหม่' },
@@ -74,13 +81,16 @@ export async function POST(req: NextRequest) {
     if (!bcrypt.compareSync(pin, pin_hash)) {
       const count = (user.failed_login_count ?? 0) + 1;
       if (count >= MAX_FAILED) {
+        // ล็อกซ้ำนานขึ้น: ถ้าถูกล็อกมาแล้วในชั่วโมงที่ผ่านมา ให้ล็อก 2 เท่า (v4 ข้อ 4.5)
+        const recentLock = user.locked_until && Date.now() - new Date(user.locked_until).getTime() < 60 * 60 * 1000;
+        const lockMinutes = recentLock ? LOCK_MINUTES * 2 : LOCK_MINUTES;
         await sbUpdate('users', { id: `eq.${user.id}` }, {
           failed_login_count: 0,
-          locked_until: new Date(Date.now() + LOCK_MINUTES * 60000).toISOString(),
+          locked_until: new Date(Date.now() + lockMinutes * 60000).toISOString(),
           updated_at: new Date().toISOString(),
         });
         return Response.json(
-          { error: `PIN ผิด ${MAX_FAILED} ครั้ง บัญชีถูกล็อก ${LOCK_MINUTES} นาที` },
+          { error: `PIN ผิด ${MAX_FAILED} ครั้ง บัญชีถูกล็อก ${lockMinutes} นาที` },
           { status: 423 },
         );
       }

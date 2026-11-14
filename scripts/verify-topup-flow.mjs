@@ -4,6 +4,8 @@
 //        → แอดมินดูสลิป → อนุมัติ → ยอดเข้ากระเป๋า + แจ้งเตือน → กรณีปฏิเสธ + แจ้งเตือน
 
 const BASE = process.argv[2] || 'http://localhost:3000';
+// IP ทดสอบสุ่มต่อรอบ — จำลอง client คนละเครือข่าย กันชนโควตา 10 ครั้ง/ชั่วโมง/IP ของ otp/send
+const TEST_IP = `198.18.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}`;
 let pass = 0;
 let fail = 0;
 const failures = [];
@@ -28,7 +30,7 @@ function cookieOf(res) {
 async function api(path, { method = 'GET', body, cookie } = {}) {
   const res = await fetch(`${BASE}${path}`, {
     method,
-    headers: { 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}) },
+    headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': TEST_IP, ...(cookie ? { Cookie: cookie } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   });
   let json = null;

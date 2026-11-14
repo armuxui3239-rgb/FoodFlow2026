@@ -3,7 +3,7 @@ import { sbOne } from '@/lib/supabase';
 import { currentUser, jsonError } from '@/lib/api-user';
 import { promptPayPayload } from '@/lib/promptpay';
 
-const FALLBACK_PROMPTPAY = '0812345678';
+const FALLBACK_PROMPTPAY = process.env.PROMPTPAY_FALLBACK_TARGET ?? '0812345678';
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await currentUser();

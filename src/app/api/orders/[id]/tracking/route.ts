@@ -1,5 +1,6 @@
 import { sbList, sbOne } from '@/lib/supabase';
 import { currentUser, jsonError } from '@/lib/api-user';
+import { decodeWkbPoint, haversineKm } from '@/lib/geo';
 
 interface OrderRow {
   id: string;
@@ -7,7 +8,8 @@ interface OrderRow {
   status: string;
   total: number;
   created_at: string;
-  restaurants: { name: string } | null;
+  delivery_address_id: string | null;
+  restaurants: { name: string; location: string } | null;
 }
 
 interface HistoryRow {
@@ -41,7 +43,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const order = await sbOne<OrderRow>('orders', {
     id: `eq.${id}`,
     customer_id: `eq.${user.id}`,
-    select: 'id,order_code,status,total,created_at,restaurants(name)',
+    select: 'id,order_code,status,total,created_at,delivery_address_id,restaurants(name,location)',
   });
   if (!order) return jsonError('ไม่พบคำสั่งซื้อ', 404);
 
@@ -63,5 +65,26 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
       })
     : null;
 
-  return Response.json({ data: { order, history, task, driver } });
+  // ETA ค่าประมาณ (v4 ข้อ 3): ระยะเส้นตรงร้าน→จุดส่ง ÷ ความเร็วเฉลี่ย 25 กม./ชม. — ระบุชัดว่าค่าประมาณ
+  let distanceKm: number | null = null;
+  let etaMinutes: number | null = null;
+  const fromPoint = decodeWkbPoint(order.restaurants?.location ?? null);
+  const toPoint = order.delivery_address_id
+    ? decodeWkbPoint(
+        (
+          await sbOne<{ location: string }>('addresses', {
+            id: `eq.${order.delivery_address_id}`,
+            select: 'location',
+          })
+        )?.location ?? null,
+      )
+    : null;
+  if (fromPoint && toPoint) {
+    distanceKm = Math.round(haversineKm(fromPoint, toPoint) * 10) / 10;
+    etaMinutes = Math.max(3, Math.ceil((distanceKm / 25) * 60));
+  }
+
+  return Response.json({
+    data: { order, history, task, driver, eta: { distanceKm, etaMinutes } },
+  });
 }

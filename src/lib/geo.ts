@@ -20,3 +20,16 @@ export function decodeWkbPoint(hex: string | null | undefined): [number, number]
     return null;
   }
 }
+
+/** ระยะทางเส้นตรง (กิโลเมตร) ระหว่างพิกัด [lng, lat] สองจุด — ใช้คำนวณ ETA ค่าประมาณ (v4 ข้อ 3:
+ *  ค่าเริ่มต้น = ระยะทางเส้นตรง + ความเร็วเฉลี่ย ไม่ใช่เส้นทางถนนจริง) */
+export function haversineKm(a: [number, number], b: [number, number]): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b[1] - a[1]);
+  const dLng = toRad(b[0] - a[0]);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a[1])) * Math.cos(toRad(b[1])) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+}

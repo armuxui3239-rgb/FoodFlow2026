@@ -60,3 +60,31 @@ export function maskPhone(p: string): string {
   if (p.length < 6) return p;
   return `${p.slice(0, 3)}****${p.slice(-3)}`;
 }
+
+/** ตรวจ PIN ที่เดาง่าย (v4 ข้อ 4.5): เลขซ้ำทั้งชุด · เรียงขึ้น/ลงต่อเนื่อง · ตรงวันเกิดของผู้ใช้
+ *  คืนข้อความเหตุผลถ้าอ่อน หรือ null ถ้าผ่าน */
+export function isWeakPin(pin: string, birthDate?: string | null): string | null {
+  if (new RegExp(`^(${pin[0]}){6}$`).test(pin)) {
+    return 'PIN ไม่ควรเป็นเลขซ้ำกันทั้ง 6 หลัก (เช่น 111111)';
+  }
+  const digits = pin.split('').map(Number);
+  const asc = digits.every((d, i) => i === 0 || d === digits[i - 1] + 1);
+  const desc = digits.every((d, i) => i === 0 || d === digits[i - 1] - 1);
+  if (asc || desc) {
+    return 'PIN ไม่ควรเรียงต่อเนื่อง (เช่น 123456 หรือ 654321)';
+  }
+  if (birthDate) {
+    const d = new Date(birthDate);
+    if (!Number.isNaN(d.getTime())) {
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const candidates = [
+        `${dd}${mm}${String(d.getFullYear()).slice(-2)}`,
+        `${dd}${mm}${d.getFullYear()}`,
+        `${dd}${mm}${d.getFullYear() + 543}`,
+      ];
+      if (candidates.includes(pin)) return 'PIN ไม่ควรเป็นวันเกิดของคุณ';
+    }
+  }
+  return null;
+}

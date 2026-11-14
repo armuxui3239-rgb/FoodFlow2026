@@ -156,7 +156,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     return new Response(new Uint8Array(body), {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="foodflow-${job.resource}-${job.id.slice(0, 8)}.csv"`,
+        'Content-Disposition': `attachment; filename="foodthunder-${job.resource}-${job.id.slice(0, 8)}.csv"`,
       },
     });
   }
@@ -170,7 +170,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   return new Response(csv, {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': `attachment; filename="foodflow-${job.resource}-${job.id.slice(0, 8)}.csv"`,
+      'Content-Disposition': `attachment; filename="foodthunder-${job.resource}-${job.id.slice(0, 8)}.csv"`,
     },
   });
 }

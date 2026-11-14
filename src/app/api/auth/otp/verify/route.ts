@@ -40,14 +40,36 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'รหัสหมดอายุ กรุณาขอรหัสใหม่' }, { status: 400 });
     }
     if (otp.attempts >= MAX_ATTEMPTS) {
+      // เกิน 5 ครั้ง → ยกเลิกรหัสทันที (v4 ข้อ 4.3)
+      await sbUpdate('otp_codes', { id: `eq.${otp.id}`, consumed_at: 'is.null' }, { consumed_at: new Date().toISOString() });
       return Response.json({ error: 'กรอกผิดครบ 5 ครั้ง กรุณาขอรหัสใหม่' }, { status: 423 });
     }
     if (!bcrypt.compareSync(code, otp.code_hash)) {
-      const nextAttempts = otp.attempts + 1;
-      await sbUpdate('otp_codes', { id: `eq.${otp.id}` }, { attempts: nextAttempts });
-      const left = MAX_ATTEMPTS - nextAttempts;
+      // นับพลาดแบบ atomic — update โดยกำหนด attempts = ค่าที่อ่านล่าสุด กันคำขอพร้อมกันข้ามขั้น
+      let current = otp.attempts;
+      for (let i = 0; i < 3; i += 1) {
+        const updated = await sbUpdate<{ attempts: number }>(
+          'otp_codes',
+          { id: `eq.${otp.id}`, attempts: `eq.${current}` },
+          { attempts: current + 1 },
+        );
+        if (updated.length > 0) {
+          current += 1;
+          break;
+        }
+        const fresh = await sbOne<{ attempts: number }>('otp_codes', {
+          id: `eq.${otp.id}`,
+          select: 'attempts',
+        });
+        if (!fresh) break;
+        current = fresh.attempts;
+      }
+      if (current >= MAX_ATTEMPTS) {
+        await sbUpdate('otp_codes', { id: `eq.${otp.id}`, consumed_at: 'is.null' }, { consumed_at: new Date().toISOString() });
+        return Response.json({ error: 'กรอกผิดครบ 5 ครั้ง กรุณาขอรหัสใหม่' }, { status: 423 });
+      }
       return Response.json(
-        { error: `รหัสไม่ถูกต้อง (พยายามได้อีก ${left} ครั้ง)` },
+        { error: `รหัสไม่ถูกต้อง (พยายามได้อีก ${MAX_ATTEMPTS - current} ครั้ง)` },
         { status: 400 },
       );
     }

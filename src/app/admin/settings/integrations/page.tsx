@@ -81,13 +81,6 @@ const CARDS: IntegrationCard[] = [
       : 'รอเซิร์ฟเวอร์ — เปิดด้วย flag NEXT_PUBLIC_CALLS_ENABLED=true เมื่อตั้งค่า LIVEKIT_* ใน .env แล้ว',
   },
   {
-    Icon: Bell,
-    title: 'การแจ้งเตือนแบบ Push (FCM)',
-    staticStatus: 'not_connected',
-    note: 'รอ Firebase project key จากคอนโซล (ยังไม่มีการลงทะเบียนอุปกรณ์)',
-    flagKey: 'integration_fcm_enabled',
-  },
-  {
     Icon: Bot,
     title: 'ผู้ช่วย AI (แชทบอท)',
     staticStatus: 'not_connected',

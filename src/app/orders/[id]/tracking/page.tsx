@@ -58,6 +58,7 @@ interface TrackingData {
   history: HistoryRow[];
   task: TaskRow | null;
   driver: Driver | null;
+  eta: { distanceKm: number | null; etaMinutes: number | null } | null;
 }
 
 /** จุดไทม์ไลน์ตามต้นแบบ: สร้างคำสั่ง → ชำระเงิน → ร้านรับ → เตรียมอาหาร → รับอาหาร → กำลังจัดส่ง → ส่งถึงแล้ว */
@@ -215,6 +216,14 @@ export default function TrackingPage() {
         </Link>
         <h1 className="truncate-1 text-lg font-bold text-black">ติดตามคำสั่งซื้อ</h1>
       </div>
+
+      {/* ETA ค่าประมาณ (v4 ข้อ 3 — ระยะเส้นตรง + ความเร็วเฉลี่ย ไม่ใช่เส้นทางถนนจริง) */}
+      {data.eta?.etaMinutes != null && (
+        <p className="rounded-2xl bg-[#FFF4CC] px-4 py-3 text-xs leading-relaxed text-black">
+          ระยะทางจากร้านถึงจุดส่งประมาณ {data.eta.distanceKm} กม. · ใช้เวลาส่งโดยประมาณ ~
+          {data.eta.etaMinutes} นาที (ค่าประมาณจากระยะเส้นตรง ไม่ใช่เส้นทางถนนจริง)
+        </p>
+      )}
 
       {/* สรุปสถานะปัจจุบันใหญ่ ๆ */}
       <section

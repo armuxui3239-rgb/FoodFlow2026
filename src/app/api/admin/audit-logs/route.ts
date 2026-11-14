@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     return new Response(csv, {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="foodflow-audit-logs.csv"',
+        'Content-Disposition': 'attachment; filename="foodthunder-audit-logs.csv"',
       },
     });
   }
