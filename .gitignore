@@ -44,6 +44,8 @@ agent-ctx/
 .claude
 .z-ai-config
 /skills/
+# agent skills junction (ชี้ไป .agent/skills ภายนอก repo — ไว้ให้ ZCode ค้นพบ skill)
+/.agents/
 local-*
 prompt
 test
