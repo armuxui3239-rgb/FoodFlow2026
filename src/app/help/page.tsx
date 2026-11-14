@@ -13,10 +13,13 @@ import {
   ArrowLeft,
   CircleHelp,
   Facebook,
+  Globe,
   Headset,
   Info,
+  Instagram,
   MessageCircle,
   Phone,
+  Twitter,
 } from 'lucide-react';
 
 interface Faq {
@@ -92,6 +95,9 @@ const FAQS: Faq[] = [
 const OTHER_CHANNELS: { label: string; detail: string; Icon: typeof Phone }[] = [
   { label: 'Facebook', detail: 'เพจฟู๊ด ธันเดอร์', Icon: Facebook },
   { label: 'LINE', detail: 'LINE Official Account', Icon: MessageCircle },
+  { label: 'เว็บไซต์', detail: 'foodthunder.co.th', Icon: Globe },
+  { label: 'X', detail: '@FoodThunderTH', Icon: Twitter },
+  { label: 'Instagram', detail: '@foodthunder.th', Icon: Instagram },
   { label: 'โทรศัพท์', detail: 'สายด่วนบริการลูกค้า', Icon: Phone },
 ];
 

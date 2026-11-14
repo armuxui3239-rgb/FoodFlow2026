@@ -66,7 +66,7 @@ bun run lint
 | ไรเดอร์ (driver) | `/driver` | เปิด-ปิดรับงาน รับ/จัดส่ง รายได้ ประวัติงาน |
 | ผู้ดูแลระบบ (admin) | `/admin` | ภาพรวมทั้งระบบ ผู้ใช้ คูปอง อนุมัติร้าน |
 
-> บัญชีทดสอบ (seed): `{admin,driver1,restaurant1,customer1}@foodthunder.co.th` รหัสผ่าน `Food@1234`
+> บัญชีทดสอบ (seed): `{admin,driver1,restaurant1,customer1}@foodthunder.co.th` — รหัสผ่านอยู่ในเอกสารแยก `TEST-ACCOUNTS.local.md` (ไม่ commit ตามมาตรฐานความปลอดภัย v4 ข้อ 8.1)
 
 ### ตัวแปรสภาพแวดล้อม (Environment Variables)
 

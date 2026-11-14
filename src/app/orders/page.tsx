@@ -71,6 +71,9 @@ export default function OrdersPage() {
   const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [actionError, setActionError] = useState('');
+  // เหตุผลยกเลิกจากตารางที่แอดมินจัดการ (v4 ข้อ 8.11)
+  const [cancelReasons, setCancelReasons] = useState<{ id: string; label: string }[]>([]);
+  const [cancelReasonId, setCancelReasonId] = useState('');
 
   // ดึงข้อมูลครั้งเดียว แล้วกรองด้วยแท็บปัจจุบันฝั่ง client (เรียกซ้ำหลังยกเลิกสำเร็จ)
   const load = useCallback(async () => {
@@ -89,13 +92,26 @@ export default function OrdersPage() {
     void load();
   }, [load]);
 
+  // ดึงเหตุผลยกเลิกเมื่อเปิด dialog (จากตารางที่แอดมินจัดการ — v4 ข้อ 8.11)
+  useEffect(() => {
+    if (!cancelTarget || cancelReasons.length > 0) return;
+    api<{ data: { id: string; label: string }[] }>('/api/cancellation-reasons')
+      .then((r) => setCancelReasons(r.data ?? []))
+      .catch(() => setCancelReasons([]));
+  }, [cancelTarget, cancelReasons.length]);
+
   const confirmCancel = async () => {
     if (!cancelTarget) return;
+    if (!cancelReasonId) {
+      setActionError('กรุณาเลือกเหตุผลการยกเลิก');
+      return;
+    }
     setCancelling(true);
     setActionError('');
     try {
-      await api(`/api/orders/${cancelTarget.id}/cancel`, { method: 'POST' });
+      await api(`/api/orders/${cancelTarget.id}/cancel`, { method: 'POST', body: JSON.stringify({ reasonId: cancelReasonId }) });
       setCancelTarget(null);
+      setCancelReasonId('');
       await load();
     } catch (e) {
       setCancelTarget(null);
@@ -247,14 +263,37 @@ export default function OrdersPage() {
       >
         <AlertDialogContent className="rounded-3xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              ยืนยันการยกเลิกคำสั่งซื้อ #{cancelTarget?.order_code}?
-            </AlertDialogTitle>
+            <AlertDialogTitle>เลือกเหตุผลการยกเลิก</AlertDialogTitle>
             <AlertDialogDescription>
-              หากคุณยังไม่ได้ชำระเงิน คำสั่งซื้อจะถูกยกเลิกทันที
+              ยกเลิกคำสั่งซื้อ #{cancelTarget?.order_code} — เลือกเหตุผลเพื่อช่วยให้ร้านและทีมงานพัฒนาบริการ
               การยกเลิกไม่สามารถย้อนกลับได้
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="flex flex-wrap gap-2">
+            {cancelReasons.length === 0 && (
+              <p className="text-sm text-neutral-400">กำลังโหลดเหตุผล…</p>
+            )}
+            {cancelReasons.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setCancelReasonId(r.id)}
+                aria-pressed={cancelReasonId === r.id}
+                className={`h-9 rounded-full border px-3 text-xs font-bold transition-colors ${
+                  cancelReasonId === r.id
+                    ? 'border-black bg-[#FFF4CC] text-black'
+                    : 'border-line bg-white text-neutral-600 hover:border-neutral-300'
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+          {actionError && (
+            <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+              {actionError}
+            </p>
+          )}
           <AlertDialogFooter className="flex-row gap-2">
             <AlertDialogCancel
               disabled={cancelling}
@@ -263,9 +302,9 @@ export default function OrdersPage() {
               ยกเลิก
             </AlertDialogCancel>
             <AlertDialogAction
-              disabled={cancelling}
+              disabled={cancelling || !cancelReasonId}
               data-testid="confirm-cancel-order"
-              className="flex-1 rounded-full bg-red-500 text-white hover:bg-red-600"
+              className="mt-0 flex-1 rounded-full bg-red-500 text-white hover:bg-red-600"
               onClick={() => void confirmCancel()}
             >
               {cancelling ? 'กำลังยกเลิก...' : 'ยืนยันยกเลิก'}

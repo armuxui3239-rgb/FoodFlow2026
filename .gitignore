@@ -26,6 +26,8 @@ node_modules
 *.key
 credentials*.json
 .dev.vars
+# รหัสบัญชีทดสอบ (v4 ข้อ 8.1 — เก็บไว้เครื่องเท่านั้น)
+TEST-ACCOUNTS.local.md
 
 # ---- DATABASE / RUNTIME DATA (ไม่เข้า repo — ใช้ scripts/seed-*.mjs แทน) ----
 /db/

@@ -136,6 +136,17 @@ export default function OrderDetailPage() {
   /** ยกเลิกได้เฉพาะสถานะเดียวกับที่ API ยอมรับ (ก่อนร้านตอบรับออเดอร์) */
   const canCancel = ['created', 'pending_payment', 'restaurant_pending'].includes(order?.status ?? '');
 
+  // เหตุผลยกเลิก — ดึงจากตารางที่แอดมินจัดการ (v4 ข้อ 8.11)
+  const [cancelReasons, setCancelReasons] = useState<{ id: string; label: string }[]>([]);
+  const [cancelReasonId, setCancelReasonId] = useState('');
+  const [cancelOpen, setCancelOpen] = useState(false);
+  useEffect(() => {
+    if (!canCancel || cancelReasons.length > 0) return;
+    api<{ data: { id: string; label: string }[] }>('/api/cancellation-reasons')
+      .then((r) => setCancelReasons(r.data ?? []))
+      .catch(() => setCancelReasons([]));
+  }, [canCancel, cancelReasons.length]);
+
   /** ทิปไรเดอร์ — ใช้จำนวนที่พิมพ์เองถ้ามี ไม่งั้นใช้พรีเซ็ต */
   const sendTip = async () => {
     if (!order) return;
@@ -157,10 +168,14 @@ export default function OrderDetailPage() {
   };
 
   const cancelOrder = async () => {
+    if (!cancelReasonId) {
+      setError('กรุณาเลือกเหตุผลการยกเลิก');
+      return;
+    }
     if (!window.confirm('ยืนยันการยกเลิกคำสั่งซื้อนี้? การยกเลิกไม่สามารถย้อนคืนได้')) return;
     setCanceling(true);
     try {
-      await api(`/api/orders/${id}/cancel`, { method: 'POST' });
+      await api(`/api/orders/${id}/cancel`, { method: 'POST', body: JSON.stringify({ reasonId: cancelReasonId }) });
       load();
     } catch (e) {
       setError((e as Error).message);
@@ -214,21 +229,51 @@ export default function OrderDetailPage() {
         </ol>
       </section>
 
-      {/* ยกเลิกคำสั่งซื้อ — เฉพาะก่อนร้านตอบรับ */}
+      {/* ยกเลิกคำสั่งซื้อ — เฉพาะก่อนร้านตอบรับ + เลือกเหตุผลจากระบบ (v4 ข้อ 8.11) */}
       {canCancel && (
-        <section aria-label="ยกเลิกคำสั่งซื้อ" className="flex items-center justify-between rounded-3xl border border-line bg-white p-4">
-          <div className="min-w-0">
-            <p className="text-sm font-bold text-ink">ยกเลิกคำสั่งซื้อ</p>
-            <p className="truncate-1 text-xs text-ink-soft">ยกเลิกได้ก่อนร้านตอบรับออเดอร์เท่านั้น</p>
+        <section aria-label="ยกเลิกคำสั่งซื้อ" className="space-y-3 rounded-3xl border border-line bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-ink">ยกเลิกคำสั่งซื้อ</p>
+              <p className="truncate-1 text-xs text-ink-soft">ยกเลิกได้ก่อนร้านตอบรับออเดอร์เท่านั้น</p>
+            </div>
+            <button
+              onClick={() => setCancelOpen(!cancelOpen)}
+              data-testid="order-cancel"
+              className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-red-200 bg-white px-4 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+            >
+              <XCircle className="h-4 w-4" aria-hidden /> {cancelOpen ? 'ปิด' : 'ยกเลิก'}
+            </button>
           </div>
-          <button
-            onClick={() => void cancelOrder()}
-            disabled={canceling}
-            data-testid="order-cancel"
-            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-red-200 bg-white px-4 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
-          >
-            <XCircle className="h-4 w-4" aria-hidden /> {canceling ? 'กำลังยกเลิก...' : 'ยกเลิก'}
-          </button>
+          {cancelOpen && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-ink-soft">เลือกเหตุผลการยกเลิก</p>
+              <div className="flex flex-wrap gap-2">
+                {cancelReasons.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setCancelReasonId(r.id)}
+                    aria-pressed={cancelReasonId === r.id}
+                    className={`h-9 rounded-full border px-3 text-xs font-bold transition-colors ${
+                      cancelReasonId === r.id
+                        ? 'border-black bg-[#FFF4CC] text-black'
+                        : 'border-line bg-white text-neutral-600 hover:border-neutral-300'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => void cancelOrder()}
+                disabled={canceling || !cancelReasonId}
+                className="h-11 w-full rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+              >
+                {canceling ? 'กำลังยกเลิก...' : 'ยืนยันยกเลิกคำสั่งซื้อ'}
+              </button>
+            </div>
+          )}
         </section>
       )}
 
