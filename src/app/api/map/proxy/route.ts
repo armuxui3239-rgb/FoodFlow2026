@@ -85,8 +85,13 @@ export async function GET(req: NextRequest) {
         if (fallback.status === 200) {
           const key2 = createHash('sha256').update(`${full}@2x.png`).digest('hex');
           const cachePath2 = path.join(process.cwd(), MAP_CACHE_DIR, key2);
-          await mkdir(path.dirname(cachePath2), { recursive: true });
-          await writeFile(cachePath2, fallback.body);
+          // เขียนแคชแบบ best-effort — FS อ่านอย่างเดียว (เช่น Vercel serverless) ก็ยังตอบภาพได้
+          try {
+            await mkdir(path.dirname(cachePath2), { recursive: true });
+            await writeFile(cachePath2, fallback.body);
+          } catch {
+            /* ข้ามการแคช */
+          }
           return respond(fallback.body, false, fallback.contentType);
         }
       }
@@ -98,8 +103,13 @@ export async function GET(req: NextRequest) {
       payload = Buffer.from(JSON.stringify(rewriteMapResourceUrls(JSON.parse(payload.toString()), base)));
       isTileJson = true;
     }
-    await mkdir(path.dirname(cachePath), { recursive: true });
-    await writeFile(cachePath, payload);
+    // เขียนแคชแบบ best-effort — FS อ่านอย่างเดียว (เช่น Vercel serverless) ก็ยังตอบภาพได้
+    try {
+      await mkdir(path.dirname(cachePath), { recursive: true });
+      await writeFile(cachePath, payload);
+    } catch {
+      /* ข้ามการแคช */
+    }
     return respond(payload, isTileJson, upstream.contentType);
   } catch (err) {
     console.error('map/proxy error:', err);

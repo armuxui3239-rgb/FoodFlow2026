@@ -7,7 +7,7 @@ import { createRealtimeClient } from '@/lib/realtime';
 
 /**
  * ระบบโทรจบในระบบ (in-system call) — นโยบาย: ไม่พึ่งบริการภายนอกทั้งหมด
- * - สื่อเสียง/ภาพวิ่ง P2P ผ่าน WebRTC ของเบราว์เซอร์ (ไม่มี LiveKit ไม่มี TURN/STUN)
+ * - สื่อเสียง/ภาพวิ่ง P2P ผ่าน WebRTC ของเบราว์เซอร์ (ไม่มี LiveKit/TURN — STUN สาธารณะไร้คีย์ช่วยค้นพบ IP เท่านั้น)
  * - สัญญาณ SDP/ICE ระหว่างสองฝ่ายใช้ Supabase Broadcast บนช่องชื่อคาดเดาไม่ได้
  *   (calls:{orderId}:{hmac16}) และกริ่งส่วนตัว ring:{userId}:{hmac16}
  *   ที่ API คืนเฉพาะผู้ร่วมออเดอร์ที่ยืนยันแล้วเท่านั้น
@@ -44,9 +44,16 @@ export const CALL_STATUS_TH: Record<CallStatus, string> = {
   'permission-error': 'ไม่ได้รับสิทธิ์ไมโครโฟน/กล้อง',
 };
 
-/** (a) สร้างการเชื่อมต่อ WebRTC — iceServers: [] เพราะโทรจบในระบบ ไม่มีเซิร์ฟเวอร์ TURN/STUN ภายนอก */
+/** STUN สาธารณะฟรี ไม่ต้องสมัคร ไม่ต้องสร้างคีย์ (เจ้าของอนุมัติ 2026-11-14: เอาที่ใช้งานได้จริงตอนเปิดตัว)
+ *  หน้าที่ STUN คือบอกแต่ละฝ่ายว่า "IP สาธารณะของเธอคืออะไร" เท่านั้น — เสียง/ภาพยังวิ่งตรง P2P ไม่ผ่านเซิร์ฟเวอร์ใคร
+ *  ไม่มี TURN (สื่อไม่ผ่านตัวกลางเลย) — เครือข่าย NAT แบบ symmetric ยังอาจต่อไม่ได้ (แจ้งอย่างสัจจะใน UI) */
+const CALL_STUN_SERVERS: RTCIceServer[] = [
+  { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
+];
+
+/** (a) สร้างการเชื่อมต่อ WebRTC — P2P ตรง + STUN ไร้คีย์ช่วยเจอเส้นทาง ไม่มี TURN/เซิร์ฟเวอร์กลาง */
 export function createCallConnection(): RTCPeerConnection {
-  return new RTCPeerConnection({ iceServers: [] });
+  return new RTCPeerConnection({ iceServers: CALL_STUN_SERVERS });
 }
 
 /** (b) ขอสิทธิ์ไมค์ (+กล้องถ้าต้องการ) — ถ้ากล้องไม่ได้ลองเหลือแค่เสียง; ไม่ได้เลย throw ข้อความไทยเข้าใจง่าย */

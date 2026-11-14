@@ -6,7 +6,7 @@
 
 | ของเดิมในแม่แบบ | แทนด้วย (ของเรา) | สถานะตรวจจริง | หลักฐาน |
 |---|---|---|---|
-| **Twilio (SMS)** | รหัสยืนยันสร้างเอง แสดง**ในแอป** (`VERIFICATION_DELIVERY=internal_code`) — ไม่มีช่องทางออกนอกระบบ | ✅ ตัดหมด | grep twilio = 0 · docs/SMS_GATEWAY_ANDROID_TH.md ระบุ archived |
+| **Twilio (SMS)** | รหัสยืนยันสร้างเอง แสดง**ในแอป** และ**ลงช่องกรอกอัตโนมัติ** (`VERIFICATION_DELIVERY=internal_code`) — "OTP ของเรา" ไม่มีการส่ง SMS ไม่มีช่องทางออกนอกระบบ | ✅ ตัดหมด | grep twilio = 0 · docs/SMS_GATEWAY_ANDROID_TH.md ระบุ archived |
 | **Firebase / FCM (push)** | Supabase Broadcast (แชท/สาย/เหตุการณ์) + แจ้งเตือน**ในแอป** (`notifications` ตาราง + เส้นเขียนจริงจากเติมเงิน) | ✅ ตัดหมด — แถว catalog FCM ในหน้า integrations ถอดแล้ว (เฟส 6) | grep firebase/fcm = 0 · ข้อจำกัดที่รับไว้: แจ้งเตือนตอนปิดแอปไม่ทำงาน |
 | **Google Maps** | MapLibre GL + แผนที่ OSM (tile URL จาก env `MAP_STYLE_UPSTREAM`) + รองรับไฟล์ **PMTiles** เพื่อโหมดออฟไลน์ (`NEXT_PUBLIC_MAP_PMTILES_URL`) | ✅ | grep google_maps/maps.googleapis = 0 · src/lib/map-config.ts · map-pmtiles.ts |
 | **Google Directions (ETA)** | คำนวณ **ระยะเส้นตรง (haversine) ÷ ความเร็วเฉลี่ย 25 กม./ชม.** — แสดงในหน้าติดตามพร้อมป้าย "ค่าประมาณ ไม่ใช่เส้นทางถนนจริง" (v4 ข้อ 3 กำหนดให้แจ้งสัจจะ) | ✅ (เฟส 6) | src/lib/geo.ts haversineKm · api/orders/[id]/tracking · ทดสอบจริง 1.4 กม. → ~4 นาที · รองรับสลับ OSRM ผ่าน env ภายหลังโดยไม่แก้โค้ด |
@@ -17,7 +17,7 @@
 | **MinIO (ไฟล์)** | **Supabase Storage** — bucket `topup-slips` (private): อัปโหลด/อ่านผ่าน service key ฝั่ง server เท่านั้น | ✅ (เฟส 5) | api/wallet/topup/slip · api/admin/topups/[id]/slip |
 | **Socket.IO (realtime)** | **Supabase Broadcast** — แชทออเดอร์ + สาย WebRTC + ring channels, ชื่อ channel กันเดาด้วย HMAC | ✅ | src/lib/realtime.ts · chat-channel.ts · calls.ts |
 | **ล็อกอินโซเชียล FB/Google/Apple** | **เบอร์โทร + PIN** เท่านั้น | ✅ ตัดหมด | grep oauth = 0 · ไม่มีปุ่มโซเชียลในหน้าเข้าสู่ระบบ |
-| **LiveKit / coturn (โทรเสียง-วิดีโอภายนอก)** | **WebRTC P2P** สัญญาณผ่าน Supabase Broadcast — `iceServers: []` ตามนโยบาย (จำกัด hard-NAT แจ้งใน UI อย่างสัจจะ) | ✅ | src/lib/calls.ts · /calls/[room] · เกณฑ์ 12.14: คำนวณ/QR/OTP ทำงานได้โดยไม่พึ่งภายนอก (แผนที่ต้อง tile ภายนอกหรือไฟล์ PMTiles) |
+| **LiveKit / coturn (โทรเสียง-วิดีโอภายนอก)** | **WebRTC P2P** สัญญาณผ่าน Supabase Broadcast — STUN สาธารณะ**ไร้คีย์** (Google) เฉพาะช่วยค้นพบ IP: สื่อวิ่งตรงระหว่างผู้ใช้ ไม่ผ่านเซิร์ฟเวอร์ใคร (เจ้าของอนุมัติ 2026-11-14 เพื่อเชื่อมต่อได้จริงบนมือถือ) | ✅ | src/lib/calls.ts · /calls/[room] · เกณฑ์ 12.14: คำนวณ/QR/OTP ทำงานได้โดยไม่พึ่งภายนอก (แผนที่ต้อง tile ภายนอกหรือไฟล์ PMTiles) |
 | **android-sms-gateway (แผนเก่า)** | archived — แทนด้วย internal_code | ✅ | docs/SMS_GATEWAY_ANDROID_TH.md |
 
 ## ข้อจำกัดที่รับไว้ตาม v4 ข้อ 3 (บันทึกตามจริง)

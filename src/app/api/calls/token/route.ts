@@ -7,7 +7,7 @@ import { callRoomName, callRingChannelName, broadcastEvent } from '@/lib/chat-ch
  * POST /api/calls/token?order=<id> — ระบบโทรจบในระบบ (in-system call)
  *
  * นโยบาย: ไม่มีบริการภายนอก — สื่อเสียง/ภาพวิ่ง P2P ผ่าน WebRTC ของเบราว์เซอร์ล้วน ๆ
- * (RTCPeerConnection แบบ iceServers: [] — ไม่มี LiveKit และไม่มีเซิร์ฟเวอร์ TURN/STUN)
+ * (ไม่มี LiveKit/TURN — STUN สาธารณะไร้คีย์ช่วยค้นพบ IP เท่านั้น: สื่อไม่ผ่านเซิร์ฟเวอร์ใคร)
  * เซิร์ฟเวอร์ทำหน้าที่แค่ตรวจสิทธิ์ผู้ร่วมออเดอร์ แจกชื่อช่องสัญญาณแบบคาดเดาไม่ได้
  * แล้วส่งสัญญาณ SDP/ICE ของสองฝ่ายผ่าน Supabase Broadcast (payload ไม่มีสื่อ — มีแค่สัญญาณ)
  */
