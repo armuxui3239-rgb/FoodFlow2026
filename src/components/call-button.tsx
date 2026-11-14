@@ -62,8 +62,8 @@ export function CallButton({ orderId }: { orderId: string }) {
             >
               <h2 className="mb-2 text-base font-bold text-ink">ยังไม่เปิดใช้งาน</h2>
               <p className="text-sm text-ink-soft">
-                ฟีเจอร์โทรเสียง/วิดีโอจะเปิดให้ใช้เมื่อระบบมีเซิร์ฟเวอร์สื่อ (LiveKit) รองรับ
-                ในขณะนี้ยังไม่พร้อมใช้งาน — ติดต่อผู้จัดส่งได้ทางหมายเลขในใบเสร็จ
+                ฟีเจอร์โทรเสียง/วิดีโอยังไม่เปิดใช้งานบนระบบนี้
+                — ติดต่อผู้จัดส่งได้ทางหมายเลขในใบเสร็จ
               </p>
               <button
                 type="button"

@@ -74,11 +74,11 @@ const CARDS: IntegrationCard[] = [
   },
   {
     Icon: PhoneCall,
-    title: 'โทรผ่าน LiveKit',
+    title: 'โทรในระบบ (WebRTC P2P)',
     staticStatus: CALLS_ENABLED ? 'ready' : 'disabled',
     note: CALLS_ENABLED
-      ? 'เปิดใช้งานแล้วผ่าน flag NEXT_PUBLIC_CALLS_ENABLED'
-      : 'รอเซิร์ฟเวอร์ — เปิดด้วย flag NEXT_PUBLIC_CALLS_ENABLED=true เมื่อตั้งค่า LIVEKIT_* ใน .env แล้ว',
+      ? 'เปิดใช้งานแล้ว — เสียง/ภาพวิ่งตรงระหว่างผู้ใช้ ไม่ผ่านเซิร์ฟเวอร์สื่อภายนอก (STUN สาธารณะไร้คีย์ช่วยเชื่อมต่อ)'
+      : 'ปิดอยู่ด้วย flag NEXT_PUBLIC_CALLS_ENABLED',
   },
   {
     Icon: Bot,

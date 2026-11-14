@@ -12,28 +12,28 @@ CREATE EXTENSION IF NOT EXISTS vector; -- สำหรับ rag_documents.embed
 -- ---------- ชนิด enum (รื้อค่าจากข้อมูลจริง) ----------
 CREATE TYPE "AiUsageOutcome" AS ENUM ('success', 'error');
 CREATE TYPE "ChatSenderType" AS ENUM ('ai', 'customer', 'system');
-CREATE TYPE "ChatSessionType" AS ENUM ('ai_support', 'customer_restaurant');
-CREATE TYPE "DeliveryTaskStatus" AS ENUM ('delivered', 'assigned', 'picked_up');
+CREATE TYPE "ChatSessionType" AS ENUM ('ai_support', 'customer_restaurant', 'driver_customer', 'restaurant_driver');
+CREATE TYPE "DeliveryTaskStatus" AS ENUM ('assigned', 'delivered', 'picked_up');
 CREATE TYPE "ExportFormat" AS ENUM ('csv', 'xlsx', 'json');
-CREATE TYPE "ExportJobStatus" AS ENUM ('pending', 'running', 'completed', 'failed');
+CREATE TYPE "ExportJobStatus" AS ENUM ('completed', 'pending', 'running', 'failed');
 CREATE TYPE "KycStatus" AS ENUM ('pending', 'approved', 'rejected');
-CREATE TYPE "LocaleCode" AS ENUM ('en');
+CREATE TYPE "LocaleCode" AS ENUM ('th');
 CREATE TYPE "LoyaltyTxnType" AS ENUM ('credit');
-CREATE TYPE "OrderStatus" AS ENUM ('completed', 'delivered', 'paid', 'pending_payment', 'cancelled', 'delivering', 'driver_assigned', 'picked_up', 'preparing', 'ready_for_pickup', 'refunded', 'restaurant_accepted');
-CREATE TYPE "PaymentMethod" AS ENUM ('cash', 'promptpay');
-CREATE TYPE "PaymentStatus" AS ENUM ('completed', 'pending');
+CREATE TYPE "OrderStatus" AS ENUM ('cancelled', 'completed', 'delivered', 'driver_assigned', 'paid', 'pending_payment', 'picked_up', 'refunded', 'restaurant_pending', 'delivering', 'preparing', 'ready_for_pickup', 'restaurant_accepted');
+CREATE TYPE "PaymentMethod" AS ENUM ('wallet');
+CREATE TYPE "PaymentStatus" AS ENUM ('completed', 'pending', 'refunded');
 CREATE TYPE "PriceRange" AS ENUM ('$', '$$');
 CREATE TYPE "PromotionStatus" AS ENUM ('active', 'inactive', 'expired');
 CREATE TYPE "PromotionType" AS ENUM ('fixed', 'percentage');
 CREATE TYPE "RestaurantApprovalStatus" AS ENUM ('approved', 'pending', 'rejected', 'suspended');
-CREATE TYPE "StaffInviteStatus" AS ENUM ('invited', 'accepted', 'expired', 'revoked');
-CREATE TYPE "StaffRole" AS ENUM ('owner');
-CREATE TYPE "StaffShiftStatus" AS ENUM ('scheduled', 'in_progress', 'completed', 'cancelled');
+CREATE TYPE "StaffInviteStatus" AS ENUM ('pending', 'invited', 'accepted', 'expired', 'revoked');
+CREATE TYPE "StaffRole" AS ENUM ('kitchen', 'manager');
+CREATE TYPE "StaffShiftStatus" AS ENUM ('completed', 'scheduled', 'in_progress', 'cancelled');
 CREATE TYPE "SupportChannel" AS ENUM ('in_app');
-CREATE TYPE "SupportMessageType" AS ENUM ('message', 'note', 'system');
-CREATE TYPE "TicketIssueType" AS ENUM ('late_delivery');
+CREATE TYPE "SupportMessageType" AS ENUM ('public_reply', 'message', 'note', 'system');
+CREATE TYPE "TicketIssueType" AS ENUM ('late_delivery', 'wrong_item');
 CREATE TYPE "TicketPriority" AS ENUM ('medium');
-CREATE TYPE "TicketStatus" AS ENUM ('open');
+CREATE TYPE "TicketStatus" AS ENUM ('in_progress', 'open', 'resolved');
 CREATE TYPE "UserRole" AS ENUM ('admin', 'customer', 'driver', 'restaurant');
 CREATE TYPE "VehicleType" AS ENUM ('motorbike');
 CREATE TYPE "WalletTxnType" AS ENUM ('credit', 'debit');
@@ -113,6 +113,15 @@ CREATE TABLE ai_usage_events (
   latency_ms integer NOT NULL,
   error_code character varying(255),
   created_at timestamptz NOT NULL
+);
+
+CREATE TABLE cancellation_reasons (
+  id uuid PRIMARY KEY,
+  label character varying(255) NOT NULL,
+  is_active boolean NOT NULL,
+  sort_order integer NOT NULL,
+  created_at timestamptz NOT NULL,
+  updated_at timestamptz NOT NULL
 );
 
 CREATE TABLE cart_items (
@@ -445,7 +454,8 @@ CREATE TABLE otp_codes (
   expires_at timestamptz NOT NULL,
   attempts integer NOT NULL,
   consumed_at timestamptz,
-  created_at timestamptz NOT NULL
+  created_at timestamptz NOT NULL,
+  ip text
 );
 
 CREATE TABLE password_reset_tokens (
@@ -454,7 +464,11 @@ CREATE TABLE password_reset_tokens (
   token character varying(255) NOT NULL,
   expires_at timestamptz NOT NULL,
   used_at timestamptz,
-  created_at timestamptz NOT NULL
+  created_at timestamptz NOT NULL,
+  status character varying(255) NOT NULL,
+  reviewed_by uuid,
+  reviewed_at timestamptz,
+  review_note text
 );
 
 CREATE TABLE payment_intents (
@@ -484,7 +498,11 @@ CREATE TABLE payment_refund_requests (
   failure_code character varying(255),
   created_at timestamptz NOT NULL,
   updated_at timestamptz NOT NULL,
-  completed_at timestamptz
+  completed_at timestamptz,
+  requested_by uuid,
+  reviewed_by uuid,
+  reviewed_at timestamptz,
+  review_note text
 );
 
 CREATE TABLE payment_webhook_receipts (
@@ -515,7 +533,7 @@ CREATE TABLE payments (
 
 CREATE TABLE payout_ledger (
   id uuid PRIMARY KEY,
-  order_id uuid NOT NULL,
+  order_id uuid,
   recipient_type character varying(255) NOT NULL,
   recipient_id uuid,
   amount integer NOT NULL,
@@ -691,7 +709,10 @@ CREATE TABLE restaurants (
   approved_at timestamptz,
   approved_by_id uuid,
   onboarding_state jsonb,
-  updated_at timestamptz NOT NULL
+  updated_at timestamptz NOT NULL,
+  bank_name text,
+  bank_account_number text,
+  bank_account_name text
 );
 
 CREATE TABLE reviews (
@@ -805,7 +826,11 @@ CREATE TABLE wallet_transactions (
   ref_id uuid,
   created_at timestamptz NOT NULL,
   status character varying(255) NOT NULL,
-  refund_request_id uuid
+  refund_request_id uuid,
+  proof_url text,
+  reviewed_by uuid,
+  reviewed_at timestamptz,
+  review_note text
 );
 
 -- ---------- Foreign Keys ----------
@@ -817,6 +842,8 @@ ALTER TABLE payout_ledger ADD CONSTRAINT fk_payout_ledger_refund_request_id FORE
 ALTER TABLE notification_settings ADD CONSTRAINT fk_notification_settings_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE payment_refund_requests ADD CONSTRAINT fk_payment_refund_requests_order_id FOREIGN KEY (order_id) REFERENCES orders(id);
 ALTER TABLE payment_refund_requests ADD CONSTRAINT fk_payment_refund_requests_payment_id FOREIGN KEY (payment_id) REFERENCES payments(id);
+ALTER TABLE payment_refund_requests ADD CONSTRAINT fk_payment_refund_requests_requested_by FOREIGN KEY (requested_by) REFERENCES users(id);
+ALTER TABLE payment_refund_requests ADD CONSTRAINT fk_payment_refund_requests_reviewed_by FOREIGN KEY (reviewed_by) REFERENCES users(id);
 ALTER TABLE driver_kyc_submissions ADD CONSTRAINT fk_driver_kyc_submissions_driver_profile_id FOREIGN KEY (driver_profile_id) REFERENCES driver_profiles(id);
 ALTER TABLE driver_kyc_submissions ADD CONSTRAINT fk_driver_kyc_submissions_reviewed_by_id FOREIGN KEY (reviewed_by_id) REFERENCES users(id);
 ALTER TABLE email_verification_tokens ADD CONSTRAINT fk_email_verification_tokens_user_id FOREIGN KEY (user_id) REFERENCES users(id);
@@ -828,6 +855,7 @@ ALTER TABLE notifications ADD CONSTRAINT fk_notifications_user_id FOREIGN KEY (u
 ALTER TABLE customer_profiles ADD CONSTRAINT fk_customer_profiles_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE customer_profiles ADD CONSTRAINT fk_customer_profiles_default_address_id FOREIGN KEY (default_address_id) REFERENCES addresses(id);
 ALTER TABLE password_reset_tokens ADD CONSTRAINT fk_password_reset_tokens_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+ALTER TABLE password_reset_tokens ADD CONSTRAINT fk_password_reset_tokens_reviewed_by FOREIGN KEY (reviewed_by) REFERENCES users(id);
 ALTER TABLE orders ADD CONSTRAINT fk_orders_customer_id FOREIGN KEY (customer_id) REFERENCES users(id);
 ALTER TABLE orders ADD CONSTRAINT fk_orders_restaurant_id FOREIGN KEY (restaurant_id) REFERENCES restaurants(id);
 ALTER TABLE orders ADD CONSTRAINT fk_orders_driver_id FOREIGN KEY (driver_id) REFERENCES users(id);
@@ -899,6 +927,7 @@ ALTER TABLE dispatch_offers ADD CONSTRAINT fk_dispatch_offers_driver_id FOREIGN 
 ALTER TABLE restaurant_holiday_closures ADD CONSTRAINT fk_restaurant_holiday_closures_restaurant_id FOREIGN KEY (restaurant_id) REFERENCES restaurants(id);
 ALTER TABLE wallet_transactions ADD CONSTRAINT fk_wallet_transactions_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE wallet_transactions ADD CONSTRAINT fk_wallet_transactions_refund_request_id FOREIGN KEY (refund_request_id) REFERENCES payment_refund_requests(id);
+ALTER TABLE wallet_transactions ADD CONSTRAINT fk_wallet_transactions_reviewed_by FOREIGN KEY (reviewed_by) REFERENCES users(id);
 ALTER TABLE payment_intents ADD CONSTRAINT fk_payment_intents_order_id FOREIGN KEY (order_id) REFERENCES orders(id);
 
 -- จบสคีมา — ขั้นถัดไป: bun scripts/seed-thai.mjs (ต้องตั้ง SUPABASE_URL + SBK ก่อน)
