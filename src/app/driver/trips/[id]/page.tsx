@@ -427,7 +427,7 @@ export default function DriverTripPage() {
                 ) : (
                   <div className="space-y-3">
                     <div className="flex gap-2">
-                      {[2000, 5000, 10000].map((s) => (
+                      {[1000, 2000, 3000, 5000, 7000, 10000].map((s) => (
                         <button
                           key={s}
                           type="button"

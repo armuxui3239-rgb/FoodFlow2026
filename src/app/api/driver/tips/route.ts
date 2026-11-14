@@ -67,8 +67,8 @@ export async function POST(req: NextRequest) {
   if (!body.orderId) return jsonError('กรุณาระบุ orderId', 400);
 
   const amount = Number(body.amountSatang);
-  if (!Number.isInteger(amount) || amount < 2000 || amount > 100000) {
-    return jsonError('จำนวนทิปต้องอยู่ระหว่าง 20–1,000 บาท', 400);
+  if (!Number.isInteger(amount) || amount < 1000 || amount > 100000) {
+    return jsonError('จำนวนทิปต้องอยู่ระหว่าง 10–1,000 บาท', 400);
   }
 
   const order = await sbOne<TipOrderRow>('orders', {

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { BadgePercent, QrCode, TicketX } from 'lucide-react';
+import { BadgePercent, Banknote, QrCode, TicketX, Wallet } from 'lucide-react';
 import { api, baht } from '@/lib/client';
 
 interface CartData {
@@ -35,9 +35,20 @@ export default function CheckoutPage() {
   const [couponErr, setCouponErr] = useState('');
   const [checkingCoupon, setCheckingCoupon] = useState(false);
 
+  // วิธีชำระเงิน (เฟส 5.2): กระเป๋าเงิน / เงินสดปลายทาง / พร้อมเพย์ QR
+  const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'cash' | 'promptpay'>('promptpay');
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+
   useEffect(() => {
     api<CartData>('/api/cart').then(setData).catch(() => router.replace('/cart'));
   }, [router]);
+
+  // ยอดกระเป๋าเงิน — แสดงและใช้กันว่า "ยอดไม่พอ" ตั้งแต่หน้าเช็กเอาต์ (ตรวจจริงอีกชั้นที่ backend)
+  useEffect(() => {
+    api<{ data: { balance: number } }>('/api/wallet')
+      .then((r) => setWalletBalance(r.data?.balance ?? 0))
+      .catch(() => setWalletBalance(null));
+  }, []);
 
   const subtotal = (data?.items ?? []).reduce((s, i) => s + i.unit_price * i.quantity, 0); // สตางค์
   const discount = coupon?.discount ?? 0;
@@ -98,7 +109,11 @@ export default function CheckoutPage() {
     try {
       const res = await api<{ order: { id: string } }>('/api/orders', {
         method: 'POST',
-        body: JSON.stringify({ notes: notes || null, couponCode: coupon?.code ?? null }),
+        body: JSON.stringify({
+          notes: notes || null,
+          couponCode: coupon?.code ?? null,
+          paymentMethod,
+        }),
       });
       router.push(`/orders/${res.order.id}`);
     } catch (e) {
@@ -106,6 +121,18 @@ export default function CheckoutPage() {
       setSubmitting(false);
     }
   };
+
+  const walletEnough = walletBalance === null ? true : walletBalance >= total;
+  const PAYMENTS: { key: 'wallet' | 'cash' | 'promptpay'; label: string; sub: string; Icon: typeof Wallet }[] = [
+    {
+      key: 'wallet',
+      label: 'กระเป๋าเงิน',
+      sub: walletBalance !== null ? `ยอดคงเหลือ ${baht(walletBalance)}` : 'กำลังโหลดยอด…',
+      Icon: Wallet,
+    },
+    { key: 'cash', label: 'เงินสดปลายทาง', sub: 'จ่ายเงินสดให้ไรเดอร์เมื่อส่งถึง', Icon: Banknote },
+    { key: 'promptpay', label: 'พร้อมเพย์ QR', sub: 'สแกนจ่ายง่าย ไม่มีค่าธรรมเนียม', Icon: QrCode },
+  ];
 
   if (!data) return <div className="h-64 animate-pulse rounded-3xl bg-neutral-100" />;
   if (data.items.length === 0) {
@@ -182,15 +209,52 @@ export default function CheckoutPage() {
         />
       </section>
 
-      <section aria-label="วิธีชำระเงิน" className="flex items-center gap-3 rounded-3xl border-2 border-black bg-[#FFC400]/10 p-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-black text-[#FFC400]">
-          <QrCode className="h-6 w-6" aria-hidden />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-black">PromptPay</p>
-          <p className="truncate-1 text-xs text-neutral-500">สแกนจ่ายง่าย ไม่มีค่าธรรมเนียม</p>
-        </div>
-        <span className="shrink-0 rounded-full bg-black px-3 py-1 text-[11px] font-bold text-[#FFC400]">เลือกแล้ว</span>
+      <section aria-label="วิธีชำระเงิน" className="space-y-3">
+        <h2 className="text-sm font-medium text-black">วิธีชำระเงิน</h2>
+        {PAYMENTS.map((p) => {
+          const selected = paymentMethod === p.key;
+          const disabled = p.key === 'wallet' && !walletEnough;
+          return (
+            <button
+              key={p.key}
+              type="button"
+              onClick={() => {
+                if (!disabled) setPaymentMethod(p.key);
+              }}
+              aria-pressed={selected}
+              disabled={disabled}
+              className={`flex w-full items-center gap-3 rounded-3xl p-4 text-left transition-colors ${
+                selected
+                  ? 'border-2 border-black bg-[#FFC400]/10'
+                  : disabled
+                    ? 'border border-line bg-neutral-50 opacity-60'
+                    : 'border border-line bg-white hover:bg-neutral-50'
+              }`}
+            >
+              <span
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${
+                  selected ? 'bg-black text-[#FFC400]' : 'bg-neutral-100 text-black'
+                }`}
+              >
+                <p.Icon className="h-6 w-6" aria-hidden />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-black">{p.label}</p>
+                <p className="truncate-1 text-xs text-neutral-500">{p.sub}</p>
+              </div>
+              {selected && (
+                <span className="shrink-0 rounded-full bg-black px-3 py-1 text-[11px] font-bold text-[#FFC400]">
+                  เลือกแล้ว
+                </span>
+              )}
+              {disabled && (
+                <span className="shrink-0 rounded-full bg-neutral-100 px-3 py-1 text-[11px] font-bold text-neutral-500">
+                  ยอดไม่พอ
+                </span>
+              )}
+            </button>
+          );
+        })}
       </section>
 
       <section aria-label="สรุปยอด" className="space-y-2 rounded-3xl border border-line bg-white p-4 text-sm">

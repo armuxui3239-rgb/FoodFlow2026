@@ -34,11 +34,13 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await currentUser();
   if (!user) return jsonError('กรุณาเข้าสู่ระบบ', 401);
-  const { addressId, notes = null, couponCode = null } = (await req.json().catch(() => ({}))) as {
+  const { addressId, notes = null, couponCode = null, paymentMethod = 'promptpay' } = (await req.json().catch(() => ({}))) as {
     addressId?: string | null;
     notes?: string | null;
     couponCode?: string | null;
+    paymentMethod?: 'wallet' | 'cash' | 'promptpay';
   };
+  const pm = paymentMethod === 'wallet' || paymentMethod === 'cash' ? paymentMethod : 'promptpay';
   // ถ้าไม่ส่งที่อยู่มา ใช้ที่อยู่ตั้งต้นของลูกค้า
   let finalAddressId = addressId ?? null;
   if (!finalAddressId) {
@@ -73,6 +75,25 @@ export async function POST(req: NextRequest) {
   }
 
   const total = subtotal + DELIVERY_FEE - promotionDiscount;
+
+  // ---- กระเป๋าเงิน: ตรวจยอดก่อนหัก (เฟส 5.2) — คำนวณแบบเดียวกับ api/wallet (รวม 50 รายการล่าสุดที่ completed) ----
+  if (pm === 'wallet') {
+    const txs = await sbList<{ amount_delta: number }>('wallet_transactions', {
+      user_id: `eq.${user.id}`,
+      status: 'eq.completed',
+      order: 'created_at.desc',
+      limit: '50',
+      select: 'amount_delta',
+    });
+    const walletBalance = txs.reduce((s, t) => s + t.amount_delta, 0);
+    if (total > walletBalance) {
+      return jsonError(
+        `ยอดเงินในกระเป๋าไม่พอ (คงเหลือ ${(walletBalance / 100).toLocaleString('th-TH', { maximumFractionDigits: 2 })} บาท)`,
+        400,
+      );
+    }
+  }
+
   const fullRestaurant = await sbOne<{ phone: string | null }>('restaurants', {
     id: `eq.${cart.restaurant_id}`,
     select: 'phone',
@@ -95,12 +116,13 @@ export async function POST(req: NextRequest) {
     customer_id: user.id,
     restaurant_id: cart.restaurant_id,
     delivery_address_id: finalAddressId,
-    status: 'pending_payment',
+    // wallet = หักเงินทันที -> paid · cash = เงินสดปลายทาง ร้านเริ่มทำได้เลย (payments ยัง pending) · promptpay = รอชำระ
+    status: pm === 'promptpay' ? 'pending_payment' : 'paid',
     subtotal,
     delivery_fee: DELIVERY_FEE,
     promotion_discount: promotionDiscount,
     total,
-    payment_method: 'promptpay',
+    payment_method: pm,
     notes,
   });
   await sbInsert('order_items',
@@ -116,23 +138,40 @@ export async function POST(req: NextRequest) {
   await sbInsert('payments', {
     order_id: order.id,
     amount: total,
-    method: 'promptpay',
-    status: 'pending',
+    method: pm,
+    status: pm === 'wallet' ? 'completed' : 'pending',
+    paid_at: pm === 'wallet' ? new Date().toISOString() : null,
     transaction_id: `TXN-${crypto.randomUUID().slice(0, 12).toUpperCase()}`,
   });
+  if (pm === 'wallet') {
+    await sbInsert('wallet_transactions', {
+      user_id: user.id,
+      amount_delta: -total, // สตางค์ติดลบ = หักเงินออกจากกระเป๋า
+      type: 'debit',
+      status: 'completed',
+      reason: `ชำระค่าอาหาร ${order.order_code}`,
+      ref_id: order.id,
+    });
+  }
   if (appliedPromotion) {
     await recordPromotionUsage(appliedPromotion, user.id, order.id, promotionDiscount);
   }
   await sbDelete('cart_items', { cart_id: `eq.${cart.id}` });
   await sbDelete('carts', { id: `eq.${cart.id}` });
 
-  const payload = promptPayPayload(promptPayTarget, total);
-  const qrImage = await QRCode.toDataURL(payload, { width: 320, margin: 1 });
+  // คิวอาร์โค้ดเฉพาะพร้อมเพย์ — กระเป๋าเงินหักทันที / เงินสดปลายทางไม่ต้องมีคิวอาร์
+  let qrImage: string | null = null;
+  let payload: string | null = null;
+  if (pm === 'promptpay') {
+    payload = promptPayPayload(promptPayTarget, total);
+    qrImage = await QRCode.toDataURL(payload, { width: 320, margin: 1 });
+  }
   return Response.json(
     {
       order,
       qrImage,
       payload,
+      paymentMethod: pm,
       promotion: appliedPromotion ? { code: appliedPromotion.code, discount: promotionDiscount } : null,
     },
     { status: 201 },

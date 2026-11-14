@@ -31,8 +31,8 @@ interface Payment {
 
 const STEPS = ['pending_payment', 'paid', 'restaurant_accepted', 'preparing', 'ready_for_pickup', 'delivering', 'delivered'];
 
-// ทิปพร้อมเลือก: 20 / 50 / 100 บาท (สตางค์) — ช่วงที่ API รองรับคือ 2,000–100,000 สตางค์
-const TIP_PRESETS = [2000, 5000, 10000];
+// ทิปพร้อมเลือก: 10 / 20 / 30 / 50 / 70 / 100 บาท (สตางค์) — ช่วงที่ API รองรับ 1,000–100,000 สตางค์ (v4 ข้อ 8.12)
+const TIP_PRESETS = [1000, 2000, 3000, 5000, 7000, 10000];
 
 // แชทใช้ได้เมื่อถึงช่วงที่มีไรเดอร์/กำลังจัดส่ง/ส่งถึงแล้ว — มีไรเดอร์คุยกับไรเดอร์ ยังไม่มีคุยกับร้าน
 const CHAT_STATUSES = ['driver_assigned', 'driver_arriving_restaurant', 'picked_up', 'delivering', 'delivered', 'completed'];
