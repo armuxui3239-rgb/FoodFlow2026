@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { cookies } from 'next/headers';
-import { sbOne, sbUpdate } from '@/lib/supabase';
+import { sbOne, sbUpdate, sbInsert, sbList } from '@/lib/supabase';
 import { PENDING_COOKIE, newPendingFlow, serializePending, pendingCookieOptions } from '@/lib/auth-flow';
 
 interface OtpRow {
@@ -99,7 +100,43 @@ export async function POST(req: NextRequest) {
       purpose: otp.purpose as 'register' | 'reset_pin',
     });
 
-    const res = Response.json({ ok: true, purpose: otp.purpose });
+    // ลืม PIN (v4 ข้อ 4.5): ยืนยันตัวตนแล้ว = สร้างคำขอรีเซ็ต -> รอแอดมินอนุมัติก่อนตั้ง PIN ใหม่
+    let nextPath = otp.purpose === 'register' ? '/onboarding/profile' : '/forgot-pin?awaiting=1';
+    if (otp.purpose === 'reset_pin') {
+      const nowIso = new Date().toISOString();
+      const approved = await sbOne<{ id: string }>('password_reset_tokens', {
+        user_id: `eq.${user.id}`,
+        status: 'eq.approved',
+        used_at: 'is.null',
+        expires_at: `gte.${nowIso}`,
+        select: 'id',
+      });
+      if (approved) {
+        // มีคำขอที่อนุมัติแล้วรออยู่ -> ไปตั้ง PIN ใหม่ได้ทันที
+        nextPath = '/onboarding/pin?flow=reset';
+      } else {
+        const existingPending = await sbList<{ id: string }>('password_reset_tokens', {
+          user_id: `eq.${user.id}`,
+          status: 'eq.pending',
+          expires_at: `gte.${nowIso}`,
+          order: 'created_at.desc',
+          limit: '1',
+          select: 'id',
+        });
+        if (!existingPending[0]) {
+          await sbInsert('password_reset_tokens', {
+            id: crypto.randomUUID(),
+            user_id: user.id,
+            token: crypto.randomUUID(),
+            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            status: 'pending',
+          });
+        }
+        nextPath = '/forgot-pin?awaiting=1';
+      }
+    }
+
+    const res = Response.json({ ok: true, purpose: otp.purpose, next: nextPath });
     const opt = pendingCookieOptions();
     res.headers.append(
       'Set-Cookie',

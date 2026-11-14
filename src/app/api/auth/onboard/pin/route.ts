@@ -75,6 +75,25 @@ export async function POST(req: NextRequest) {
         updated_at: new Date().toISOString(),
       });
     } else {
+      // ลืม PIN (v4 ข้อ 4.5): ต้องมีคำขอที่แอดมินอนุมัติแล้ว — และปิดการใช้คำขอหลังตั้ง PIN สำเร็จ
+      const approved = await sbOne<{ id: string }>('password_reset_tokens', {
+        user_id: `eq.${flow.userId}`,
+        status: 'eq.approved',
+        used_at: 'is.null',
+        expires_at: `gte.${new Date().toISOString()}`,
+        select: 'id',
+      });
+      if (!approved) {
+        return Response.json(
+          { error: 'คำขอรีเซ็ต PIN ยังไม่ได้รับอนุมัติจากผู้ดูแลระบบ' },
+          { status: 403 },
+        );
+      }
+      await sbUpdate(
+        'password_reset_tokens',
+        { user_id: `eq.${flow.userId}`, status: 'eq.approved', used_at: 'is.null' },
+        { used_at: new Date().toISOString(), status: 'used' },
+      );
       redirect = '/';
     }
 

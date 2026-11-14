@@ -82,7 +82,8 @@ export default function VerifyOtpPage() {
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? 'ตรวจสอบไม่สำเร็จ');
       sessionStorage.removeItem('ft_otp_flow');
-      router.push(flow.purpose === 'register' ? '/onboarding/profile' : '/onboarding/pin?flow=reset');
+      // ปลายทางจาก backend: register -> ตั้งโปรไฟล์ต่อ · reset_pin -> รออนุมัติแอดมิน (หรือตั้ง PIN ใหม่ทันทีถ้าอนุมัติแล้ว)
+      router.push(body.next ?? (flow.purpose === 'register' ? '/onboarding/profile' : '/forgot-pin?awaiting=1'));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ตรวจสอบไม่สำเร็จ');
       setDigits(['', '', '', '', '', '']);
