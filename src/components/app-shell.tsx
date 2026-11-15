@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import { Home, ReceiptText, ShoppingBag, User } from 'lucide-react';
+import { Home, MessageCircle, ReceiptText, ShoppingBag, User } from 'lucide-react';
 import { useCart, useSession } from '@/lib/client';
 import { BrandLogo } from '@/components/brand-logo';
 
 const TABS = [
   { href: '/', label: 'หน้าแรก', icon: Home },
+  { href: '/messages', label: 'ข้อความ', icon: MessageCircle },
   { href: '/orders', label: 'คำสั่งซื้อ', icon: ReceiptText },
   { href: '/cart', label: 'ตะกร้า', icon: ShoppingBag },
   { href: '/profile', label: 'โปรไฟล์', icon: User },
@@ -69,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         aria-label="เมนูหลัก"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
       >
-        <div className="mx-auto grid max-w-5xl grid-cols-4">
+        <div className="mx-auto grid max-w-5xl grid-cols-5">
           {TABS.map(({ href, label, icon: Icon }) => {
             const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
             return (
