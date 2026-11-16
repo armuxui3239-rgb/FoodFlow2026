@@ -132,3 +132,63 @@ body {
   cursor: not-allowed;
 }
 
+/* ---------- DARK MODE (เปิดด้วย class .dark บน <html> — ตามกลยุทธ์ @custom-variant ด้านบน) ----------
+   ชั้นที่ 1: token variables — คลาส text-ink / text-ink-soft / border-line / bg-background พลิกอัตโนมัติ
+   ชั้นที่ 2: override utility ดิบที่กระจายทั่วระบบ (นับจาก grep จริง 2026-11-15) — แก้จุดเดียวครอบทุกหน้า
+   เหลืองแบรนด์ #FFC400 / ชิปดำเหลือง / ข้อความสถานะ emerald-600 / แดงข้อผิดพลาด คงเดิมทุกจุด */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #141414;
+  --card-foreground: #fafafa;
+  --ink: #fafafa;
+  --ink-soft: #a1a1aa;
+  --line: #262626;
+  --primary: #1f1f1f;
+  --primary-foreground: #ffc400;
+  --secondary: #332b06;
+  --secondary-foreground: #fafafa;
+  --muted: #1f1f1f;
+  --muted-foreground: #a1a1aa;
+  --accent: #332b06;
+  --accent-foreground: #fafafa;
+  --popover: #141414;
+  --popover-foreground: #fafafa;
+  --ring: #ffc400;
+  color-scheme: dark;
+}
+
+/* ชั้นที่ 2 — พื้นหลัง/ตัวอักษร/ขอบ โหมดมืด */
+.dark .bg-white { background-color: #0a0a0a; }
+.dark .bg-white\/95 { background-color: rgb(10 10 10 / 0.95); }
+.dark .bg-neutral-50 { background-color: #141414; }
+.dark .bg-neutral-100 { background-color: #1f1f1f; }
+.dark .bg-neutral-200 { background-color: #262626; }
+.dark .bg-\[\#FFF4CC\] { background-color: #332b06; }
+.dark .bg-red-50 { background-color: #2a0d0d; }
+.dark .bg-emerald-50 { background-color: #0f2417; }
+.dark .text-black { color: #fafafa; }
+.dark .text-neutral-300 { color: #71717a; }
+.dark .text-neutral-600 { color: #d4d4d8; }
+.dark .text-neutral-700 { color: #d4d4d8; }
+.dark .border-neutral-200 { border-color: #262626; }
+.dark .border-neutral-300 { border-color: #3f3f46; }
+.dark .border-black { border-color: #fafafa; }
+.dark .border-red-200 { border-color: #5c1a1a; }
+
+.dark .hover\:bg-neutral-50:hover { background-color: #1f1f1f; }
+.dark .hover\:bg-neutral-100:hover { background-color: #262626; }
+.dark .hover\:bg-neutral-200:hover { background-color: #262626; }
+.dark .hover\:bg-\[\#FFF4CC\]:hover { background-color: #332b06; }
+
+/* กติกาแบรนด์: บนพื้นเหลืองตัวอักษรต้องดำเสมอ (text-black ภายในพื้นเหลือง ห้ามกลายเป็นขาว) */
+.dark .bg-\[\#FFC400\] .text-black { color: #0a0a0a; }
+.dark .bg-brand .text-black { color: #0a0a0a; }
+.dark .hover\:bg-\[\#FFC400\]:hover .text-black { color: #0a0a0a; }
+.dark .btn-brand { color: #0a0a0a; }
+
+/* เลื่อนแบบบาง (พอร์ทัล) */
+.dark .ft-scroll::-webkit-scrollbar-thumb { background: #3f3f46; }
+.dark .ft-scroll::-webkit-scrollbar-thumb:hover { background: #52525b; }
+.dark .ft-scroll { scrollbar-color: #3f3f46 transparent; }
+

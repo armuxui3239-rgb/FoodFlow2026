@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { Home, MessageCircle, ReceiptText, ShoppingBag, User } from 'lucide-react';
 import { useCart, useSession } from '@/lib/client';
 import { BrandLogo } from '@/components/brand-logo';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const TABS = [
   { href: '/', label: 'หน้าแรก', icon: Home },
@@ -55,6 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
               )}
             </Link>
+            <ThemeToggle />
             <HeaderUser />
           </div>
         </div>

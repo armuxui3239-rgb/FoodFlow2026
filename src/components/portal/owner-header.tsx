@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { api, useSession } from '@/lib/client';
 import { BrandLogo } from '@/components/brand-logo';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 /** เมนูนำทางของพอร์ทัลร้านค้า — ครบทุกหน้าตาม docs/PAGE-MAP.md */
 const NAV: { href: string; label: string; Icon: typeof Store }[] = [
@@ -57,13 +58,16 @@ export function OwnerHeader() {
               <p className="text-[11px] text-neutral-400">มุมมองเจ้าของร้าน{user ? ` · ${user.fullName}` : ''}</p>
             </div>
           </div>
-          <button
-            onClick={() => void logout()}
-            aria-label="ออกจากระบบ"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100"
-          >
-            <LogOut className="h-5 w-5 text-neutral-500" aria-hidden />
-          </button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              onClick={() => void logout()}
+              aria-label="ออกจากระบบ"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100"
+            >
+              <LogOut className="h-5 w-5 text-neutral-500" aria-hidden />
+            </button>
+          </div>
         </div>
         <nav aria-label="เมนูพอร์ทัลร้านค้า" className="flex gap-1.5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {NAV.map(({ href, label, Icon }) => {

@@ -23,7 +23,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="th">
+    <html lang="th" suppressHydrationWarning>
+      <head>
+        {/* ธีมก่อนวาดจอ (กันวาบขาว): ค่าที่บันทึกไว้ > ค่าระบบปฏิบัติการ > โหมดสว่าง */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('ft_theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}",
+          }}
+        />
+      </head>
       <body className={`${prompt.variable} antialiased`}>
         <AppShell>{children}</AppShell>
       </body>

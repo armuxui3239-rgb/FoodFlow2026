@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useSession } from '@/lib/client';
 import { BrandLogo } from '@/components/brand-logo';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 /** เมนูนำทางของศูนย์ควบคุมผู้ดูแลระบบ */
 const NAV: { href: string; label: string; Icon: typeof Shield }[] = [
@@ -63,13 +64,16 @@ export function AdminHeader() {
               <p className="text-[11px] text-neutral-400">{user ? `ผู้ดูแล: ${user.fullName}` : 'ฟู๊ด ธันเดอร์'}</p>
             </div>
           </div>
-          <button
-            onClick={() => void logout()}
-            aria-label="ออกจากระบบ"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100"
-          >
-            <LogOut className="h-5 w-5 text-neutral-500" aria-hidden />
-          </button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              onClick={() => void logout()}
+              aria-label="ออกจากระบบ"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100"
+            >
+              <LogOut className="h-5 w-5 text-neutral-500" aria-hidden />
+            </button>
+          </div>
         </div>
         <nav aria-label="เมนูศูนย์ควบคุม" className="flex gap-1.5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {NAV.map(({ href, label, Icon }) => {
