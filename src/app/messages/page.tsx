@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { CircleHelp, Headset, MessageCirclePlus } from 'lucide-react';
 import { api, useSession } from '@/lib/client';
 import { BrandLogo } from '@/components/brand-logo';
@@ -28,6 +29,8 @@ function thaiDate(iso: string): string {
 export default function MessagesPage() {
   const { user, ready: sessionReady } = useSession();
   const router = useRouter();
+  const t = useTranslations('messages');
+  const tc = useTranslations('common');
   const [sessions, setSessions] = useState<ChatSessionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -89,10 +92,10 @@ export default function MessagesPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <BrandLogo className="h-20 w-20 rounded-3xl shadow-sm" />
-        <h1 className="text-lg font-bold text-black">เข้าสู่ระบบเพื่อดูข้อความ</h1>
-        <p className="text-sm text-neutral-400">ติดต่อฝ่ายบริการลูกค้าได้หลังเข้าสู่ระบบ</p>
+        <h1 className="text-lg font-bold text-black">{t('loginTitle')}</h1>
+        <p className="text-sm text-neutral-400">{t('loginSubtitle')}</p>
         <Link href="/login?next=%2Fmessages" className="btn-brand inline-flex h-12 items-center px-8 text-sm">
-          เข้าสู่ระบบ
+          {tc('login')}
         </Link>
       </div>
     );
@@ -100,7 +103,7 @@ export default function MessagesPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="pt-1 text-xl font-bold text-black">ข้อความ</h1>
+      <h1 className="pt-1 text-xl font-bold text-black">{t('title')}</h1>
 
       {error && (
         <p className="rounded-2xl bg-red-50 px-4 py-3 text-center text-xs text-red-500">{error}</p>
@@ -111,8 +114,8 @@ export default function MessagesPage() {
           <span className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100">
             <Headset className="h-9 w-9 text-neutral-300" aria-hidden />
           </span>
-          <h2 className="text-lg font-bold text-black">ยังไม่มีบทสนทนา</h2>
-          <p className="text-sm text-neutral-400">ทีมงานพร้อมช่วยเหลือคุณเสมอ</p>
+          <h2 className="text-lg font-bold text-black">{t('emptyTitle')}</h2>
+          <p className="text-sm text-neutral-400">{t('emptySubtitle')}</p>
           <button
             type="button"
             onClick={() => void startChat()}
@@ -120,7 +123,7 @@ export default function MessagesPage() {
             data-testid="start-support-chat"
             className="btn-brand inline-flex h-12 items-center px-8 text-sm"
           >
-            {creating ? 'กำลังเปิดบทสนทนา...' : 'ติดต่อฝ่ายบริการ'}
+            {creating ? t('openingChat') : t('contactSupport')}
           </button>
         </div>
       ) : (
@@ -136,9 +139,9 @@ export default function MessagesPage() {
                   <Headset className="h-6 w-6 text-[#FFC400]" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate-1 text-sm font-bold text-black">ฝ่ายบริการลูกค้า</p>
+                  <p className="truncate-1 text-sm font-bold text-black">{t('supportName')}</p>
                   <p className="truncate-1 mt-0.5 text-xs text-neutral-400">
-                    {s.last_message ?? 'แตะเพื่อเปิดบทสนทนา'}
+                    {s.last_message ?? t('tapToOpen')}
                   </p>
                 </div>
                 <time className="shrink-0 text-[11px] text-neutral-400" dateTime={s.last_message_at ?? s.created_at}>
@@ -160,7 +163,7 @@ export default function MessagesPage() {
             className="btn-brand pointer-events-auto flex h-11 items-center gap-2 px-6 text-sm shadow-lg"
           >
             <MessageCirclePlus className="h-4.5 w-4.5" aria-hidden />
-            {creating ? 'กำลังเปิดบทสนทนา...' : 'เริ่มบทสนทนาใหม่'}
+            {creating ? t('openingChat') : t('newChat')}
           </button>
         </div>
       )}

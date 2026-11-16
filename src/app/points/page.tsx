@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Coins, Sparkles } from 'lucide-react';
 import { api } from '@/lib/client';
 
@@ -16,6 +17,7 @@ interface PointRow {
 
 /** หน้าแต้มสะสม — ข้อมูลจริงจาก loyalty_transactions */
 export default function PointsPage() {
+  const t = useTranslations('aux');
   const [total, setTotal] = useState<number | null>(null);
   const [rows, setRows] = useState<PointRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ export default function PointsPage() {
           >
             <ArrowLeft className="h-5 w-5" aria-hidden />
           </Link>
-          <h1 className="text-lg font-bold text-black">แต้มสะสม</h1>
+          <h1 className="text-lg font-bold text-black">{t('pointsTitle')}</h1>
         </div>
       </header>
 
@@ -54,9 +56,9 @@ export default function PointsPage() {
         )}
 
         {/* การ์ดแต้มรวม */}
-        <section aria-label="แต้มรวม" className="rounded-3xl bg-black p-6 text-white">
+        <section aria-label={t('yourPoints')} className="rounded-3xl bg-black p-6 text-white">
           <p className="flex items-center gap-2 text-sm text-[#FFC400]">
-            <Coins className="h-5 w-5" aria-hidden /> แต้มของคุณ
+            <Coins className="h-5 w-5" aria-hidden /> {t('yourPoints')}
           </p>
           {total === null ? (
             <div className="mt-2 h-10 w-32 animate-pulse rounded-2xl bg-neutral-800" />

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, Bird, Clock, Drumstick, Fish, Flame, MapPin, Pizza, Plus, Salad, Sandwich, Search, SlidersHorizontal, Soup, Sparkles, Star, Utensils } from 'lucide-react';
 import { BrandLogo } from '@/components/brand-logo';
 import type { LucideIcon } from 'lucide-react';
@@ -91,6 +92,7 @@ function toOfferCard(p: OfferRow, i: number): OfferCard {
 export default function HomePage() {
   const { user } = useSession();
   const { refresh: refreshCart } = useCart();
+  const t = useTranslations('home');
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [popular, setPopular] = useState<PopularItem[]>([]);
   const [offers, setOffers] = useState<OfferCard[]>([]);
@@ -169,7 +171,7 @@ export default function HomePage() {
           </h1>
           <p className="flex items-center gap-1 text-xs text-neutral-500">
             <span className="h-2 w-2 shrink-0 rounded-full bg-[#FFC400] ring-2 ring-black/5" aria-hidden />
-            <span className="truncate-1">ส่งถึง: กรุงเทพมหานคร</span>
+            <span className="truncate-1">{t('deliverTo')}</span>
             <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
           </p>
         </div>
@@ -182,14 +184,14 @@ export default function HomePage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="ค้นหาร้านหรือเมนูอาหาร"
-            aria-label="ค้นหาร้านหรือเมนูอาหาร"
+            placeholder={t('searchPlaceholder')}
+            aria-label={t('searchPlaceholder')}
             className="h-full w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
           />
         </div>
         <button
           type="button"
-          aria-label="ตัวกรองการค้นหา"
+          aria-label={t('filterLabel')}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-black text-[#FFC400] transition-transform active:scale-95"
         >
           <SlidersHorizontal className="h-5 w-5" aria-hidden />
@@ -198,10 +200,10 @@ export default function HomePage() {
 
       {/* 3) ข้อเสนอพิเศษ — การ์ดโปรโมชั่นเลื่อนได้ (ข้อมูลจริงจากตาราง promotions) */}
       {offers.length > 0 ? (
-      <section aria-label="ข้อเสนอพิเศษ">
+      <section aria-label={t('offersTitle')}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-black">ข้อเสนอพิเศษ <Flame className="inline h-4 w-4 text-[#FFC400]" aria-hidden /></h2>
-          <Link href="/offers" className="text-xs font-medium text-neutral-400">ดูทั้งหมด</Link>
+          <h2 className="text-base font-bold text-black">{t('offersTitle')} <Flame className="inline h-4 w-4 text-[#FFC400]" aria-hidden /></h2>
+          <Link href="/offers" className="text-xs font-medium text-neutral-400">{t('seeAll')}</Link>
         </div>
         <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
           {offers.map((o) => (
@@ -245,10 +247,10 @@ export default function HomePage() {
 
       {/* 4) แนะนำสำหรับคุณ — การ์ดอาหารเลื่อนแนวนอน */}
       {popular.length > 0 && (
-        <section aria-label="แนะนำสำหรับคุณ">
+        <section aria-label={t('recommendedTitle')}>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-base font-bold text-black">แนะนำสำหรับคุณ <Sparkles className="inline h-4 w-4 text-[#FFC400]" aria-hidden /></h2>
-            <span className="text-xs font-medium text-neutral-400">ดูทั้งหมด</span>
+            <h2 className="text-base font-bold text-black">{t('recommendedTitle')} <Sparkles className="inline h-4 w-4 text-[#FFC400]" aria-hidden /></h2>
+            <span className="text-xs font-medium text-neutral-400">{t('seeAll')}</span>
           </div>
           <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
             {popular.slice(0, 8).map((p) => (
@@ -288,12 +290,12 @@ export default function HomePage() {
       )}
 
       {/* 5) หมวดหมู่เมนู — วงกลม 4 คอลัมน์ */}
-      <section aria-label="หมวดหมู่เมนู">
+      <section aria-label={t('categoriesTitle')}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-black">หมวดหมู่เมนู</h2>
+          <h2 className="text-base font-bold text-black">{t('categoriesTitle')}</h2>
           {activeCat && (
             <button onClick={() => setActiveCat(null)} className="text-xs font-medium text-neutral-400">
-              ล้างตัวเลือก
+              {t('clearFilter')}
             </button>
           )}
         </div>
@@ -328,10 +330,10 @@ export default function HomePage() {
       </section>
 
       {/* 6) ร้านใกล้คุณ — รายการร้าน */}
-      <section aria-label="ร้านใกล้คุณ">
+      <section aria-label={t('nearbyTitle')}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-black">ร้านใกล้คุณ</h2>
-          <span className="text-xs text-neutral-400">พบ {shown.length} ร้าน</span>
+          <h2 className="text-base font-bold text-black">{t('nearbyTitle')}</h2>
+          <span className="text-xs text-neutral-400">{t('foundRestaurants', { count: shown.length })}</span>
         </div>
         {loading ? (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -340,7 +342,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : shown.length === 0 ? (
-          <p className="py-12 text-center text-sm text-neutral-400">ไม่พบร้านที่ค้นหา</p>
+          <p className="py-12 text-center text-sm text-neutral-400">{t('noRestaurants')}</p>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2">
             {shown.map((r) => (
@@ -367,7 +369,7 @@ export default function HomePage() {
                         r.is_open ? 'bg-black text-[#FFC400]' : 'bg-white text-neutral-500'
                       }`}
                     >
-                      {r.is_open ? 'เปิดอยู่' : 'ปิดแล้ว'}
+                      {r.is_open ? t('openNow') : t('closedNow')}
                     </span>
                   </div>
                   <div className="space-y-1.5 p-4">
@@ -384,7 +386,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-3 text-xs text-neutral-500">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5" aria-hidden />
-                        {r.prep_time_avg_minutes ?? 20}-{(r.prep_time_avg_minutes ?? 20) + 10} นาที
+                        {r.prep_time_avg_minutes ?? 20}-{(r.prep_time_avg_minutes ?? 20) + 10} {t('minutesUnit')}
                       </span>
                       {r.address_line && (
                         <span className="flex min-w-0 items-center gap-1">

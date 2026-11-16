@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, CircleHelp, Headset, Send } from 'lucide-react';
 import { api } from '@/lib/client';
 
@@ -27,6 +28,7 @@ const POLL_INTERVAL = 4000;
 
 export default function ChatPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('chatRoom');
   const [messages, setMessages] = useState<ChatMessage[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -146,7 +148,7 @@ export default function ChatPage() {
           <Headset className="h-5 w-5 text-[#FFC400]" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate-1 text-sm font-bold text-black">ฝ่ายบริการลูกค้า</p>
+          <p className="truncate-1 text-sm font-bold text-black">{t('title')}</p>
           <p className="flex items-center gap-1.5 text-[11px] text-emerald-600">
             <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
             ออนไลน์

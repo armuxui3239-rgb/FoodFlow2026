@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from 'next';
+import { cookies } from 'next/headers';
+import { NextIntlClientProvider } from 'next-intl';
 import { Prompt } from 'next/font/google';
 import { AppShell } from '@/components/app-shell';
+import { PwaRegister } from '@/components/pwa-register';
+import thMessages from '@/messages/th.json';
+import enMessages from '@/messages/en.json';
 import './globals.css';
+
+const MESSAGES = { th: thMessages, en: enMessages } as const;
+type Locale = keyof typeof MESSAGES;
 
 const prompt = Prompt({
   subsets: ['thai', 'latin'],
@@ -13,6 +21,15 @@ const prompt = Prompt({
 export const metadata: Metadata = {
   title: 'ฟู๊ด ธันเดอร์ — สั่งอาหาร ส่งไว ถึงบ้าน',
   description: 'สั่งอาหารจากร้านคุณภาพใกล้คุณ ชำระผ่าน PromptPay ส่งไวถึงมือ',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Food Thunder',
+  },
+  icons: {
+    apple: '/icons/icon-192.png',
+  },
 };
 
 export const viewport: Viewport = {
@@ -21,9 +38,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // ภาษาจาก cookie 'ft_locale' (ปุ่มสลับภาษาตั้งค่า) — ค่าเริ่มต้นไทย
+  const cookieStore = await cookies();
+  const cookieLocale = cookieStore.get('ft_locale')?.value;
+  const locale: Locale = cookieLocale === 'en' ? 'en' : 'th';
+
   return (
-    <html lang="th" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         {/* ธีมก่อนวาดจอ (กันวาบขาว): ค่าที่บันทึกไว้ > ค่าระบบปฏิบัติการ > โหมดสว่าง */}
         <script
@@ -34,7 +56,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${prompt.variable} antialiased`}>
-        <AppShell>{children}</AppShell>
+        <PwaRegister />
+        <NextIntlClientProvider locale={locale} messages={MESSAGES[locale]}>
+          <AppShell>{children}</AppShell>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

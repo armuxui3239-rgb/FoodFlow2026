@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Component, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import {
   Accordion,
@@ -134,6 +135,7 @@ class HelpErrorBoundary extends Component<{ children: ReactNode }, { hasError: b
 type HelpTab = 'faq' | 'contact';
 
 function HelpCenterContent() {
+  const t = useTranslations('aux');
   const [mounted, setMounted] = useState(false);
   const [tab, setTab] = useState<HelpTab>('faq');
   const [openItem, setOpenItem] = useState<string | null>(null);
@@ -166,7 +168,7 @@ function HelpCenterContent() {
         >
           <ArrowLeft className="h-4 w-4 text-black" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold text-black">ศูนย์ช่วยเหลือ</h1>
+        <h1 className="text-lg font-bold text-black">{t('helpTitle')}</h1>
       </header>
 
       {/* แถบแท็บ — คำถามที่พบบ่อย / ติดต่อเรา */}

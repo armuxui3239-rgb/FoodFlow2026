@@ -1,0 +1,334 @@
+{
+  "common": {
+    "login": "เข้าสู่ระบบ",
+    "logout": "ออกจากระบบ",
+    "loading": "กำลังโหลด...",
+    "switchLanguage": "สลับภาษา",
+    "or": "หรือ",
+    "brandTagline": "สั่งอาหาร ส่งไว ถึงบ้าน",
+    "save": "บันทึกการเปลี่ยนแปลง",
+    "saving": "กำลังบันทึก...",
+    "cancel": "ยกเลิก",
+    "next": "ถัดไป",
+    "edit": "แก้ไข",
+    "retry": "ลองอีกครั้ง",
+    "verified": "ยืนยันแล้ว"
+  },
+  "nav": {
+    "home": "หน้าแรก",
+    "messages": "ข้อความ",
+    "orders": "คำสั่งซื้อ",
+    "cart": "ตะกร้า",
+    "profile": "โปรไฟล์"
+  },
+  "login": {
+    "title": "เข้าสู่ระบบ",
+    "subtitlePin": "ใช้เบอร์โทรและ PIN 6 หลักของคุณ",
+    "subtitleEmail": "สำหรับบัญชีที่สมัครด้วยอีเมล",
+    "failed": "เข้าสู่ระบบไม่สำเร็จ",
+    "phoneLabel": "เบอร์โทรศัพท์",
+    "pinLabel": "PIN 6 หลัก",
+    "pinPlaceholder": "PIN 6 หลัก",
+    "showPin": "แสดง PIN",
+    "hidePin": "ซ่อน PIN",
+    "remember": "จำฉันไว้ในอุปกรณ์นี้",
+    "submitting": "กำลังเข้าสู่ระบบ...",
+    "forgotPin": "ลืม PIN?",
+    "emailLabel": "อีเมล",
+    "emailPlaceholder": "อีเมล",
+    "passwordLabel": "รหัสผ่าน",
+    "passwordPlaceholder": "รหัสผ่าน",
+    "emailSubmit": "เข้าสู่ระบบด้วยอีเมล",
+    "switchToEmail": "เข้าสู่ระบบด้วยอีเมล (บัญชีเดิม)",
+    "switchToPin": "เข้าสู่ระบบด้วยเบอร์โทร + PIN",
+    "noAccount": "ยังไม่มีบัญชี?",
+    "register": "สมัครสมาชิก"
+  },
+  "register": {
+    "title": "สมัครบัญชีใหม่",
+    "subtitle": "ยืนยันเบอร์โทรด้วยรหัสยืนยัน 6 หลัก ที่ระบบสร้างให้คุณในแอปโดยตรง (หมดอายุ 10 นาที)",
+    "phoneLabel": "เบอร์โทรศัพท์",
+    "emailPlaceholder": "อีเมล",
+    "fullNamePlaceholder": "ชื่อ-นามสกุล",
+    "submit": "รับรหัสยืนยัน",
+    "submitting": "กำลังส่งรหัส...",
+    "hasAccount": "มีบัญชีอยู่แล้ว?",
+    "loginLink": "เข้าสู่ระบบ"
+  },
+  "onboardingProfile": {
+    "title": "กรอกโปรไฟล์ของคุณ",
+    "fullName": "ชื่อ-นามสกุล",
+    "nickname": "ชื่อเล่น",
+    "birthDate": "วันเกิด",
+    "email": "อีเมล",
+    "gender": "เพศ",
+    "genderMale": "ชาย",
+    "genderFemale": "หญิง",
+    "genderOther": "อื่น ๆ",
+    "uploadPhoto": "อัปโหลดรูปโปรไฟล์"
+  },
+  "profile": {
+    "loginTitle": "เข้าสู่ระบบเพื่อดูโปรไฟล์",
+    "loginSubtitle": "จัดการบัญชี ที่อยู่ และคำสั่งซื้อของคุณ",
+    "totalOrders": "คำสั่งซื้อทั้งหมด",
+    "memberBadge": "สมาชิก Food Thunder",
+    "since": "ตั้งแต่",
+    "confirmLogoutTitle": "ยืนยันการออกจากระบบ",
+    "confirmLogoutDesc": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+    "editTitle": "แก้ไขโปรไฟล์",
+    "avatarHint": "แตะที่รูปเพื่ออัปโหลดรูปโปรไฟล์ (PNG/JPG/WEBP ≤ 2MB)",
+    "avatarUploading": "กำลังอัปโหลดรูป...",
+    "fullName": "ชื่อ-นามสกุล",
+    "nickname": "ชื่อเล่น",
+    "gender": "เพศ",
+    "genderUnset": "ไม่ระบุ",
+    "birthDate": "วันเกิด",
+    "email": "อีเมล",
+    "phoneReadonly": "เบอร์โทรศัพท์ (เปลี่ยนไม่ได้ — ผูกกับการยืนยัน OTP)",
+    "savedNotice": "บันทึกโปรไฟล์เรียบร้อยแล้ว",
+    "menu": {
+      "favorites": "ร้านโปรดของฉัน",
+      "offers": "ข้อเสนอพิเศษและคูปอง",
+      "points": "แต้มสะสมของฉัน",
+      "wallet": "กระเป๋าเงิน",
+      "addresses": "ที่อยู่ของฉัน",
+      "notifications": "การแจ้งเตือน",
+      "security": "ความปลอดภัย",
+      "language": "ภาษา",
+      "invite": "เชิญเพื่อนรับส่วนลด",
+      "help": "ศูนย์ช่วยเหลือ"
+    }
+  },
+  "languagePage": {
+    "title": "ภาษา",
+    "recommended": "แนะนำ",
+    "others": "ภาษาอื่น ๆ",
+    "note": "สลับระหว่างภาษาไทยและภาษาอังกฤษได้ทันทีสำหรับหน้าหลักและบัญชีของคุณ"
+  },
+  "home": {
+    "deliverTo": "ส่งถึง: กรุงเทพมหานคร",
+    "searchPlaceholder": "ค้นหาร้านหรือเมนูอาหาร",
+    "filterLabel": "ตัวกรองการค้นหา",
+    "offersTitle": "ข้อเสนอพิเศษ",
+    "seeAll": "ดูทั้งหมด",
+    "codePrefix": "โค้ด",
+    "recommendedTitle": "แนะนำสำหรับคุณ",
+    "categoriesTitle": "หมวดหมู่เมนู",
+    "clearFilter": "ล้างตัวเลือก",
+    "nearbyTitle": "ร้านใกล้คุณ",
+    "foundRestaurants": "พบ {count} ร้าน",
+    "noRestaurants": "ไม่พบร้านที่ค้นหา",
+    "openNow": "เปิดอยู่",
+    "closedNow": "ปิดแล้ว",
+    "minutesUnit": "นาที"
+  },
+  "cart": {
+    "emptyTitle": "ตะกร้าว่างเปล่า",
+    "emptySubtitle": "ดูเหมือนยังไม่มีอะไรอยู่ในตะกร้า — ไปเลือกเมนูอร่อย ๆ กันเลย!",
+    "browseRestaurants": "ดูร้านอาหาร"
+  },
+  "orders": {
+    "tabActive": "กำลังดำเนินการ",
+    "tabCompleted": "สำเร็จ",
+    "tabCancelled": "ยกเลิก",
+    "emptyActive": "ไม่มีคำสั่งซื้อที่กำลังดำเนินการ",
+    "emptyCompleted": "ยังไม่มีคำสั่งซื้อที่สำเร็จ",
+    "emptyCancelled": "ยังไม่มีคำสั่งซื้อที่ถูกยกเลิก"
+  },
+  "checkout": {
+    "title": "ชำระเงิน",
+    "deliveryAddress": "ที่อยู่จัดส่ง",
+    "noDefaultAddress": "ยังไม่ได้ตั้งค่าที่อยู่จัดส่งหลัก",
+    "changeAddress": "เปลี่ยนที่อยู่",
+    "couponLabel": "รหัสคูปอง",
+    "couponPlaceholder": "เช่น THUNDER30",
+    "applyCoupon": "ใช้โค้ด",
+    "checkingCoupon": "กำลังตรวจ…",
+    "notesLabel": "บันทึกถึงร้าน (ถ้ามี)",
+    "notesPlaceholder": "เช่น ไม่เอาหอม เผ็ดน้อย",
+    "paymentMethod": "วิธีชำระเงิน",
+    "payWallet": "กระเป๋าเงิน",
+    "payCash": "เงินสดปลายทาง",
+    "payCashSub": "จ่ายเงินสดให้ไรเดอร์เมื่อส่งถึง",
+    "payPromptpay": "พร้อมเพย์ QR",
+    "payPromptpaySub": "สแกนจ่ายง่าย ไม่มีค่าธรรมเนียม",
+    "selected": "เลือกแล้ว",
+    "insufficient": "ยอดไม่พอ",
+    "subtotal": "ยอดอาหาร",
+    "deliveryFee": "ค่าจัดส่ง",
+    "total": "ยอดที่ต้องชำระ",
+    "confirmOrder": "ยืนยันคำสั่งซื้อ",
+    "creatingOrder": "กำลังสร้างคำสั่งซื้อ…"
+  },
+  "wallet": {
+    "loginTitle": "เข้าสู่ระบบเพื่อดูกระเป๋าเงิน",
+    "loginSubtitle": "เติมเงินและตรวจสอบยอดการใช้จ่ายของคุณ",
+    "myWallet": "กระเป๋าเงินของฉัน",
+    "topup": "เติมเงิน",
+    "emptyTitle": "ยังไม่มีรายการกระเป๋าเงิน",
+    "emptySubtitle": "เติมเงินเพื่อใช้จ่ายสะดวกยิ่งขึ้น",
+    "historyTitle": "ประวัติการใช้งาน"
+  },
+  "addresses": {
+    "title": "ที่อยู่ของฉัน",
+    "addNew": "เพิ่มที่อยู่ใหม่",
+    "emptyTitle": "ยังไม่มีที่อยู่จัดส่ง",
+    "emptySubtitle": "เพิ่มที่อยู่เพื่อให้ไรเดอร์ส่งอาหารถึงคุณได้เร็วขึ้น",
+    "defaultBadge": "ค่าเริ่มต้น"
+  },
+  "restaurants": {
+    "title": "ร้านอาหารทั้งหมด",
+    "foundCount": "พบ {count} ร้าน",
+    "filters": "ตัวกรอง",
+    "searchPlaceholder": "ค้นหาร้านอาหาร",
+    "notFound": "ไม่พบร้านที่ค้นหา"
+  },
+  "settings": {
+    "title": "การตั้งค่า",
+    "accountLabel": "บัญชี",
+    "notifications": "การแจ้งเตือน",
+    "notificationsDesc": "จัดการการแจ้งเตือนออเดอร์และโปรโมชั่น",
+    "security": "ความปลอดภัย",
+    "securityDesc": "รหัสผ่าน PIN และการยืนยันตัวตน",
+    "profile": "ข้อมูลส่วนตัว",
+    "profileDesc": "ชื่อ เบอร์โทร และอีเมลของคุณ",
+    "addresses": "ที่อยู่จัดส่ง",
+    "addressesDesc": "จัดการที่อยู่บ้าน ที่ทำงาน และอื่น ๆ",
+    "wallet": "กระเป๋าเงิน",
+    "walletDesc": "ยอดเงินคงเหลือและประวัติธุรกรรม",
+    "language": "ภาษา",
+    "languageDesc": "เปลี่ยนภาษาของแอป",
+    "help": "ศูนย์ช่วยเหลือ",
+    "helpDesc": "คำถามที่พบบ่อยและติดต่อทีมงาน"
+  },
+  "verifyOtp": {
+    "title": "ยืนยันรหัส OTP",
+    "subtitle": "ระบบสร้างรหัสยืนยัน 6 หลักสำหรับเบอร์ {phone} ให้คุณแล้ว",
+    "resendIn": "ส่งซ้ำได้ใน",
+    "seconds": "วินาที",
+    "resend": "ส่งรหัสซ้ำ",
+    "submit": "ยืนยัน",
+    "checking": "กำลังตรวจสอบ..."
+  },
+  "forgotPin": {
+    "title": "ลืม PIN",
+    "subtitle": "กรอกเบอร์โทรเพื่อยืนยันตัวตนด้วย OTP — หลังยืนยัน ผู้ดูแลระบบจะตรวจคำขอก่อนให้ตั้ง PIN ใหม่",
+    "phoneLabel": "เบอร์โทรศัพท์",
+    "sendOtp": "ส่งรหัส OTP",
+    "sending": "กำลังส่งรหัส..."
+  },
+  "securitySettings": {
+    "title": "ความปลอดภัย",
+    "changePin": "เปลี่ยน PIN",
+    "oldPin": "PIN เดิม",
+    "newPin": "PIN ใหม่ 6 หลัก",
+    "confirmPin": "ยืนยัน PIN ใหม่",
+    "notEnabled": "ยังไม่เปิดใช้งาน"
+  },
+  "notificationSettings": {
+    "title": "การแจ้งเตือน",
+    "general": "การแจ้งเตือนทั่วไป",
+    "orderUpdates": "อัปเดตคำสั่งซื้อ",
+    "promotions": "โปรโมชั่นและข้อเสนอ",
+    "newServices": "บริการใหม่",
+    "other": "การแจ้งเตือนแบบอื่น",
+    "sound": "เสียง",
+    "vibrate": "การสั่น",
+    "notEnabled": "ยังไม่เปิดใช้งาน"
+  },
+  "restaurantDetail": {
+    "notFound": "ไม่พบร้านอาหาร",
+    "backHome": "กลับหน้าแรก",
+    "openNow": "เปิดอยู่",
+    "closedNow": "ปิดแล้ว",
+    "minutesUnit": "นาที"
+  },
+  "foodDetail": {
+    "multiChoice": "เลือกได้หลายรายการ",
+    "singleChoice": "เลือก 1 รายการ",
+    "required": "จำเป็น",
+    "noOptions": "ไม่มีตัวเลือกในกลุ่มนี้",
+    "notFound": "ไม่พบเมนูนี้",
+    "added": "เพิ่มแล้ว",
+    "choosePrefix": "เลือก",
+    "addToCart": "เพิ่มลงตะกร้า"
+  },
+  "topup": {
+    "title": "เติมเงิน",
+    "pinTitle": "ยืนยันด้วย PIN",
+    "pinSubtitle": "กรอก PIN 6 หลักเพื่อยืนยันการเติมเงิน",
+    "back": "ย้อนกลับ",
+    "submitSlip": "ส่งสลิปเพื่อตรวจสอบ",
+    "uploadingSlip": "กำลังส่งสลิป…"
+  },
+  "messages": {
+    "title": "ข้อความ",
+    "loginTitle": "เข้าสู่ระบบเพื่อดูข้อความ",
+    "loginSubtitle": "ติดต่อฝ่ายบริการลูกค้าได้หลังเข้าสู่ระบบ",
+    "emptyTitle": "ยังไม่มีบทสนทนา",
+    "emptySubtitle": "ทีมงานพร้อมช่วยเหลือคุณเสมอ",
+    "contactSupport": "ติดต่อฝ่ายบริการ",
+    "newChat": "เริ่มบทสนทนาใหม่",
+    "openingChat": "กำลังเปิดบทสนทนา...",
+    "supportName": "ฝ่ายบริการลูกค้า",
+    "tapToOpen": "แตะเพื่อเปิดบทสนทนา"
+  },
+  "tracking": {
+    "title": "ติดตามคำสั่งซื้อ",
+    "currentStatus": "สถานะปัจจุบัน",
+    "viewAllOrders": "ดูคำสั่งซื้อทั้งหมด"
+  },
+  "rateOrder": {
+    "title": "ให้คะแนนคำสั่งซื้อ",
+    "mood1": "แย่มาก",
+    "mood2": "ไม่ค่อยดี",
+    "mood3": "ปานกลาง",
+    "mood4": "ดีมาก",
+    "mood5": "ประทับใจ"
+  },
+  "calls": {
+    "orderPrefix": "ออเดอร์"
+  },
+  "orderMap": {
+    "title": "แผนที่เส้นทางจัดส่ง",
+    "noCoords": "ไม่มีพิกัดสำหรับคำสั่งซื้อนี้"
+  },
+  "chatRoom": {
+    "title": "ฝ่ายบริการลูกค้า",
+    "placeholder": "พิมพ์ข้อความ..."
+  },
+  "orderDetail": {
+    "title": "รายละเอียดคำสั่งซื้อ",
+    "payNow": "ชำระเงินตอนนี้",
+    "cancelOrder": "ยกเลิกคำสั่งซื้อ",
+    "trackOrder": "ติดตามคำสั่งซื้อ",
+    "rateOrder": "ให้คะแนนคำสั่งซื้อ"
+  },
+  "onboardingFlow": {
+    "skip": "ข้าม",
+    "start": "เริ่มต้นใช้งาน",
+    "locationTitle": "ตั้งค่าที่อยู่จัดส่ง",
+    "notifTitle": "เปิดการแจ้งเตือน",
+    "notifDesc": "อย่าพลาดสถานะอาหารของคุณ — เปิดการแจ้งเตือนแล้วเราจะบอกคุณทุกขั้นตอนตั้งแต่ร้านรับออเดอร์จนถึงประตูบ้าน",
+    "pinTitle": "ตั้งรหัส PIN 6 หลัก",
+    "biometricTitle": "เปิดใช้ไบโอเมตริก",
+    "biometricDesc": "เปิดใช้ลายนิ้วมือหรือใบหน้าเพื่อปลดล็อกแอปได้เร็วขึ้น (ทำงานบนอุปกรณ์ที่รองรับ และสามารถเปลี่ยนได้ภายหลังในหน้าความปลอดภัย)",
+    "enable": "เปิดใช้งาน",
+    "welcomeTitle": "ยินดีด้วย! บัญชีของคุณพร้อมใช้งาน",
+    "welcomeRedirect": "คุณจะถูกพาไปยังหน้าแรกภายใน {seconds} วินาที",
+    "startOrdering": "เริ่มสั่งอาหารเลย"
+  },
+  "aux": {
+    "favoritesTitle": "ร้านโปรดของฉัน",
+    "offersTitle": "ข้อเสนอพิเศษและคูปอง",
+    "pointsTitle": "แต้มสะสม",
+    "yourPoints": "แต้มของคุณ",
+    "inviteTitle": "เชิญเพื่อนรับส่วนลด",
+    "inviteLoginTitle": "เข้าสู่ระบบเพื่อรับโค้ดเชิญ",
+    "helpTitle": "ศูนย์ช่วยเหลือ",
+    "notificationsTitle": "การแจ้งเตือน",
+    "notificationsLoginTitle": "เข้าสู่ระบบเพื่อดูการแจ้งเตือน",
+    "filtersTitle": "ตัวกรองร้านอาหาร",
+    "searchTitle": "ค้นหาร้านและเมนูอาหาร"
+  }
+}

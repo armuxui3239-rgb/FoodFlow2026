@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ChevronLeft, Minus, Plus, ShoppingBag, Tag, Trash2, Utensils } from 'lucide-react';
 import { api, baht, useCart } from '@/lib/client';
 
@@ -23,6 +24,7 @@ const DELIVERY_FEE = 3500; // สตางค์ตามมาตรฐาน�
 
 export default function CartPage() {
   const { refresh } = useCart();
+  const t = useTranslations('cart');
   const [data, setData] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -92,12 +94,12 @@ export default function CartPage() {
         <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-neutral-100">
           <ShoppingBag className="h-10 w-10 text-neutral-300" aria-hidden />
         </span>
-        <h1 className="text-lg font-bold text-black">ตะกร้าว่างเปล่า</h1>
+        <h1 className="text-lg font-bold text-black">{t('emptyTitle')}</h1>
         <p className="max-w-56 text-sm text-neutral-400">
-          ดูเหมือนยังไม่มีอะไรอยู่ในตะกร้า — ไปเลือกเมนูอร่อย ๆ กันเลย!
+          {t('emptySubtitle')}
         </p>
         <Link href="/" className="btn-brand inline-flex h-12 items-center px-8 text-sm">
-          ดูร้านอาหาร
+          {t('browseRestaurants')}
         </Link>
       </div>
     );

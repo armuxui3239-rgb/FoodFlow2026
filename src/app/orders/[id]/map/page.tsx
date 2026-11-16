@@ -4,6 +4,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Bike, MapPin, Store } from 'lucide-react';
 import { api, STATUS_TH } from '@/lib/client';
 import type { MapPoint } from './MapCanvas';
@@ -24,6 +25,8 @@ interface MapData {
 /** หน้าแผนที่ติดตามไรเดอร์ — แผนที่ OSM จริง (OpenFreeMap ผ่าน proxy ของเรา) */
 export default function OrderMapPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('orderMap');
+  const tc = useTranslations('common');
   const [data, setData] = useState<MapData | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -52,9 +55,9 @@ export default function OrderMapPage() {
             <ArrowLeft className="h-5 w-5" aria-hidden />
           </Link>
           <div className="min-w-0">
-            <h1 className="truncate-1 text-sm font-bold text-black">แผนที่เส้นทางจัดส่ง</h1>
+            <h1 className="truncate-1 text-sm font-bold text-black">{t('title')}</h1>
             <p className="text-[11px] text-neutral-400">
-              {data ? `#${data.order.code} · ${STATUS_TH[data.order.status] ?? data.order.status}` : 'กำลังโหลด…'}
+              {data ? `#${data.order.code} · ${STATUS_TH[data.order.status] ?? data.order.status}` : tc('loading')}
             </p>
           </div>
         </div>
@@ -75,7 +78,7 @@ export default function OrderMapPage() {
                 <MapCanvas points={points} />
               ) : (
                 <div className="flex h-full items-center justify-center text-sm text-neutral-400">
-                  ไม่มีพิกัดสำหรับคำสั่งซื้อนี้
+                  {t('noCoords')}
                 </div>
               )}
             </div>

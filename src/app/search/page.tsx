@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Clock,
   History,
@@ -79,6 +80,7 @@ function writeRecent(next: string[]): void {
 }
 
 export default function SearchPage() {
+  const t = useTranslations('aux');
   const recent = useSyncExternalStore(subscribeRecent, getRecentSnapshot, getRecentServerSnapshot);
   const [term, setTerm] = useState('');
   const [submitted, setSubmitted] = useState('');
@@ -153,7 +155,7 @@ export default function SearchPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="sr-only">ค้นหาร้านและเมนูอาหาร</h1>
+      <h1 className="sr-only">{t('searchTitle')}</h1>
 
       {/* ช่องค้นหา — autofocus ค้นทันทีแบบ debounce 300ms */}
       <search className="flex items-center gap-3 pt-1">

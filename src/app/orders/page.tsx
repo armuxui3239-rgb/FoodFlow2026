@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CircleCheck,
   Clock,
@@ -64,6 +65,7 @@ const TAB_EMPTY: Record<OrderTab, { Icon: typeof Clock; title: string; cta: bool
 };
 
 export default function OrdersPage() {
+  const t = useTranslations('orders');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -161,7 +163,9 @@ export default function OrdersPage() {
 
       {/* แท็บ 3 หมวด — กรองจากข้อมูลชุดเดียวฝั่ง client */}
       <div role="tablist" aria-label="หมวดคำสั่งซื้อ" className="flex rounded-full bg-neutral-100 p-1">
-        {TABS.map(({ key, label }) => (
+        {TABS.map(({ key }) => {
+          const tabLabel = key === 'active' ? t('tabActive') : key === 'completed' ? t('tabCompleted') : t('tabCancelled');
+          return (
           <button
             key={key}
             type="button"
@@ -173,13 +177,14 @@ export default function OrdersPage() {
               tab === key ? 'bg-black text-[#FFC400]' : 'text-neutral-500 hover:text-black'
             }`}
           >
-            {label}
+            {tabLabel}
             <span className="tabular-nums">({counts[key]})</span>
           </button>
-        ))}
+          );
+        })}
       </div>
 
-      <div role="tabpanel" aria-label={TABS.find((t) => t.key === tab)?.label}>
+      <div role="tabpanel" aria-label={TABS.find((item) => item.key === tab)?.label}>
         {filtered.length === 0 ? (
           // สถานะ empty ต่อแท็บ
           <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-line bg-white py-12 text-center">
@@ -189,7 +194,9 @@ export default function OrdersPage() {
                 return <Icon className="h-8 w-8 text-neutral-300" aria-hidden />;
               })()}
             </span>
-            <p className="text-sm text-neutral-400">{TAB_EMPTY[tab].title}</p>
+            <p className="text-sm text-neutral-400">
+              {tab === 'active' ? t('emptyActive') : tab === 'completed' ? t('emptyCompleted') : t('emptyCancelled')}
+            </p>
             {TAB_EMPTY[tab].cta && (
               <Link href="/" className="btn-brand inline-flex h-11 items-center px-6 text-sm">
                 สั่งอาหารเลย

@@ -3,6 +3,18 @@
 รูปแบบตาม [Keep a Changelog](https://keepachangelog.com/th/1.1.0/)
 และกำหนดเวอร์ชันตาม [Semantic Versioning](https://semver.org/lang/th/)
 
+## [0.7.5] — 2026-11-16 (PWA มาตรฐาน + แก้บั๊กโปรไฟล์/สมัครสมาชิก + i18n สองภาษา + นำการ์ดเหลือง OTP ออก)
+
+### เพิ่ม (Added)
+- **มาตรฐาน PWA ครบชุด**: `public/manifest.webmanifest`, `public/sw.js` (cache static assets + offline fallback โดยไม่ cache `/api/*`), `public/offline.html`, ไอคอน 192×192 และ 512×512 (`public/icons/icon-*.png`), และ `src/components/pwa-register.tsx` ผูกใน `src/app/layout.tsx`
+- **อัปโหลดรูปโปรไฟล์จริง**: `POST /api/profile/avatar` อัปโหลดไฟล์ PNG/JPG/WEBP (≤ 2MB) เข้า Supabase Storage bucket `avatars` ใช้ได้ทั้งหน้า `/onboarding/profile` และ `/profile/edit`
+- **ระบบ i18n สองภาษา (TH/EN)** (`next-intl` + cookie `ft_locale`): ครอบคลุม Shell/Nav, `/login`, `/register`, `/onboarding/profile`, `/profile`, `/language`, หน้าแรก (`/`), `/cart`, `/orders`
+
+### แก้ไข (Fixed)
+- **ฟอร์ม `/onboarding/profile`**: เปลี่ยนไอคอนช่องเลือกเพศจากโทรศัพท์เป็น `Users` และเพิ่ม `GET /api/auth/onboard/profile` เพื่อดึง `fullName`, `email` จากขั้นตอนสมัครสมาชิกมาแสดงอัตโนมัติ
+- **ข้อมูลโปรไฟล์ (`/api/profile`, `/profile`, `/profile/edit`)**: ดึงและแก้ไข `nickname`, `birthDate`, `gender` จาก `customer_profiles.preferences` ได้ครบ
+- **หน้า OTP (`/verify-otp`)**: นำการ์ดเหลืองออกตามคำสั่งเจ้าของ (ยังคงลงรหัส 6 หลักในช่องให้อัตโนมัติ)
+
 ## [0.7.4] — 2026-11-15 (ยืนยันรับมือ + จับบั๊กความปลอดภัยจริง 2 ตัว)
 
 ### แก้ไข (Fixed) — บั๊กที่ซ่อนมาตลอด จับได้จากการยืนยันรับมือรอบ 1-4

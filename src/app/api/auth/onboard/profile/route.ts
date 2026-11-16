@@ -17,6 +17,39 @@ interface CustomerProfile {
   preferences: ProfilePrefs | null;
 }
 
+/** GET — ดึงข้อมูลที่กรอกไว้ตอนสมัคร (ชื่อ-นามสกุล, อีเมล, รูป, preferences) มาแสดงในฟอร์ม onboarding */
+export async function GET() {
+  try {
+    const cookieStore = await cookies();
+    const flow = parsePending(cookieStore.get(PENDING_COOKIE)?.value);
+    if (!flow || flow.purpose !== 'register') {
+      return Response.json({ error: 'หมดเวลาดำเนินการ กรุณาเริ่มใหม่' }, { status: 401 });
+    }
+    const u = await sbOne<{ full_name: string | null; email: string; avatar_url: string | null }>('users', {
+      id: `eq.${flow.userId}`,
+      select: 'full_name,email,avatar_url',
+    });
+    const profile = await sbOne<CustomerProfile>('customer_profiles', {
+      user_id: `eq.${flow.userId}`,
+      select: 'id,user_id,preferences',
+    });
+    const prefs = profile?.preferences ?? {};
+    return Response.json({
+      data: {
+        fullName: u?.full_name ?? '',
+        email: u?.email ?? flow.email ?? '',
+        avatarUrl: u?.avatar_url ?? '',
+        nickname: prefs.nickname ?? '',
+        birthDate: prefs.birth_date ?? '',
+        gender: prefs.gender ?? '',
+      },
+    });
+  } catch (err) {
+    console.error('onboard/profile GET error:', err);
+    return Response.json({ error: 'โหลดข้อมูลไม่สำเร็จ' }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();

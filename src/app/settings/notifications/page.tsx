@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Bell,
   ChevronLeft,
@@ -22,13 +23,14 @@ interface NotificationSetting {
 }
 
 /** ลำดับการแสดงผล + ชื่อภาษาไทย + ไอคอนของแต่ละประเภทการแจ้งเตือน */
-const DISPLAY: { key: string; title: string; Icon: typeof Bell }[] = [
-  { key: 'order_updates', title: 'อัปเดตคำสั่งซื้อ', Icon: Package },
-  { key: 'promotions', title: 'โปรโมชั่นและข้อเสนอ', Icon: Percent },
-  { key: 'new_services', title: 'บริการใหม่', Icon: Sparkles },
+const DISPLAY: { key: string; titleKey: string; Icon: typeof Bell }[] = [
+  { key: 'order_updates', titleKey: 'orderUpdates', Icon: Package },
+  { key: 'promotions', titleKey: 'promotions', Icon: Percent },
+  { key: 'new_services', titleKey: 'newServices', Icon: Sparkles },
 ];
 
 export default function NotificationSettingsPage() {
+  const t = useTranslations('notificationSettings');
   const [settings, setSettings] = useState<NotificationSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -118,11 +120,12 @@ export default function NotificationSettingsPage() {
       {/* กลุ่ม: การแจ้งเตือนทั่วไป */}
       <section aria-label="การแจ้งเตือนทั่วไป">
         <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-          การแจ้งเตือนทั่วไป
+          {t('general')}
         </h2>
         <div className="overflow-hidden rounded-3xl border border-line bg-white">
-          {DISPLAY.map(({ key, title, Icon }, i) => {
+          {DISPLAY.map(({ key, titleKey, Icon }, i) => {
             const row = settings.find((s) => s.event_type === key);
+            const title = t(titleKey);
             return (
               <div
                 key={key}
@@ -146,14 +149,14 @@ export default function NotificationSettingsPage() {
       </section>
 
       {/* กลุ่มเพิ่มเติม — ยังไม่เปิดใช้งาน */}
-      <section aria-label="การแจ้งเตือนแบบอื่น">
+      <section aria-label={t('other')}>
         <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-          การแจ้งเตือนแบบอื่น
+          {t('other')}
         </h2>
         <div className="overflow-hidden rounded-3xl border border-line bg-white">
           {[
-            { title: 'เสียง', Icon: Volume2 },
-            { title: 'การสั่น', Icon: Vibrate },
+            { title: t('sound'), Icon: Volume2 },
+            { title: t('vibrate'), Icon: Vibrate },
           ].map(({ title, Icon }, i) => (
             <div
               key={title}
@@ -163,8 +166,8 @@ export default function NotificationSettingsPage() {
                 <Icon className="h-4.5 w-4.5 text-neutral-400" aria-hidden />
               </span>
               <span className="flex-1 text-sm font-medium text-neutral-400">{title}</span>
-              <span className="shrink-0 rounded-full bg-[#FFF4CC] px-2 py-0.5 text-[10px] font-bold text-black">
-                ยังไม่เปิดใช้งาน
+              <span className="shrink-0 whitespace-nowrap rounded-full bg-[#FFF4CC] px-2 py-0.5 text-[10px] font-bold text-black">
+                {t('notEnabled')}
               </span>
               <Switch disabled aria-label={`${title} (ยังไม่เปิดใช้งาน)`} className="data-[state=unchecked]:bg-neutral-200" />
             </div>

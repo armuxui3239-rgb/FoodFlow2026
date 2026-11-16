@@ -13,12 +13,21 @@ interface UserRow {
   created_at: string;
 }
 
-interface CustomerProfile {
-  total_orders: number;
-  default_address_id: string | null;
+interface ProfilePrefs {
+  nickname?: string;
+  birth_date?: string;
+  gender?: string;
+  [key: string]: unknown;
 }
 
-/** GET — ข้อมูลโปรไฟล์ของผู้ใช้ปัจจุบัน (users + สถิติลูกค้า + ที่อยู่ตั้งต้น) */
+interface CustomerProfile {
+  id?: string;
+  total_orders: number;
+  default_address_id: string | null;
+  preferences: ProfilePrefs | null;
+}
+
+/** GET — ข้อมูลโปรไฟล์ของผู้ใช้ปัจจุบัน (users + สถิติลูกค้า + preferences + ที่อยู่ตั้งต้น) */
 export async function GET() {
   const user = await currentUser();
   if (!user) return jsonError('กรุณาเข้าสู่ระบบ', 401);
@@ -31,7 +40,7 @@ export async function GET() {
 
   const cp = await sbOne<CustomerProfile>('customer_profiles', {
     user_id: `eq.${user.id}`,
-    select: 'total_orders,default_address_id',
+    select: 'id,total_orders,default_address_id,preferences',
   });
   const defaultAddr = cp?.default_address_id
     ? await sbOne<{ id: string; label: string; address_line: string }>('addresses', {
@@ -40,6 +49,7 @@ export async function GET() {
       })
     : null;
 
+  const prefs = cp?.preferences ?? {};
   return Response.json({
     data: {
       id: u.id,
@@ -47,6 +57,9 @@ export async function GET() {
       phone: u.phone,
       fullName: u.full_name,
       avatarUrl: u.avatar_url,
+      nickname: prefs.nickname ?? '',
+      birthDate: prefs.birth_date ?? '',
+      gender: prefs.gender ?? '',
       locale: u.preferred_locale ?? 'th',
       phoneVerified: Boolean(u.phone_verified_at),
       memberSince: u.created_at,
@@ -56,15 +69,18 @@ export async function GET() {
   });
 }
 
-/** PATCH — แก้ชื่อ/อีเมล/รูปโปรไฟล์ (เบอร์โทรเปลี่ยนไม่ได้ที่นี่ เพราะผูก OTP) */
+/** PATCH — แก้ชื่อ/อีเมล/รูปโปรไฟล์/ข้อมูลส่วนตัว (เบอร์โทรเปลี่ยนไม่ได้ที่นี่ เพราะผูก OTP) */
 export async function PATCH(req: NextRequest) {
   const user = await currentUser();
   if (!user) return jsonError('กรุณาเข้าสู่ระบบ', 401);
 
-  const { fullName, email, avatarUrl } = (await req.json().catch(() => ({}))) as {
+  const { fullName, email, avatarUrl, nickname, birthDate, gender } = (await req.json().catch(() => ({}))) as {
     fullName?: string;
     email?: string;
     avatarUrl?: string | null;
+    nickname?: string;
+    birthDate?: string;
+    gender?: string;
   };
 
   const body: Record<string, string | null> = { updated_at: new Date().toISOString() };
@@ -89,12 +105,40 @@ export async function PATCH(req: NextRequest) {
   }
 
   const [row] = await sbUpdate<UserRow>('users', { id: `eq.${user.id}` }, body);
+
+  let savedPrefs: ProfilePrefs = {};
+  if (nickname !== undefined || birthDate !== undefined || gender !== undefined) {
+    const cp = await sbOne<CustomerProfile>('customer_profiles', {
+      user_id: `eq.${user.id}`,
+      select: 'id,preferences',
+    });
+    savedPrefs = {
+      ...(cp?.preferences ?? {}),
+      ...(nickname !== undefined ? { nickname: nickname.trim() || undefined } : {}),
+      ...(birthDate !== undefined ? { birth_date: birthDate || undefined } : {}),
+      ...(gender !== undefined ? { gender: gender || undefined } : {}),
+    };
+    if (cp?.id) {
+      await sbUpdate('customer_profiles', { id: `eq.${cp.id}` }, { preferences: savedPrefs });
+    } else {
+      const { sbInsert } = await import('@/lib/supabase');
+      await sbInsert('customer_profiles', {
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        preferences: savedPrefs,
+      });
+    }
+  }
+
   return Response.json({
     data: {
       id: row.id,
       email: row.email,
       fullName: row.full_name,
       avatarUrl: row.avatar_url,
+      nickname: savedPrefs.nickname ?? '',
+      birthDate: savedPrefs.birth_date ?? '',
+      gender: savedPrefs.gender ?? '',
     },
   });
 }

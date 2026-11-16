@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Briefcase,
   ChevronLeft,
@@ -53,6 +54,8 @@ function labelIcon(label: string) {
 }
 
 export default function AddressesPage() {
+  const t = useTranslations('addresses');
+  const tc = useTranslations('common');
   const [addresses, setAddresses] = useState<AddressItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -159,7 +162,7 @@ export default function AddressesPage() {
         </span>
         <p className="text-sm text-red-500">{error}</p>
         <button onClick={load} className="btn-brand h-11 rounded-full px-6 text-sm">
-          ลองอีกครั้ง
+          {tc('retry')}
         </button>
       </div>
     );
@@ -176,12 +179,12 @@ export default function AddressesPage() {
         >
           <ChevronLeft className="h-5 w-5" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold text-black">ที่อยู่ของฉัน</h1>
+        <h1 className="text-lg font-bold text-black">{t('title')}</h1>
         <button
           type="button"
           onClick={openAdd}
           className="absolute right-0 flex h-10 w-10 items-center justify-center rounded-full bg-black text-[#FFC400] active:scale-90"
-          aria-label="เพิ่มที่อยู่ใหม่"
+          aria-label={t('addNew')}
         >
           <Plus className="h-5 w-5" aria-hidden />
         </button>
@@ -192,16 +195,16 @@ export default function AddressesPage() {
           <span className="flex h-24 w-24 items-center justify-center rounded-full bg-[#FFF4CC]">
             <MapPin className="h-10 w-10 text-black" aria-hidden />
           </span>
-          <h2 className="text-lg font-bold text-black">ยังไม่มีที่อยู่จัดส่ง</h2>
+          <h2 className="text-lg font-bold text-black">{t('emptyTitle')}</h2>
           <p className="max-w-64 text-sm text-neutral-400">
-            เพิ่มที่อยู่เพื่อให้ไรเดอร์ส่งอาหารถึงคุณได้เร็วขึ้น
+            {t('emptySubtitle')}
           </p>
           <button onClick={openAdd} className="btn-brand inline-flex h-12 items-center px-8 text-sm">
-            เพิ่มที่อยู่ใหม่
+            {t('addNew')}
           </button>
         </div>
       ) : (
-        <ul className="space-y-3" aria-label="รายการที่อยู่จัดส่ง">
+        <ul className="space-y-3" aria-label={t('title')}>
           {addresses.map((a) => {
             const Icon = labelIcon(a.label);
             return (
@@ -213,8 +216,8 @@ export default function AddressesPage() {
                   <p className="flex items-center gap-2">
                     <span className="truncate-1 text-sm font-bold text-black">{a.label}</span>
                     {a.is_default && (
-                      <span className="shrink-0 rounded-full bg-black px-2 py-0.5 text-[10px] font-bold text-[#FFC400]">
-                        ค่าเริ่มต้น
+                      <span className="shrink-0 whitespace-nowrap rounded-full bg-black px-2 py-0.5 text-[10px] font-bold text-[#FFC400]">
+                        {t('defaultBadge')}
                       </span>
                     )}
                   </p>

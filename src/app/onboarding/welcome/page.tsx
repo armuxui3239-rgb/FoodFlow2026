@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { PartyPopper } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
 export default function WelcomePage() {
   const router = useRouter();
+  const t = useTranslations('onboardingFlow');
   const [seconds, setSeconds] = useState(3);
 
   useEffect(() => {
@@ -27,9 +29,9 @@ export default function WelcomePage() {
         <span className="flex h-24 w-24 items-center justify-center rounded-full bg-brand">
           <PartyPopper className="h-12 w-12 text-black" aria-hidden />
         </span>
-        <h2 className="text-xl font-bold text-ink">ยินดีด้วย! บัญชีของคุณพร้อมใช้งาน</h2>
+        <h2 className="text-xl font-bold text-ink">{t('welcomeTitle')}</h2>
         <p className="max-w-xs text-sm text-ink-soft">
-          คุณจะถูกพาไปยังหน้าแรกภายใน {seconds} วินาที
+          {t('welcomeRedirect', { seconds })}
         </p>
         <button
           type="button"
@@ -39,7 +41,7 @@ export default function WelcomePage() {
           }}
           className="mt-2 rounded-full bg-brand px-8 py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong"
         >
-          เริ่มสั่งอาหารเลย
+          {t('startOrdering')}
         </button>
       </div>
     </AuthShell>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Check, ChevronLeft, Clock, Heart, MapPin, MessageCircle, Minus, Plus, Soup, Star, Utensils } from 'lucide-react';
 import { api, baht, useCart, useSession } from '@/lib/client';
 
@@ -66,6 +67,7 @@ function ReviewStars({ value }: { value: number }) {
 
 export default function RestaurantPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('restaurantDetail');
   const { refresh } = useCart();
   const { user } = useSession();
   const [isFav, setIsFav] = useState(false);
@@ -178,8 +180,8 @@ export default function RestaurantPage() {
   if (error || !restaurant) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm text-red-500">{error || 'ไม่พบร้านอาหาร'}</p>
-        <Link href="/" className="btn-brand mt-4 inline-flex h-11 items-center px-6 text-sm">กลับหน้าแรก</Link>
+        <p className="text-sm text-red-500">{error || t('notFound')}</p>
+        <Link href="/" className="btn-brand mt-4 inline-flex h-11 items-center px-6 text-sm">{t('backHome')}</Link>
       </div>
     );
   }
@@ -228,7 +230,7 @@ export default function RestaurantPage() {
                 restaurant.is_open ? 'bg-black text-[#FFC400]' : 'bg-white text-neutral-500'
               }`}
             >
-              {restaurant.is_open ? 'เปิดอยู่' : 'ปิดแล้ว'}
+              {restaurant.is_open ? t('openNow') : t('closedNow')}
             </span>
           </div>
         </div>
@@ -247,7 +249,7 @@ export default function RestaurantPage() {
             </span>
             <span className="flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600">
               <Clock className="h-3.5 w-3.5" aria-hidden />
-              {restaurant.prep_time_avg_minutes ?? 20}-{(restaurant.prep_time_avg_minutes ?? 20) + 10} นาที
+              {restaurant.prep_time_avg_minutes ?? 20}-{(restaurant.prep_time_avg_minutes ?? 20) + 10} {t('minutesUnit')}
             </span>
             {(restaurant.cuisine_types ?? []).slice(0, 2).map((c) => (
               <span key={c} className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600">

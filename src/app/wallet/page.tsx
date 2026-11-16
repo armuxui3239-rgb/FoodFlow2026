@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ArrowDownCircle,
   ArrowUpCircle,
@@ -39,6 +40,8 @@ function txStatusClass(status: string): string {
 
 export default function WalletPage() {
   const { user, ready: sessionReady } = useSession();
+  const tw = useTranslations('wallet');
+  const tc = useTranslations('common');
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<WalletTx[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,10 +106,10 @@ export default function WalletPage() {
         <span className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100">
           <Zap className="h-9 w-9 text-[#FFC400]" aria-hidden />
         </span>
-        <h1 className="text-lg font-bold text-black">เข้าสู่ระบบเพื่อดูกระเป๋าเงิน</h1>
-        <p className="text-sm text-neutral-400">เติมเงินและตรวจสอบยอดการใช้จ่ายของคุณ</p>
+        <h1 className="text-lg font-bold text-black">{tw('loginTitle')}</h1>
+        <p className="text-sm text-neutral-400">{tw('loginSubtitle')}</p>
         <Link href="/login?next=%2Fwallet" className="btn-brand inline-flex h-12 items-center px-8 text-sm">
-          เข้าสู่ระบบ
+          {tc('login')}
         </Link>
       </div>
     );
@@ -122,7 +125,7 @@ export default function WalletPage() {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FFC400]">
             <Wallet className="h-5 w-5 text-black" aria-hidden />
           </span>
-          <p className="text-sm text-neutral-400">กระเป๋าเงินของฉัน</p>
+          <p className="text-sm text-neutral-400">{tw('myWallet')}</p>
         </div>
         <p className="mt-4 text-4xl font-bold tabular-nums leading-tight text-[#FFC400]" data-testid="wallet-balance">
           {baht(balance)}
@@ -133,7 +136,7 @@ export default function WalletPage() {
           className="btn-brand mt-5 inline-flex h-11 items-center gap-2 px-6 text-sm"
         >
           <Plus className="h-4 w-4" aria-hidden />
-          เติมเงิน
+          {tw('topup')}
         </Link>
       </section>
 
@@ -143,16 +146,16 @@ export default function WalletPage() {
           <span className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100">
             <Wallet className="h-9 w-9 text-neutral-300" aria-hidden />
           </span>
-          <h2 className="text-lg font-bold text-black">ยังไม่มีรายการกระเป๋าเงิน</h2>
-          <p className="text-sm text-neutral-400">เติมเงินเพื่อใช้จ่ายสะดวกยิ่งขึ้น</p>
+          <h2 className="text-lg font-bold text-black">{tw('emptyTitle')}</h2>
+          <p className="text-sm text-neutral-400">{tw('emptySubtitle')}</p>
           <Link href="/wallet/topup" className="btn-brand inline-flex h-12 items-center gap-2 px-8 text-sm">
             <Plus className="h-4 w-4" aria-hidden />
-            เติมเงิน
+            {tw('topup')}
           </Link>
         </div>
       ) : (
-        <section aria-label="ประวัติการใช้งาน" className="space-y-3">
-          <h2 className="text-base font-bold text-black">ประวัติการใช้งาน</h2>
+        <section aria-label={tw('historyTitle')} className="space-y-3">
+          <h2 className="text-base font-bold text-black">{tw('historyTitle')}</h2>
           <ul className="overflow-hidden rounded-3xl border border-line bg-white">
             {transactions.map((t, i) => {
               const delta = Number(t.amount_delta);

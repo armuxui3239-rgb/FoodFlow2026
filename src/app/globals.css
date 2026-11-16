@@ -63,6 +63,7 @@ html,
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: clip;
 }
 
 body {
@@ -119,6 +120,7 @@ body {
   color: var(--ink);
   font-weight: 600;
   border-radius: 9999px;
+  white-space: nowrap;
   transition: filter 0.15s ease, transform 0.1s ease;
 }
 .btn-brand:hover {

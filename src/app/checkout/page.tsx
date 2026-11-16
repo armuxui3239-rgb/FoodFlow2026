@@ -1,8 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { BadgePercent, Banknote, QrCode, TicketX, Wallet } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { BadgePercent, Banknote, MapPin, QrCode, TicketX, Wallet } from 'lucide-react';
 import { api, baht } from '@/lib/client';
 
 interface CartData {
@@ -23,6 +25,7 @@ interface ValidateResult {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const t = useTranslations('checkout');
   const [data, setData] = useState<CartData | null>(null);
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -38,16 +41,20 @@ export default function CheckoutPage() {
   // วิธีชำระเงิน (เฟส 5.2): กระเป๋าเงิน / เงินสดปลายทาง / พร้อมเพย์ QR
   const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'cash' | 'promptpay'>('promptpay');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [defaultAddress, setDefaultAddress] = useState<{ label: string; address_line: string } | null>(null);
 
   useEffect(() => {
     api<CartData>('/api/cart').then(setData).catch(() => router.replace('/cart'));
   }, [router]);
 
-  // ยอดกระเป๋าเงิน — แสดงและใช้กันว่า "ยอดไม่พอ" ตั้งแต่หน้าเช็กเอาต์ (ตรวจจริงอีกชั้นที่ backend)
+  // ยอดกระเป๋าเงิน + ที่อยู่จัดส่งตั้งต้น
   useEffect(() => {
     api<{ data: { balance: number } }>('/api/wallet')
       .then((r) => setWalletBalance(r.data?.balance ?? 0))
       .catch(() => setWalletBalance(null));
+    api<{ data: { defaultAddress?: { label: string; address_line: string } | null } }>('/api/profile')
+      .then((r) => setDefaultAddress(r.data?.defaultAddress ?? null))
+      .catch(() => setDefaultAddress(null));
   }, []);
 
   const subtotal = (data?.items ?? []).reduce((s, i) => s + i.unit_price * i.quantity, 0); // สตางค์
@@ -126,12 +133,12 @@ export default function CheckoutPage() {
   const PAYMENTS: { key: 'wallet' | 'cash' | 'promptpay'; label: string; sub: string; Icon: typeof Wallet }[] = [
     {
       key: 'wallet',
-      label: 'กระเป๋าเงิน',
-      sub: walletBalance !== null ? `ยอดคงเหลือ ${baht(walletBalance)}` : 'กำลังโหลดยอด…',
+      label: t('payWallet'),
+      sub: walletBalance !== null ? `${baht(walletBalance)}` : '…',
       Icon: Wallet,
     },
-    { key: 'cash', label: 'เงินสดปลายทาง', sub: 'จ่ายเงินสดให้ไรเดอร์เมื่อส่งถึง', Icon: Banknote },
-    { key: 'promptpay', label: 'พร้อมเพย์ QR', sub: 'สแกนจ่ายง่าย ไม่มีค่าธรรมเนียม', Icon: QrCode },
+    { key: 'cash', label: t('payCash'), sub: t('payCashSub'), Icon: Banknote },
+    { key: 'promptpay', label: t('payPromptpay'), sub: t('payPromptpaySub'), Icon: QrCode },
   ];
 
   if (!data) return <div className="h-64 animate-pulse rounded-3xl bg-neutral-100" />;
@@ -141,8 +148,25 @@ export default function CheckoutPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold text-black">ชำระเงิน</h1>
-      {data.restaurant && <p className="truncate-1 text-sm text-neutral-500">ร้าน {data.restaurant.name}</p>}
+      <h1 className="text-xl font-bold text-black">{t('title')}</h1>
+      {data.restaurant && <p className="truncate-1 text-sm text-neutral-500">{data.restaurant.name}</p>}
+
+      <section aria-label={t('deliveryAddress')} className="flex items-start justify-between gap-3 rounded-3xl border border-line bg-white p-4">
+        <div className="flex min-w-0 items-start gap-2.5">
+          <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[#FFC400]" aria-hidden />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-neutral-400">
+              {t('deliveryAddress')}{defaultAddress?.label ? ` · ${defaultAddress.label}` : ''}
+            </p>
+            <p className="truncate-2 text-sm font-medium text-black">
+              {defaultAddress?.address_line ?? t('noDefaultAddress')}
+            </p>
+          </div>
+        </div>
+        <Link href="/addresses" className="shrink-0 whitespace-nowrap text-xs font-bold text-black underline">
+          {t('changeAddress')}
+        </Link>
+      </section>
 
       <section aria-label="รายการอาหาร" className="space-y-2 rounded-3xl border border-line bg-white p-4">
         {data.items.map((i) => (
@@ -155,8 +179,8 @@ export default function CheckoutPage() {
         ))}
       </section>
 
-      <section aria-label="รหัสคูปอง" className="space-y-2 rounded-3xl border border-line bg-white p-4">
-        <label htmlFor="coupon" className="text-sm font-medium text-black">รหัสคูปอง</label>
+      <section aria-label={t('couponLabel')} className="space-y-2 rounded-3xl border border-line bg-white p-4">
+        <label htmlFor="coupon" className="text-sm font-medium text-black">{t('couponLabel')}</label>
         {coupon ? (
           <div className="flex items-center justify-between gap-3 rounded-2xl bg-[#FFF4CC] px-4 py-3">
             <div className="flex min-w-0 items-center gap-2">
@@ -180,7 +204,7 @@ export default function CheckoutPage() {
               id="coupon"
               value={couponInput}
               onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-              placeholder="เช่น THUNDER30"
+              placeholder={t('couponPlaceholder')}
               className="min-w-0 flex-1 rounded-2xl border border-line bg-neutral-50 px-4 py-3 text-sm uppercase tracking-wide outline-none focus:border-black"
             />
             <button
@@ -189,7 +213,7 @@ export default function CheckoutPage() {
               disabled={checkingCoupon || subtotal <= 0}
               className="h-12 shrink-0 rounded-2xl bg-black px-5 text-sm font-bold text-[#FFC400] disabled:opacity-50"
             >
-              {checkingCoupon ? 'กำลังตรวจ…' : 'ใช้โค้ด'}
+              {checkingCoupon ? t('checkingCoupon') : t('applyCoupon')}
             </button>
           </div>
         )}
@@ -198,19 +222,19 @@ export default function CheckoutPage() {
       </section>
 
       <section className="space-y-2">
-        <label htmlFor="notes" className="text-sm font-medium text-black">บันทึกถึงร้าน (ถ้ามี)</label>
+        <label htmlFor="notes" className="text-sm font-medium text-black">{t('notesLabel')}</label>
         <textarea
           id="notes"
           rows={2}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="เช่น ไม่เอาหอม เผ็ดน้อย"
+          placeholder={t('notesPlaceholder')}
           className="w-full rounded-2xl border border-line bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-black"
         />
       </section>
 
-      <section aria-label="วิธีชำระเงิน" className="space-y-3">
-        <h2 className="text-sm font-medium text-black">วิธีชำระเงิน</h2>
+      <section aria-label={t('paymentMethod')} className="space-y-3">
+        <h2 className="text-sm font-medium text-black">{t('paymentMethod')}</h2>
         {PAYMENTS.map((p) => {
           const selected = paymentMethod === p.key;
           const disabled = p.key === 'wallet' && !walletEnough;
@@ -243,13 +267,13 @@ export default function CheckoutPage() {
                 <p className="truncate-1 text-xs text-neutral-500">{p.sub}</p>
               </div>
               {selected && (
-                <span className="shrink-0 rounded-full bg-black px-3 py-1 text-[11px] font-bold text-[#FFC400]">
-                  เลือกแล้ว
+                <span className="shrink-0 whitespace-nowrap rounded-full bg-black px-3 py-1 text-[11px] font-bold text-[#FFC400]">
+                  {t('selected')}
                 </span>
               )}
               {disabled && (
-                <span className="shrink-0 rounded-full bg-neutral-100 px-3 py-1 text-[11px] font-bold text-neutral-500">
-                  ยอดไม่พอ
+                <span className="shrink-0 whitespace-nowrap rounded-full bg-neutral-100 px-3 py-1 text-[11px] font-bold text-neutral-500">
+                  {t('insufficient')}
                 </span>
               )}
             </button>
@@ -259,21 +283,21 @@ export default function CheckoutPage() {
 
       <section aria-label="สรุปยอด" className="space-y-2 rounded-3xl border border-line bg-white p-4 text-sm">
         <div className="flex justify-between text-neutral-500">
-          <span>ยอดอาหาร</span>
+          <span>{t('subtotal')}</span>
           <span className="tabular-nums">{baht(subtotal)}</span>
         </div>
         <div className="flex justify-between text-neutral-500">
-          <span>ค่าจัดส่ง</span>
+          <span>{t('deliveryFee')}</span>
           <span className="tabular-nums">{baht(DELIVERY_FEE)}</span>
         </div>
         {discount > 0 && (
           <div className="flex justify-between font-medium text-emerald-600">
-            <span>ส่วนลดคูปอง ({coupon?.code})</span>
+            <span>{coupon?.code}</span>
             <span className="tabular-nums">−{baht(discount)}</span>
           </div>
         )}
         <div className="flex justify-between border-t border-line pt-2 text-base font-bold text-black">
-          <span>ยอดที่ต้องชำระ</span>
+          <span>{t('total')}</span>
           <span className="tabular-nums">{baht(total)}</span>
         </div>
       </section>
@@ -282,7 +306,7 @@ export default function CheckoutPage() {
         <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>
       )}
       <button onClick={() => void submit()} disabled={submitting} className="btn-brand h-12 w-full text-sm">
-        {submitting ? 'กำลังสร้างคำสั่งซื้อ…' : `ยืนยันคำสั่งซื้อ · ${baht(total)}`}
+        {submitting ? t('creatingOrder') : `${t('confirmOrder')} · ${baht(total)}`}
       </button>
     </div>
   );

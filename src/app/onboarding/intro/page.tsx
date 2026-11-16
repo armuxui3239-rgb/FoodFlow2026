@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { ChevronRight } from 'lucide-react';
 import { BrandLogo } from '@/components/brand-logo';
 
@@ -41,6 +42,8 @@ const INTRO_COOKIE = 'ft_intro_seen=1; path=/; max-age=31536000; SameSite=Lax';
 
 export default function IntroPage() {
   const router = useRouter();
+  const t = useTranslations('onboardingFlow');
+  const tc = useTranslations('common');
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const isLast = index === SLIDES.length - 1;
@@ -115,7 +118,7 @@ export default function IntroPage() {
           onClick={finish}
           className="pointer-events-auto rounded-full bg-black/55 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition active:scale-95 hover:bg-black/70"
         >
-          ข้าม
+          {t('skip')}
         </button>
       </div>
 
@@ -143,7 +146,7 @@ export default function IntroPage() {
             onClick={finish}
             className="flex h-14 w-full items-center justify-center gap-1 rounded-full bg-[#FFC400] text-base font-bold text-black shadow-lg transition hover:bg-[#ffd34d] active:scale-[0.98]"
           >
-            เริ่มต้นใช้งานฟู๊ด ธันเดอร์
+            {t('start')}
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>
         ) : (
@@ -152,7 +155,7 @@ export default function IntroPage() {
             onClick={() => scrollTo(index + 1)}
             className="flex h-14 w-full items-center justify-center gap-1 rounded-full bg-[#FFC400] text-base font-bold text-black shadow-lg transition hover:bg-[#ffd34d] active:scale-[0.98]"
           >
-            ถัดไป
+            {tc('next')}
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>
         )}

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Check, ChevronDown, ChevronUp, Minus, Plus, Star, Utensils } from 'lucide-react';
 import { api, baht } from '@/lib/client';
 
@@ -30,6 +31,7 @@ interface FoodData {
 /** หน้ารายละเอียดเมนู + ตัวเลือกเสริม (ตามแม่แบบ food_detail) — เพิ่มลงตะกร้าด้วยตัวเลือกที่เลือกจริง */
 export default function FoodDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('foodDetail');
   const [data, setData] = useState<FoodData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -159,8 +161,8 @@ export default function FoodDetailPage() {
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-sm font-bold text-black">{opt.name}</h3>
                   <span className="text-[10px] font-bold text-neutral-400">
-                    {opt.isMultiple ? 'เลือกได้หลายรายการ' : 'เลือก 1 รายการ'}
-                    {opt.isRequired && <span className="text-red-500"> · จำเป็น</span>}
+                    {opt.isMultiple ? t('multiChoice') : t('singleChoice')}
+                    {opt.isRequired && <span className="text-red-500"> · {t('required')}</span>}
                   </span>
                 </div>
                 <ul className="mt-2">
@@ -188,7 +190,7 @@ export default function FoodDetailPage() {
                       </li>
                     );
                   })}
-                  {opt.values.length === 0 && <li className="py-2 text-xs text-neutral-400">ไม่มีตัวเลือกในกลุ่มนี้</li>}
+                  {opt.values.length === 0 && <li className="py-2 text-xs text-neutral-400">{t('noOptions')}</li>}
                 </ul>
               </section>
             ))}
@@ -196,7 +198,7 @@ export default function FoodDetailPage() {
         ) : (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
             <Star className="h-10 w-10 text-neutral-300" aria-hidden />
-            <p className="text-sm text-neutral-400">ไม่พบเมนูนี้</p>
+            <p className="text-sm text-neutral-400">{t('notFound')}</p>
           </div>
         )}
       </main>
@@ -234,15 +236,15 @@ export default function FoodDetailPage() {
             >
               {addDone ? (
                 <>
-                  <Check className="h-4.5 w-4.5" aria-hidden /> เพิ่มแล้ว
+                  <Check className="h-4.5 w-4.5" aria-hidden /> {t('added')}
                 </>
               ) : missingRequired.length > 0 ? (
                 <>
-                  <ChevronUp className="h-4 w-4" aria-hidden /> เลือก {missingRequired[0].name}
+                  <ChevronUp className="h-4 w-4" aria-hidden /> {t('choosePrefix')} {missingRequired[0].name}
                 </>
               ) : (
                 <>
-                  <ChevronDown className="h-4 w-4 rotate-180 opacity-0" aria-hidden /> เพิ่มลงตะกร้า · {baht(unitSatang * qty)}
+                  <ChevronDown className="h-4 w-4 rotate-180 opacity-0" aria-hidden /> {t('addToCart')} · {baht(unitSatang * qty)}
                 </>
               )}
             </button>

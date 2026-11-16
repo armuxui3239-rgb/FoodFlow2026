@@ -3,12 +3,14 @@
 import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { BadgeCheck, CircleAlert, KeyRound, Smartphone } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
 /** หน้ายืนยันเบอร์เพื่อขอรีเซ็ต PIN */
 function ForgotPinForm() {
   const router = useRouter();
+  const t = useTranslations('forgotPin');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,7 +53,7 @@ function ForgotPinForm() {
           <KeyRound className="h-8 w-8 text-black" aria-hidden />
         </span>
         <p className="text-center text-sm text-ink-soft">
-          กรอกเบอร์โทรเพื่อยืนยันตัวตนด้วย OTP — หลังยืนยัน ผู้ดูแลระบบจะตรวจคำขอก่อนให้ตั้ง PIN ใหม่
+          {t('subtitle')}
         </p>
       </div>
 
@@ -72,7 +74,7 @@ function ForgotPinForm() {
             placeholder="812345678"
             autoComplete="tel"
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-            aria-label="เบอร์โทรศัพท์"
+            aria-label={t('phoneLabel')}
             required
           />
         </label>
@@ -82,7 +84,7 @@ function ForgotPinForm() {
           disabled={loading}
           className="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
         >
-          {loading ? 'กำลังส่งรหัส...' : 'ส่งรหัส OTP'}
+          {loading ? t('sending') : t('sendOtp')}
         </button>
       </form>
 

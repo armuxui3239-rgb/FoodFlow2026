@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { MapPin, Home, Building2, Store } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
@@ -16,6 +17,8 @@ const LABELS = [
 
 export default function LocationSetupPage() {
   const router = useRouter();
+  const t = useTranslations('onboardingFlow');
+  const tc = useTranslations('common');
   const mapDiv = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [label, setLabel] = useState('บ้าน');
@@ -86,7 +89,7 @@ export default function LocationSetupPage() {
   };
 
   return (
-    <AuthShell title="ตั้งค่าที่อยู่จัดส่ง" backHref="/onboarding/profile">
+    <AuthShell title={t('locationTitle')} backHref="/onboarding/profile">
       <div className="relative mb-4 h-64 overflow-hidden rounded-3xl border border-line">
         <div ref={mapDiv} className="h-full w-full" aria-label="แผนที่เลือกตำแหน่ง" />
         {/* หมุดกึ่งกลางคงที่ — เลื่อนแผนที่เพื่อจัดตำแหน่ง */}
@@ -146,7 +149,7 @@ export default function LocationSetupPage() {
           disabled={loading}
           className="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
         >
-          {loading ? 'กำลังบันทึก...' : 'ถัดไป'}
+          {loading ? tc('saving') : tc('next')}
         </button>
       </form>
     </AuthShell>

@@ -1,0 +1,334 @@
+{
+  "common": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "loading": "Loading...",
+    "switchLanguage": "Switch language",
+    "or": "or",
+    "brandTagline": "Order food, delivered fast to your home",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "next": "Next",
+    "edit": "Edit",
+    "retry": "Try again",
+    "verified": "Verified"
+  },
+  "nav": {
+    "home": "Home",
+    "messages": "Messages",
+    "orders": "Orders",
+    "cart": "Cart",
+    "profile": "Profile"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitlePin": "Use your phone number and 6-digit PIN",
+    "subtitleEmail": "For accounts registered with email",
+    "failed": "Sign-in failed",
+    "phoneLabel": "Phone number",
+    "pinLabel": "6-digit PIN",
+    "pinPlaceholder": "6-digit PIN",
+    "showPin": "Show PIN",
+    "hidePin": "Hide PIN",
+    "remember": "Remember me on this device",
+    "submitting": "Signing in...",
+    "forgotPin": "Forgot PIN?",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Password",
+    "emailSubmit": "Sign in with email",
+    "switchToEmail": "Sign in with email (legacy accounts)",
+    "switchToPin": "Sign in with phone + PIN",
+    "noAccount": "No account yet?",
+    "register": "Sign up"
+  },
+  "register": {
+    "title": "Create account",
+    "subtitle": "Verify your phone with a 6-digit code generated directly in the app (expires in 10 min)",
+    "phoneLabel": "Phone number",
+    "emailPlaceholder": "Email",
+    "fullNamePlaceholder": "Full name",
+    "submit": "Get verification code",
+    "submitting": "Sending code...",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in"
+  },
+  "onboardingProfile": {
+    "title": "Complete your profile",
+    "fullName": "Full name",
+    "nickname": "Nickname",
+    "birthDate": "Date of birth",
+    "email": "Email",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "uploadPhoto": "Upload profile photo"
+  },
+  "profile": {
+    "loginTitle": "Sign in to view profile",
+    "loginSubtitle": "Manage your account, addresses, and orders",
+    "totalOrders": "Total orders",
+    "memberBadge": "Food Thunder Member",
+    "since": "Since",
+    "confirmLogoutTitle": "Confirm sign out",
+    "confirmLogoutDesc": "Are you sure you want to sign out?",
+    "editTitle": "Edit profile",
+    "avatarHint": "Tap the photo to upload a profile picture (PNG/JPG/WEBP ≤ 2MB)",
+    "avatarUploading": "Uploading photo...",
+    "fullName": "Full name",
+    "nickname": "Nickname",
+    "gender": "Gender",
+    "genderUnset": "Not specified",
+    "birthDate": "Date of birth",
+    "email": "Email",
+    "phoneReadonly": "Phone number (cannot be changed — linked to OTP)",
+    "savedNotice": "Profile saved successfully",
+    "menu": {
+      "favorites": "Favorite restaurants",
+      "offers": "Offers & coupons",
+      "points": "My points",
+      "wallet": "Wallet",
+      "addresses": "My addresses",
+      "notifications": "Notifications",
+      "security": "Security",
+      "language": "Language",
+      "invite": "Invite friends",
+      "help": "Help center"
+    }
+  },
+  "languagePage": {
+    "title": "Language",
+    "recommended": "Recommended",
+    "others": "Other languages",
+    "note": "Switch immediately between Thai and English for main pages and your account"
+  },
+  "home": {
+    "deliverTo": "Deliver to: Bangkok",
+    "searchPlaceholder": "Search restaurants or dishes",
+    "filterLabel": "Search filters",
+    "offersTitle": "Special offers",
+    "seeAll": "See all",
+    "codePrefix": "Code",
+    "recommendedTitle": "Recommended for you",
+    "categoriesTitle": "Categories",
+    "clearFilter": "Clear filter",
+    "nearbyTitle": "Restaurants near you",
+    "foundRestaurants": "{count} restaurants",
+    "noRestaurants": "No matching restaurants found",
+    "openNow": "Open",
+    "closedNow": "Closed",
+    "minutesUnit": "min"
+  },
+  "cart": {
+    "emptyTitle": "Your cart is empty",
+    "emptySubtitle": "Looks like you haven't added anything yet — explore delicious menus!",
+    "browseRestaurants": "Browse restaurants"
+  },
+  "orders": {
+    "tabActive": "Active",
+    "tabCompleted": "Completed",
+    "tabCancelled": "Cancelled",
+    "emptyActive": "No active orders",
+    "emptyCompleted": "No completed orders yet",
+    "emptyCancelled": "No cancelled orders yet"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "deliveryAddress": "Delivery address",
+    "noDefaultAddress": "No default delivery address set",
+    "changeAddress": "Change",
+    "couponLabel": "Coupon code",
+    "couponPlaceholder": "e.g. THUNDER30",
+    "applyCoupon": "Apply",
+    "checkingCoupon": "Checking…",
+    "notesLabel": "Note to restaurant (optional)",
+    "notesPlaceholder": "e.g. No onions, less spicy",
+    "paymentMethod": "Payment method",
+    "payWallet": "Wallet",
+    "payCash": "Cash on delivery",
+    "payCashSub": "Pay cash to the driver upon arrival",
+    "payPromptpay": "PromptPay QR",
+    "payPromptpaySub": "Scan & pay easily with zero fee",
+    "selected": "Selected",
+    "insufficient": "Insufficient",
+    "subtotal": "Subtotal",
+    "deliveryFee": "Delivery fee",
+    "total": "Total",
+    "confirmOrder": "Place order",
+    "creatingOrder": "Creating order…"
+  },
+  "wallet": {
+    "loginTitle": "Sign in to view wallet",
+    "loginSubtitle": "Top up and track your spending",
+    "myWallet": "My wallet",
+    "topup": "Top up",
+    "emptyTitle": "No wallet transactions yet",
+    "emptySubtitle": "Top up for faster checkout",
+    "historyTitle": "Transaction history"
+  },
+  "addresses": {
+    "title": "My addresses",
+    "addNew": "Add new address",
+    "emptyTitle": "No delivery addresses yet",
+    "emptySubtitle": "Add an address for faster delivery",
+    "defaultBadge": "Default"
+  },
+  "restaurants": {
+    "title": "All restaurants",
+    "foundCount": "{count} restaurants",
+    "filters": "Filters",
+    "searchPlaceholder": "Search restaurants",
+    "notFound": "No matching restaurants found"
+  },
+  "settings": {
+    "title": "Settings",
+    "accountLabel": "Account",
+    "notifications": "Notifications",
+    "notificationsDesc": "Manage order and promotion alerts",
+    "security": "Security",
+    "securityDesc": "Password, PIN, and verification",
+    "profile": "Personal info",
+    "profileDesc": "Name, phone, and email",
+    "addresses": "Delivery addresses",
+    "addressesDesc": "Manage home, work, and other addresses",
+    "wallet": "Wallet",
+    "walletDesc": "Balance and transaction history",
+    "language": "Language",
+    "languageDesc": "Switch app language",
+    "help": "Help center",
+    "helpDesc": "FAQs and support"
+  },
+  "verifyOtp": {
+    "title": "Verify OTP",
+    "subtitle": "A 6-digit verification code has been generated for {phone}",
+    "resendIn": "Resend in",
+    "seconds": "sec",
+    "resend": "Resend code",
+    "submit": "Verify",
+    "checking": "Verifying..."
+  },
+  "forgotPin": {
+    "title": "Forgot PIN",
+    "subtitle": "Enter your phone number to verify via OTP — an admin will approve your reset request before setting a new PIN",
+    "phoneLabel": "Phone number",
+    "sendOtp": "Send OTP",
+    "sending": "Sending..."
+  },
+  "securitySettings": {
+    "title": "Security",
+    "changePin": "Change PIN",
+    "oldPin": "Current PIN",
+    "newPin": "New 6-digit PIN",
+    "confirmPin": "Confirm new PIN",
+    "notEnabled": "Not enabled"
+  },
+  "notificationSettings": {
+    "title": "Notifications",
+    "general": "General notifications",
+    "orderUpdates": "Order updates",
+    "promotions": "Promotions & offers",
+    "newServices": "New services",
+    "other": "Other alerts",
+    "sound": "Sound",
+    "vibrate": "Vibration",
+    "notEnabled": "Not enabled"
+  },
+  "restaurantDetail": {
+    "notFound": "Restaurant not found",
+    "backHome": "Back home",
+    "openNow": "Open",
+    "closedNow": "Closed",
+    "minutesUnit": "min"
+  },
+  "foodDetail": {
+    "multiChoice": "Multiple choices",
+    "singleChoice": "Choose 1",
+    "required": "Required",
+    "noOptions": "No options in this group",
+    "notFound": "Dish not found",
+    "added": "Added",
+    "choosePrefix": "Select",
+    "addToCart": "Add to cart"
+  },
+  "topup": {
+    "title": "Top up",
+    "pinTitle": "Verify with PIN",
+    "pinSubtitle": "Enter your 6-digit PIN to confirm top-up of",
+    "back": "Back",
+    "submitSlip": "Submit slip for review",
+    "uploadingSlip": "Uploading slip…"
+  },
+  "messages": {
+    "title": "Messages",
+    "loginTitle": "Sign in to view messages",
+    "loginSubtitle": "Contact customer support after signing in",
+    "emptyTitle": "No conversations yet",
+    "emptySubtitle": "Our support team is always here to help",
+    "contactSupport": "Contact support",
+    "newChat": "Start new chat",
+    "openingChat": "Opening chat...",
+    "supportName": "Customer Support",
+    "tapToOpen": "Tap to open chat"
+  },
+  "tracking": {
+    "title": "Track order",
+    "currentStatus": "Current status",
+    "viewAllOrders": "View all orders"
+  },
+  "rateOrder": {
+    "title": "Rate order",
+    "mood1": "Terrible",
+    "mood2": "Poor",
+    "mood3": "Okay",
+    "mood4": "Great",
+    "mood5": "Amazing"
+  },
+  "calls": {
+    "orderPrefix": "Order"
+  },
+  "orderMap": {
+    "title": "Delivery route map",
+    "noCoords": "No coordinates available for this order"
+  },
+  "chatRoom": {
+    "title": "Customer Support",
+    "placeholder": "Type a message..."
+  },
+  "orderDetail": {
+    "title": "Order details",
+    "payNow": "Pay now",
+    "cancelOrder": "Cancel order",
+    "trackOrder": "Track order",
+    "rateOrder": "Rate order"
+  },
+  "onboardingFlow": {
+    "skip": "Skip",
+    "start": "Get started",
+    "locationTitle": "Set delivery address",
+    "notifTitle": "Enable notifications",
+    "notifDesc": "Never miss an order update — enable notifications to track every step from kitchen to doorstep",
+    "pinTitle": "Set a 6-digit PIN",
+    "biometricTitle": "Enable biometrics",
+    "biometricDesc": "Use fingerprint or face unlock for faster access (on supported devices, changeable anytime in Security settings)",
+    "enable": "Enable",
+    "welcomeTitle": "All set! Your account is ready",
+    "welcomeRedirect": "Redirecting to home in {seconds} sec",
+    "startOrdering": "Start ordering"
+  },
+  "aux": {
+    "favoritesTitle": "Favorite restaurants",
+    "offersTitle": "Offers & coupons",
+    "pointsTitle": "Points",
+    "yourPoints": "Your points",
+    "inviteTitle": "Invite friends",
+    "inviteLoginTitle": "Sign in to get invite code",
+    "helpTitle": "Help center",
+    "notificationsTitle": "Notifications",
+    "notificationsLoginTitle": "Sign in to view notifications",
+    "filtersTitle": "Restaurant filters",
+    "searchTitle": "Search restaurants and dishes"
+  }
+}

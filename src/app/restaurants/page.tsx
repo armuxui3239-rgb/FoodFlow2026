@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ChevronLeft, Clock, MapPin, Search, SlidersHorizontal, Soup, Star, Utensils } from 'lucide-react';
 import { api } from '@/lib/client';
 
@@ -32,6 +33,8 @@ export default function RestaurantsPage() {
 
 function RestaurantsList() {
   const sp = useSearchParams();
+  const t = useTranslations('restaurants');
+  const tc = useTranslations('common');
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
@@ -100,15 +103,15 @@ function RestaurantsList() {
         >
           <ChevronLeft className="h-5 w-5" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold text-black">ร้านอาหารทั้งหมด</h1>
-        <span className="ml-auto text-xs text-neutral-400">{loading ? 'กำลังโหลด…' : `พบ ${shown.length} ร้าน`}</span>
+        <h1 className="truncate-1 text-lg font-bold text-black">{t('title')}</h1>
+        <span className="ml-auto shrink-0 whitespace-nowrap text-xs text-neutral-400">{loading ? tc('loading') : t('foundCount', { count: shown.length })}</span>
         <Link
           href={`/restaurants/filters${apiQuery ? `${apiQuery}` : ''}`}
-          aria-label="เปิดตัวกรองร้าน"
+          aria-label={t('filters')}
           data-testid="open-filters"
-          className="ml-1 flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
+          className="ml-1 flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#FFF4CC] px-3 text-xs font-bold text-black transition-colors hover:bg-[#FFC400]"
         >
-          <SlidersHorizontal className="h-4 w-4" aria-hidden /> ตัวกรอง
+          <SlidersHorizontal className="h-4 w-4" aria-hidden /> {t('filters')}
           {activeFilterCount > 0 && (
             <span className="rounded-full bg-black px-1.5 py-0.5 text-[10px] font-bold text-[#FFC400]">{activeFilterCount}</span>
           )}
@@ -120,8 +123,8 @@ function RestaurantsList() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="ค้นหาร้านอาหาร"
-          aria-label="ค้นหาร้านอาหาร"
+          placeholder={t('searchPlaceholder')}
+          aria-label={t('searchPlaceholder')}
           className="h-full w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
         />
       </search>
@@ -155,7 +158,7 @@ function RestaurantsList() {
       ) : shown.length === 0 ? (
         <div className="py-16 text-center">
           <Soup className="mx-auto h-10 w-10 text-neutral-300" aria-hidden />
-          <p className="mt-3 text-sm text-neutral-400">ไม่พบร้านที่ค้นหา</p>
+          <p className="mt-3 text-sm text-neutral-400">{t('notFound')}</p>
         </div>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">

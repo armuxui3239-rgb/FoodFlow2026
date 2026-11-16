@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Bell,
   ChevronLeft,
@@ -16,18 +17,19 @@ import {
 import { api, useSession } from '@/lib/client';
 
 /** หน้ารวมการตั้งค่า — ลิงก์เข้าทุกกลุ่มการตั้งค่าของบัญชี */
-const GROUPS: { href: string; label: string; desc: string; Icon: typeof Bell; testid: string }[] = [
-  { href: '/settings/notifications', label: 'การแจ้งเตือน', desc: 'จัดการการแจ้งเตือนออเดอร์และโปรโมชั่น', Icon: Bell, testid: 'settings-notifications' },
-  { href: '/settings/security', label: 'ความปลอดภัย', desc: 'รหัสผ่าน PIN และการยืนยันตัวตน', Icon: ShieldCheck, testid: 'settings-security' },
-  { href: '/profile/edit', label: 'ข้อมูลส่วนตัว', desc: 'ชื่อ เบอร์โทร และอีเมลของคุณ', Icon: UserCog, testid: 'settings-profile' },
-  { href: '/addresses', label: 'ที่อยู่จัดส่ง', desc: 'จัดการที่อยู่บ้าน ที่ทำงาน และอื่น ๆ', Icon: MapPin, testid: 'settings-addresses' },
-  { href: '/wallet', label: 'กระเป๋าเงิน', desc: 'ยอดเงินคงเหลือและประวัติธุรกรรม', Icon: Wallet, testid: 'settings-wallet' },
-  { href: '/language', label: 'ภาษา', desc: 'เปลี่ยนภาษาของแอป', Icon: Languages, testid: 'settings-language' },
-  { href: '/help', label: 'ศูนย์ช่วยเหลือ', desc: 'คำถามที่พบบ่อยและติดต่อทีมงาน', Icon: CircleHelp, testid: 'settings-help' },
+const GROUPS: { href: string; labelKey: string; descKey: string; Icon: typeof Bell; testid: string }[] = [
+  { href: '/settings/notifications', labelKey: 'notifications', descKey: 'notificationsDesc', Icon: Bell, testid: 'settings-notifications' },
+  { href: '/settings/security', labelKey: 'security', descKey: 'securityDesc', Icon: ShieldCheck, testid: 'settings-security' },
+  { href: '/profile/edit', labelKey: 'profile', descKey: 'profileDesc', Icon: UserCog, testid: 'settings-profile' },
+  { href: '/addresses', labelKey: 'addresses', descKey: 'addressesDesc', Icon: MapPin, testid: 'settings-addresses' },
+  { href: '/wallet', labelKey: 'wallet', descKey: 'walletDesc', Icon: Wallet, testid: 'settings-wallet' },
+  { href: '/language', labelKey: 'language', descKey: 'languageDesc', Icon: Languages, testid: 'settings-language' },
+  { href: '/help', labelKey: 'help', descKey: 'helpDesc', Icon: CircleHelp, testid: 'settings-help' },
 ];
 
 export default function SettingsPage() {
   const { user } = useSession();
+  const t = useTranslations('settings');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,18 +48,18 @@ export default function SettingsPage() {
         >
           <ChevronLeft className="h-5 w-5" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold text-black">การตั้งค่า</h1>
+        <h1 className="text-lg font-bold text-black">{t('title')}</h1>
       </header>
 
       {user ? (
         <p className="text-xs text-neutral-500">
-          บัญชี: <span className="font-semibold text-black">{user.fullName}</span>
+          {t('accountLabel')}: <span className="font-semibold text-black">{user.fullName}</span>
         </p>
       ) : loading ? (
         <div className="h-4 w-40 animate-pulse rounded-full bg-neutral-100" />
       ) : null}
 
-      <ul className="overflow-hidden rounded-3xl border border-line bg-white shadow-sm" aria-label="รายการการตั้งค่า">
+      <ul className="overflow-hidden rounded-3xl border border-line bg-white shadow-sm" aria-label={t('title')}>
         {GROUPS.map((g, i) => (
           <li key={g.href} className={i > 0 ? 'border-t border-line' : ''}>
             <Link
@@ -69,8 +71,8 @@ export default function SettingsPage() {
                 <g.Icon className="h-5 w-5 text-black" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-bold text-black">{g.label}</span>
-                <span className="block truncate-1 text-xs text-neutral-400">{g.desc}</span>
+                <span className="block text-sm font-bold text-black">{t(g.labelKey)}</span>
+                <span className="block truncate-1 text-xs text-neutral-400">{t(g.descKey)}</span>
               </span>
               <ChevronRight className="h-5 w-5 shrink-0 text-neutral-300" aria-hidden />
             </Link>

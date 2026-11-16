@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ChevronLeft,
   ChevronRight,
@@ -22,6 +23,7 @@ const PIN_FIELD = 'h-12 w-full rounded-2xl border border-line bg-neutral-50 px-4
 /** หน้าความปลอดภัย — จดจำการเข้าสู่ระบบ (localStorage) + เปลี่ยน PIN + ลบบัญชี (PDPA) */
 export default function SecuritySettingsPage() {
   const router = useRouter();
+  const t = useTranslations('securitySettings');
   const [remember, setRemember] = useState(true);
   const [ready, setReady] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -164,8 +166,8 @@ export default function SecuritySettingsPage() {
       </div>
 
       {/* เปลี่ยน PIN — ต้องยืนยัน PIN เดิมก่อน (v4 ข้อ 4.5 / หน้าจอ 81) */}
-      <section aria-label="เปลี่ยน PIN" className="space-y-3 rounded-3xl border border-line bg-white p-4">
-        <p className="text-sm font-bold text-black">เปลี่ยน PIN</p>
+      <section aria-label={t('changePin')} className="space-y-3 rounded-3xl border border-line bg-white p-4">
+        <p className="text-sm font-bold text-black">{t('changePin')}</p>
         {pinOpen ? (
           <>
             <input
@@ -175,8 +177,8 @@ export default function SecuritySettingsPage() {
               maxLength={6}
               value={oldPin}
               onChange={(e) => setOldPin(e.target.value.replace(/\D/g, ''))}
-              placeholder="PIN เดิม"
-              aria-label="PIN เดิม"
+              placeholder={t('oldPin')}
+              aria-label={t('oldPin')}
               className={PIN_FIELD}
             />
             <input
@@ -186,8 +188,8 @@ export default function SecuritySettingsPage() {
               maxLength={6}
               value={newPin}
               onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
-              placeholder="PIN ใหม่ 6 หลัก"
-              aria-label="PIN ใหม่"
+              placeholder={t('newPin')}
+              aria-label={t('newPin')}
               className={PIN_FIELD}
             />
             <input
@@ -197,8 +199,8 @@ export default function SecuritySettingsPage() {
               maxLength={6}
               value={confirmPin}
               onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
-              placeholder="ยืนยัน PIN ใหม่"
-              aria-label="ยืนยัน PIN ใหม่"
+              placeholder={t('confirmPin')}
+              aria-label={t('confirmPin')}
               className={PIN_FIELD}
             />
             {pinErr && (

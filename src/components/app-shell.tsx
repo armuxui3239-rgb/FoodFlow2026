@@ -3,23 +3,27 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import { Home, MessageCircle, ReceiptText, ShoppingBag, User } from 'lucide-react';
+import { Home, LogOut, MessageCircle, ReceiptText, ShoppingBag, User } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useCart, useSession } from '@/lib/client';
 import { BrandLogo } from '@/components/brand-logo';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { LocaleToggle } from '@/components/locale-toggle';
 
 const TABS = [
-  { href: '/', label: 'หน้าแรก', icon: Home },
-  { href: '/messages', label: 'ข้อความ', icon: MessageCircle },
-  { href: '/orders', label: 'คำสั่งซื้อ', icon: ReceiptText },
-  { href: '/cart', label: 'ตะกร้า', icon: ShoppingBag },
-  { href: '/profile', label: 'โปรไฟล์', icon: User },
-];
+  { href: '/', labelKey: 'home', icon: Home },
+  { href: '/messages', labelKey: 'messages', icon: MessageCircle },
+  { href: '/orders', labelKey: 'orders', icon: ReceiptText },
+  { href: '/cart', labelKey: 'cart', icon: ShoppingBag },
+  { href: '/profile', labelKey: 'profile', icon: User },
+] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { refresh: refreshSession } = useSession();
   const { count, refresh } = useCart();
+  const t = useTranslations('nav');
+  const tCommon = useTranslations('common');
 
   useEffect(() => {
     void refreshSession();
@@ -38,12 +42,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2" aria-label="ฟู๊ด ธันเดอร์ หน้าแรก">
+        <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-2 px-3 sm:px-4">
+          <Link href="/" className="flex min-w-0 items-center gap-2" aria-label="ฟู๊ด ธันเดอร์ หน้าแรก">
             <BrandLogo />
-            <span className="truncate-1 text-lg font-bold text-black">ฟู๊ด ธันเดอร์</span>
+            <span className="hidden truncate-1 text-lg font-bold text-black sm:inline">ฟู๊ด ธันเดอร์</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Link
               href="/cart"
               aria-label={`ตะกร้า ${count} รายการ`}
@@ -56,6 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
               )}
             </Link>
+            <LocaleToggle />
             <ThemeToggle />
             <HeaderUser />
           </div>
@@ -73,7 +78,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
       >
         <div className="mx-auto grid max-w-5xl grid-cols-5">
-          {TABS.map(({ href, label, icon: Icon }) => {
+          {TABS.map(({ href, labelKey, icon: Icon }) => {
             const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
             return (
               <Link
@@ -87,9 +92,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   aria-hidden
                 />
                 <span
-                  className={`text-[11px] font-medium ${active ? 'text-black' : 'text-neutral-400'}`}
+                  className={`max-w-full truncate-1 px-0.5 text-[11px] font-medium ${active ? 'text-black' : 'text-neutral-400'}`}
                 >
-                  {label}
+                  {t(labelKey)}
                 </span>
                 {active && <span className="absolute top-0 h-0.5 w-8 rounded-full bg-[#FFC400]" />}
               </Link>
@@ -103,11 +108,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function HeaderUser() {
   const { user, ready, logout } = useSession();
+  const tCommon = useTranslations('common');
   if (!ready) return <span className="h-11 w-20 animate-pulse rounded-full bg-neutral-100" />;
   if (!user) {
     return (
       <Link href="/login" className="btn-brand flex h-11 items-center px-4 text-sm">
-        เข้าสู่ระบบ
+        {tCommon('login')}
       </Link>
     );
   }
@@ -118,9 +124,12 @@ function HeaderUser() {
       </span>
       <button
         onClick={() => void logout()}
-        className="flex h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-neutral-200 px-3 text-sm text-neutral-600 hover:bg-neutral-50"
+        aria-label={tCommon('logout')}
+        title={tCommon('logout')}
+        className="flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-neutral-200 px-2.5 text-sm text-neutral-600 hover:bg-neutral-50 sm:h-11 sm:px-3"
       >
-        ออกจากระบบ
+        <LogOut className="h-4 w-4 sm:hidden" aria-hidden />
+        <span className="hidden sm:inline">{tCommon('logout')}</span>
       </button>
     </div>
   );

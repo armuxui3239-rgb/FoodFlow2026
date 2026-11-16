@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Fingerprint, ScanFace } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
 export default function BiometricSetupPage() {
   const router = useRouter();
+  const t = useTranslations('onboardingFlow');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,7 +31,7 @@ export default function BiometricSetupPage() {
   };
 
   return (
-    <AuthShell title="เปิดใช้ไบโอเมตริก">
+    <AuthShell title={t('biometricTitle')}>
       <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
         <span className="flex h-24 w-24 items-center justify-center rounded-full bg-[#FFF4CC]">
           <Fingerprint className="h-14 w-14 text-black" aria-hidden />
@@ -38,8 +40,7 @@ export default function BiometricSetupPage() {
           <ScanFace className="h-9 w-9 text-ink-soft" aria-hidden />
         </span>
         <p className="max-w-xs text-sm text-ink-soft">
-          เปิดใช้ลายนิ้วมือหรือใบหน้าเพื่อปลดล็อกแอปได้เร็วขึ้น
-          (ทำงานบนอุปกรณ์ที่รองรับ และสามารถเปลี่ยนได้ภายหลังในหน้าความปลอดภัย)
+          {t('biometricDesc')}
         </p>
         {error && (
           <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -55,7 +56,7 @@ export default function BiometricSetupPage() {
           disabled={loading}
           className="flex-1 rounded-full border border-line py-3.5 text-sm font-bold text-ink transition hover:bg-neutral-50 disabled:opacity-60"
         >
-          ข้าม
+          {t('skip')}
         </button>
         <button
           type="button"
@@ -63,7 +64,7 @@ export default function BiometricSetupPage() {
           disabled={loading}
           className="flex-1 rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
         >
-          {loading ? 'กำลังบันทึก...' : 'เปิดใช้'}
+          {loading ? '...' : t('enable')}
         </button>
       </div>
     </AuthShell>

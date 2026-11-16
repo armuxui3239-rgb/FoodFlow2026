@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { CheckCircle2, ChevronDown, HeartHandshake, MessageCircle, Phone, PhoneIncoming, PhoneOff, QrCode, SendHorizontal, Store, XCircle, Zap } from 'lucide-react';
 import { api, baht, STATUS_COLOR, STATUS_TH, useSession } from '@/lib/client';
 import { useOrderChat, type ChatMessage } from '@/lib/realtime';
@@ -64,6 +65,7 @@ function thaiDateTime(iso: string): string {
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const t = useTranslations('orderDetail');
   const { user } = useSession();
   const [order, setOrder] = useState<Order | null>(null);
   const [payment, setPayment] = useState<Payment | null>(null);
@@ -269,7 +271,7 @@ export default function OrderDetailPage() {
         <section aria-label="ยกเลิกคำสั่งซื้อ" className="space-y-3 rounded-3xl border border-line bg-white p-4">
           <div className="flex items-center justify-between">
             <div className="min-w-0">
-              <p className="text-sm font-bold text-ink">ยกเลิกคำสั่งซื้อ</p>
+              <p className="text-sm font-bold text-ink">{t('cancelOrder')}</p>
               <p className="truncate-1 text-xs text-ink-soft">ยกเลิกได้ก่อนร้านตอบรับออเดอร์เท่านั้น</p>
             </div>
             <button

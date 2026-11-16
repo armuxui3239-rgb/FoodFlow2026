@@ -2,12 +2,14 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Delete, ShieldCheck } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
 function CreatePinInner() {
   const router = useRouter();
   const params = useSearchParams();
+  const t = useTranslations('onboardingFlow');
   const isReset = params.get('flow') === 'reset';
   const backHref = isReset ? '/forgot-pin' : '/onboarding/location';
   const [pin, setPin] = useState('');
@@ -68,7 +70,7 @@ function CreatePinInner() {
   }, [onKeyDown]);
 
   return (
-    <AuthShell title="ตั้ง PIN ใหม่" backHref={backHref}>
+    <AuthShell title={t('pinTitle')} backHref={backHref}>
       <div className="mb-2 flex flex-col items-center gap-2">
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FFF4CC]">
           <ShieldCheck className="h-7 w-7 text-black" aria-hidden />

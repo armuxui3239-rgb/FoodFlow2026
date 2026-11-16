@@ -1,19 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, CalendarDays, User, Mail, Phone } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Camera, CalendarDays, User, Mail, Users } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
 export default function ProfileSetupPage() {
   const router = useRouter();
+  const t = useTranslations('onboardingProfile');
+  const tCommon = useTranslations('common');
   const [fullName, setFullName] = useState('');
   const [nickname, setNickname] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [gender, setGender] = useState('');
   const [email, setEmail] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // ดึงชื่อ-อีเมลที่กรอกไว้ตอนสมัครสมาชิกมาแสดงอัตโนมัติ
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/onboard/profile')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        if (cancelled || !res?.data) return;
+        if (res.data.fullName) setFullName(res.data.fullName);
+        if (res.data.email) setEmail(res.data.email);
+        if (res.data.avatarUrl) setAvatarUrl(res.data.avatarUrl);
+        if (res.data.nickname) setNickname(res.data.nickname);
+        if (res.data.birthDate) setBirthDate(res.data.birthDate);
+        if (res.data.gender) setGender(res.data.gender);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const uploadAvatar = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    try {
+      const form = new FormData();
+      form.append('avatar', file);
+      const res = await fetch('/api/profile/avatar', { method: 'POST', body: form });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error ?? 'อัปโหลดรูปไม่สำเร็จ');
+      setAvatarUrl(body.data?.avatarUrl ?? '');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'อัปโหลดรูปไม่สำเร็จ');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,20 +78,30 @@ export default function ProfileSetupPage() {
   };
 
   return (
-    <AuthShell title="กรอกโปรไฟล์ของคุณ" backHref="/verify-otp">
+    <AuthShell title={t('title')} backHref="/verify-otp">
       <div className="mb-6 flex justify-center">
-        <div className="relative">
-          <span className="flex h-24 w-24 items-center justify-center rounded-full bg-neutral-100">
-            <User className="h-12 w-12 text-neutral-400" aria-hidden />
+        <label className="relative cursor-pointer" aria-label={t('uploadPhoto')}>
+          <span className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-neutral-100">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="รูปโปรไฟล์" className="h-full w-full object-cover" />
+            ) : (
+              <User className="h-12 w-12 text-neutral-400" aria-hidden />
+            )}
           </span>
           <span
-            className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand"
+            className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand shadow"
             aria-hidden
           >
             <Camera className="h-4 w-4 text-black" />
           </span>
-          <span className="sr-only">อัปโหลดรูปโปรไฟล์ (ทำได้ภายหลังในหน้าโปรไฟล์)</span>
-        </div>
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            disabled={uploading}
+            onChange={(e) => void uploadAvatar(e.target.files?.[0])}
+          />
+        </label>
       </div>
 
       <form onSubmit={submit} className="space-y-4">
@@ -64,9 +117,9 @@ export default function ProfileSetupPage() {
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="ชื่อ-นามสกุล"
+            placeholder={t('fullName')}
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-            aria-label="ชื่อ-นามสกุล"
+            aria-label={t('fullName')}
             required
           />
         </label>
@@ -77,9 +130,9 @@ export default function ProfileSetupPage() {
             type="text"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
-            placeholder="ชื่อเล่น"
+            placeholder={t('nickname')}
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-            aria-label="ชื่อเล่น"
+            aria-label={t('nickname')}
           />
         </label>
 
@@ -90,7 +143,7 @@ export default function ProfileSetupPage() {
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
             className="w-full bg-transparent text-sm text-ink outline-none"
-            aria-label="วันเกิด"
+            aria-label={t('birthDate')}
           />
         </label>
 
@@ -100,25 +153,25 @@ export default function ProfileSetupPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="อีเมล"
+            placeholder={t('email')}
             autoComplete="email"
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-            aria-label="อีเมล"
+            aria-label={t('email')}
           />
         </label>
 
         <label className="flex items-center gap-3 rounded-2xl border border-line bg-neutral-50 px-4 py-3.5 focus-within:border-brand">
-          <Phone className="h-5 w-5 shrink-0 text-ink-soft" aria-hidden />
+          <Users className="h-5 w-5 shrink-0 text-ink-soft" aria-hidden />
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}
             className="w-full bg-transparent text-sm text-ink outline-none"
-            aria-label="เพศ"
+            aria-label={t('gender')}
           >
-            <option value="">เพศ</option>
-            <option value="male">ชาย</option>
-            <option value="female">หญิง</option>
-            <option value="other">อื่น ๆ</option>
+            <option value="">{t('gender')}</option>
+            <option value="male">{t('genderMale')}</option>
+            <option value="female">{t('genderFemale')}</option>
+            <option value="other">{t('genderOther')}</option>
           </select>
         </label>
 
@@ -127,7 +180,7 @@ export default function ProfileSetupPage() {
           disabled={loading}
           className="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
         >
-          {loading ? 'กำลังบันทึก...' : 'ถัดไป'}
+          {loading ? tCommon('saving') : tCommon('next')}
         </button>
       </form>
     </AuthShell>

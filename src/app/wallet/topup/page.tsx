@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   BadgeCheck,
   CircleAlert,
@@ -23,6 +24,7 @@ interface TopupResult {
 }
 
 export default function WalletTopupPage() {
+  const t = useTranslations('topup');
   const [amount, setAmount] = useState('');
   const [step, setStep] = useState<'form' | 'pin' | 'qr' | 'sent'>('form');
   const [pin, setPin] = useState('');
@@ -216,7 +218,7 @@ export default function WalletTopupPage() {
             data-testid="topup-submit-slip"
             className="btn-brand h-12 w-full text-sm"
           >
-            {uploading ? 'กำลังส่งสลิป…' : 'ส่งสลิปเพื่อตรวจสอบ'}
+            {uploading ? t('uploadingSlip') : t('submitSlip')}
           </button>
           <button
             type="button"
@@ -248,16 +250,16 @@ export default function WalletTopupPage() {
           className="inline-flex h-11 items-center gap-1 text-sm font-semibold text-black"
         >
           <ChevronLeft className="h-4 w-4" aria-hidden />
-          ย้อนกลับ
+          {t('back')}
         </button>
 
-        <section aria-label="ยืนยัน PIN" className="flex flex-col items-center gap-3 rounded-3xl border border-line bg-white p-6">
+        <section aria-label={t('pinTitle')} className="flex flex-col items-center gap-3 rounded-3xl border border-line bg-white p-6">
           <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-[#FFC400]">
             <LockKeyhole className="h-6 w-6" aria-hidden />
           </span>
-          <h1 className="text-lg font-bold text-black">ยืนยันด้วย PIN</h1>
+          <h1 className="text-lg font-bold text-black">{t('pinTitle')}</h1>
           <p className="text-xs text-neutral-400">
-            กรอก PIN 6 หลักเพื่อยืนยันการเติมเงิน {baht(parsedAmount)}
+            {t('pinSubtitle')} {baht(parsedAmount * 100)}
           </p>
           <input
             type="password"

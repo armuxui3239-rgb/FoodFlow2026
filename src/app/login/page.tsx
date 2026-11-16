@@ -3,13 +3,18 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Smartphone, KeyRound, Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { BrandLogo } from '@/components/brand-logo';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { LocaleToggle } from '@/components/locale-toggle';
 
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get('next') || '/';
+  const t = useTranslations('login');
+  const tCommon = useTranslations('common');
 
   /** บทบาทร้านค้า/ไรเดอร์/แอดมินเข้า portal ของตัวเองเสมอ — ลูกค้าไปหน้าที่ตั้งใจไว้ */
   const roleHome = (role?: string) =>
@@ -40,11 +45,11 @@ function LoginForm() {
         body: JSON.stringify({ phone, pin, remember }),
       });
       const body = await res.json();
-      if (!res.ok) throw new Error(body.error ?? 'เข้าสู่ระบบไม่สำเร็จ');
+      if (!res.ok) throw new Error(body.error ?? t('failed'));
       router.push(next || roleHome(body.user?.role));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ');
+      setError(err instanceof Error ? err.message : t('failed'));
       setLoading(false);
     }
   };
@@ -60,28 +65,33 @@ function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
       const body = await res.json();
-      if (!res.ok) throw new Error(body.error ?? 'เข้าสู่ระบบไม่สำเร็จ');
+      if (!res.ok) throw new Error(body.error ?? t('failed'));
       router.push(next || roleHome(body.user?.role));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ');
+      setError(err instanceof Error ? err.message : t('failed'));
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="relative flex min-h-screen flex-col bg-white">
+      {/* มุมสลับภาษา/ธีม — หน้า auth ไม่มี header หลัก */}
+      <div className="absolute right-3 top-3 z-10 flex items-center gap-1">
+        <LocaleToggle />
+        <ThemeToggle />
+      </div>
       <main className="flex flex-1 flex-col items-center justify-center px-5 py-10">
         <div className="mb-8 flex flex-col items-center gap-2">
           <BrandLogo className="h-16 w-16 rounded-3xl" />
           <h1 className="text-2xl font-bold text-ink">ฟู๊ด ธันเดอร์</h1>
-          <p className="text-sm text-ink-soft">สั่งอาหาร ส่งไว ถึงบ้าน</p>
+          <p className="text-sm text-ink-soft">{tCommon('brandTagline')}</p>
         </div>
 
         <div className="w-full max-w-sm rounded-3xl border border-line bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-bold text-ink">เข้าสู่ระบบ</h2>
+          <h2 className="mb-1 text-lg font-bold text-ink">{t('title')}</h2>
           <p className="mb-5 text-sm text-ink-soft">
-            {mode === 'pin' ? 'ใช้เบอร์โทรและ PIN 6 หลักของคุณ' : 'สำหรับบัญชีที่สมัครด้วยอีเมล'}
+            {mode === 'pin' ? t('subtitlePin') : t('subtitleEmail')}
           </p>
 
           {error && (
@@ -103,7 +113,7 @@ function LoginForm() {
                   placeholder="812345678"
                   autoComplete="tel"
                   className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-                  aria-label="เบอร์โทรศัพท์"
+                  aria-label={t('phoneLabel')}
                   required
                 />
               </label>
@@ -115,15 +125,15 @@ function LoginForm() {
                   inputMode="numeric"
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="PIN 6 หลัก"
+                  placeholder={t('pinPlaceholder')}
                   autoComplete="current-password"
                   className="w-full bg-transparent text-sm tracking-[0.3em] text-ink outline-none placeholder:text-neutral-400 placeholder:tracking-normal"
-                  aria-label="PIN 6 หลัก"
+                  aria-label={t('pinLabel')}
                   required
                 />
                 <button
                   type="button"
-                  aria-label={showPin ? 'ซ่อน PIN' : 'แสดง PIN'}
+                  aria-label={showPin ? t('hidePin') : t('showPin')}
                   onClick={() => setShowPin((s) => !s)}
                   className="text-ink-soft hover:text-ink"
                 >
@@ -138,7 +148,7 @@ function LoginForm() {
                   onChange={(e) => setRemember(e.target.checked)}
                   className="h-4 w-4 accent-black"
                 />
-                จำฉันไว้ในอุปกรณ์นี้
+                {t('remember')}
               </label>
 
               <button
@@ -146,12 +156,12 @@ function LoginForm() {
                 disabled={loading}
                 className="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
               >
-                {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
+                {loading ? t('submitting') : tCommon('login')}
               </button>
 
               <p className="text-center">
                 <Link href="/forgot-pin" className="text-sm font-medium text-ink-soft hover:text-ink hover:underline">
-                  ลืม PIN?
+                  {t('forgotPin')}
                 </Link>
               </p>
             </form>
@@ -163,10 +173,10 @@ function LoginForm() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="อีเมล"
+                  placeholder={t('emailPlaceholder')}
                   autoComplete="email"
                   className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-                  aria-label="อีเมล"
+                  aria-label={t('emailLabel')}
                   required
                 />
               </label>
@@ -176,10 +186,10 @@ function LoginForm() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="รหัสผ่าน"
+                  placeholder={t('passwordPlaceholder')}
                   autoComplete="current-password"
                   className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-                  aria-label="รหัสผ่าน"
+                  aria-label={t('passwordLabel')}
                   required
                 />
               </label>
@@ -188,14 +198,14 @@ function LoginForm() {
                 disabled={loading}
                 className="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
               >
-                {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบด้วยอีเมล'}
+                {loading ? t('submitting') : t('emailSubmit')}
               </button>
             </form>
           )}
 
           <div className="my-5 flex items-center gap-3">
             <span className="h-px flex-1 bg-line" />
-            <span className="text-xs text-ink-soft">หรือ</span>
+            <span className="text-xs text-ink-soft">{tCommon('or')}</span>
             <span className="h-px flex-1 bg-line" />
           </div>
 
@@ -207,14 +217,14 @@ function LoginForm() {
             }}
             className="w-full rounded-full border border-line py-3.5 text-sm font-bold text-ink transition hover:bg-neutral-50"
           >
-            {mode === 'pin' ? 'เข้าสู่ระบบด้วยอีเมล (บัญชีเดิม)' : 'เข้าสู่ระบบด้วยเบอร์โทร + PIN'}
+            {mode === 'pin' ? t('switchToEmail') : t('switchToPin')}
           </button>
         </div>
 
         <p className="mt-6 text-sm text-ink-soft">
-          ยังไม่มีบัญชี?{' '}
+          {t('noAccount')}{' '}
           <Link href="/register" className="font-bold text-ink hover:underline">
-            สมัครสมาชิก
+            {t('register')}
           </Link>
         </p>
       </main>
@@ -225,7 +235,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense
-      fallback={<div className="flex min-h-screen items-center justify-center bg-white text-sm text-ink-soft">กำลังโหลด...</div>}
+      fallback={<div className="flex min-h-screen items-center justify-center bg-white text-sm text-ink-soft">Loading...</div>}
     >
       <LoginForm />
     </Suspense>

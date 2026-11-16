@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ChevronLeft,
   CircleHelp,
@@ -38,6 +39,7 @@ interface FavoriteItem {
 }
 
 export default function FavoritesPage() {
+  const t = useTranslations('aux');
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -117,7 +119,7 @@ export default function FavoritesPage() {
         >
           <ChevronLeft className="h-5 w-5" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold text-black">ร้านโปรดของฉัน</h1>
+        <h1 className="text-lg font-bold text-black">{t('favoritesTitle')}</h1>
       </div>
 
       {favorites.length === 0 ? (

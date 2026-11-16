@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CheckCircle2,
   ChevronLeft,
@@ -52,6 +53,7 @@ function Stars({ value, size = 'h-5 w-5' }: { value: number; size?: string }) {
 
 export default function RatePage() {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('rateOrder');
   const [review, setReview] = useState<Review | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -156,7 +158,7 @@ export default function RatePage() {
           >
             <ChevronLeft className="h-5 w-5 text-black" aria-hidden />
           </Link>
-          <h1 className="truncate-1 text-lg font-bold text-black">ให้คะแนนคำสั่งซื้อ</h1>
+          <h1 className="truncate-1 text-lg font-bold text-black">{t('title')}</h1>
         </div>
 
         <section

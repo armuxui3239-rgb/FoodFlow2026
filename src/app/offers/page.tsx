@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Check, Clock, Copy, Tag, TriangleAlert, Zap } from 'lucide-react';
 import { api, baht } from '@/lib/client';
 
@@ -82,6 +83,7 @@ function CopyCodeButton({ code, dark }: { code: string; dark: boolean }) {
 }
 
 export default function OffersPage() {
+  const t = useTranslations('aux');
   const [promos, setPromos] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -117,7 +119,7 @@ export default function OffersPage() {
   return (
     <div className="space-y-5">
       <header className="pt-1">
-        <h1 className="text-xl font-bold text-black">ข้อเสนอพิเศษและคูปอง</h1>
+        <h1 className="text-xl font-bold text-black">{t('offersTitle')}</h1>
         <p className="text-sm text-neutral-400">เลือกโปรโมชั่น คัดลอกโค้ด แล้วใช้ตอนชำระเงิน</p>
       </header>
 

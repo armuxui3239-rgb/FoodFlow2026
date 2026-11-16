@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useRef } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Mic, MicOff, PhoneOff, UserRound, Video, VideoOff } from 'lucide-react';
 import { useSession } from '@/lib/client';
 import { CALL_STATUS_TH, useCall, type CallStatus } from '@/lib/calls';
@@ -26,6 +27,8 @@ function CallScreenInner() {
   const params = useParams<{ room: string }>();
   const sp = useSearchParams();
   const router = useRouter();
+  const t = useTranslations('calls');
+  const tc = useTranslations('common');
   const { user, refresh } = useSession();
   const room = params.room ?? '';
   const orderId = sp.get('order') ?? '';
@@ -57,9 +60,9 @@ function CallScreenInner() {
       <header className="flex items-center justify-between gap-2 px-4 py-3">
         <span className="flex items-center gap-1.5 rounded-full bg-neutral-800 px-3 py-1.5 text-xs font-bold">
           <UserRound className="h-3.5 w-3.5" aria-hidden />
-          {user ? `${user.fullName} · ${ROLE_TH[user.role] ?? user.role}` : 'กำลังโหลด...'}
+          {user ? `${user.fullName} · ${ROLE_TH[user.role] ?? user.role}` : tc('loading')}
         </span>
-        {orderId && <span className="truncate-1 rounded-full bg-neutral-800 px-3 py-1.5 text-xs text-neutral-300">ออเดอร์ #{orderId.slice(0, 8)}</span>}
+        {orderId && <span className="truncate-1 rounded-full bg-neutral-800 px-3 py-1.5 text-xs text-neutral-300">{t('orderPrefix')} #{orderId.slice(0, 8)}</span>}
       </header>
 
       {/* วิดีโอคู่สาย */}

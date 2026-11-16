@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { BellRing, CheckCircle2, PackageSearch, Sparkles, XCircle } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
@@ -16,6 +17,7 @@ const BENEFITS = [
 /** ขั้นตอนขอสิทธิ์การแจ้งเตือน (ตามแม่แบบ onboarding_notification) — แทรกระหว่าง location → pin */
 export default function NotificationSetupPage() {
   const router = useRouter();
+  const t = useTranslations('onboardingFlow');
   const [perm, setPerm] = useState<PermState>('idle');
   const [busy, setBusy] = useState(false);
 
@@ -35,13 +37,13 @@ export default function NotificationSetupPage() {
   };
 
   return (
-    <AuthShell title="เปิดการแจ้งเตือน" backHref="/onboarding/location">
+    <AuthShell title={t('notifTitle')} backHref="/onboarding/location">
       <div className="mb-5 flex flex-col items-center text-center">
         <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-[#FFC400] text-black shadow-sm">
           <BellRing className="h-10 w-10" aria-hidden />
         </span>
         <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-          อย่าพลาดสถานะอาหารของคุณ — เปิดการแจ้งเตือนแล้วเราจะบอกคุณทุกขั้นตอนตั้งแต่ร้านรับออเดอร์จนถึงประตูบ้าน
+          {t('notifDesc')}
         </p>
       </div>
 

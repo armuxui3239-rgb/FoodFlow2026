@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Bike,
   CheckCircle2,
@@ -105,6 +106,8 @@ function thaiShortTime(iso: string): string {
 
 export default function TrackingPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('tracking');
+  const tc = useTranslations('common');
   const [data, setData] = useState<TrackingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -174,7 +177,7 @@ export default function TrackingPage() {
           onClick={() => window.location.reload()}
           className="btn-brand inline-flex h-11 items-center px-8 text-sm"
         >
-          ลองอีกครั้ง
+          {tc('retry')}
         </button>
       </div>
     );
@@ -214,7 +217,7 @@ export default function TrackingPage() {
         >
           <ChevronLeft className="h-5 w-5 text-black" aria-hidden />
         </Link>
-        <h1 className="truncate-1 text-lg font-bold text-black">ติดตามคำสั่งซื้อ</h1>
+        <h1 className="truncate-1 text-lg font-bold text-black">{t('title')}</h1>
       </div>
 
       {/* ETA ค่าประมาณ (v4 ข้อ 3 — ระยะเส้นตรง + ความเร็วเฉลี่ย ไม่ใช่เส้นทางถนนจริง) */}
@@ -227,10 +230,10 @@ export default function TrackingPage() {
 
       {/* สรุปสถานะปัจจุบันใหญ่ ๆ */}
       <section
-        aria-label="สรุปสถานะปัจจุบัน"
+        aria-label={t('currentStatus')}
         className={`rounded-3xl p-5 text-center shadow-sm ${STATUS_COLOR[order.status] ?? 'bg-neutral-100 text-neutral-700'}`}
       >
-        <p className="text-xs font-medium opacity-70">สถานะปัจจุบัน</p>
+        <p className="text-xs font-medium opacity-70">{t('currentStatus')}</p>
         <p className="mt-1 text-2xl font-bold">{STATUS_TH[order.status] ?? order.status}</p>
         <p className="mt-2 text-xs opacity-80">
           คำสั่งซื้อ #{order.order_code} · ร้าน {order.restaurants?.name ?? 'อาหาร'} · {baht(order.total)}

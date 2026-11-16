@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Info } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { ShieldCheck } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
 interface OtpFlow {
@@ -17,6 +18,8 @@ interface OtpFlow {
 
 export default function VerifyOtpPage() {
   const router = useRouter();
+  const t = useTranslations('verifyOtp');
+  const tc = useTranslations('common');
   const [flow, setFlow] = useState<OtpFlow | null>(null);
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [error, setError] = useState('');
@@ -132,41 +135,22 @@ export default function VerifyOtpPage() {
 
   if (!flow) {
     return (
-      <AuthShell title="ยืนยันรหัส OTP" backHref="/login">
-        <p className="text-center text-sm text-ink-soft">กำลังโหลด...</p>
+      <AuthShell title={t('title')} backHref="/login">
+        <p className="text-center text-sm text-ink-soft">{tc('loading')}</p>
       </AuthShell>
     );
   }
 
   return (
-    <AuthShell title="ยืนยันรหัส OTP" backHref={flow.purpose === 'register' ? '/register' : '/forgot-pin'}>
+    <AuthShell title={t('title')} backHref={flow.purpose === 'register' ? '/register' : '/forgot-pin'}>
       <div className="mb-5 flex flex-col items-center gap-2">
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FFF4CC]">
           <ShieldCheck className="h-7 w-7 text-black" aria-hidden />
         </span>
         <p className="text-sm text-ink-soft">
-          ระบบสร้างรหัสยืนยัน 6 หลักสำหรับเบอร์ <span className="font-bold text-ink">{flow.phoneMasked}</span> ให้คุณแล้ว
+          {t('subtitle', { phone: flow.phoneMasked })}
         </p>
       </div>
-
-      {/* OTP ของเรา: รหัสที่ระบบสร้างเอง ลงช่องให้อัตโนมัติแล้ว — ไม่มีการส่ง SMS (นโยบายจบในระบบ) */}
-      {(flow.deliveryChannel === 'dev_console' || flow.deliveryChannel === 'internal_code') && flow.devCode ? (
-        <div className="mb-5 flex w-full items-start gap-2 rounded-2xl bg-[#FFF4CC] px-4 py-3 text-sm text-ink">
-          <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          <span>
-            รหัสยืนยันของคุณ:{' '}
-            <span className="font-bold tracking-[0.3em]">{flow.devCode}</span>
-            <span className="block text-xs text-ink-soft">ระบบลงรหัสในช่องให้อัตโนมัติแล้ว — ตรวจทานแล้วกดยืนยันได้เลย (ไม่มีการส่ง SMS)</span>
-          </span>
-        </div>
-      ) : (
-        <div className="mb-5 flex items-start gap-2 rounded-2xl bg-[#FFF4CC] px-4 py-3 text-sm text-ink">
-          <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          <span>
-            ระบบสร้างรหัสยืนยัน 6 หลักแล้ว — กรอกรหัสที่ได้รับ (หมดอายุ 10 นาที)
-          </span>
-        </div>
-      )}
 
       {error && (
         <p role="alert" className="mb-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -196,10 +180,10 @@ export default function VerifyOtpPage() {
 
       <p className="mb-5 text-center text-sm text-ink-soft">
         {cooldown > 0 ? (
-          <>ส่งซ้ำได้ใน <span className="font-bold text-ink">{cooldown}</span> วินาที</>
+          <>{t('resendIn')} <span className="font-bold text-ink">{cooldown}</span> {t('seconds')}</>
         ) : (
           <button type="button" onClick={resend} className="font-bold text-ink hover:underline">
-            ส่งรหัสซ้ำ
+            {t('resend')}
           </button>
         )}
       </p>
@@ -210,7 +194,7 @@ export default function VerifyOtpPage() {
         disabled={loading || digits.join('').length !== 6}
         className="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
       >
-        {loading ? 'กำลังตรวจสอบ...' : 'ยืนยัน'}
+        {loading ? t('checking') : t('submit')}
       </button>
     </AuthShell>
   );

@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Smartphone, Mail, User, Phone } from 'lucide-react';
 import { AuthShell } from '@/components/auth-shell';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations('register');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
@@ -46,13 +48,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <AuthShell title="สมัครบัญชีใหม่" backHref="/login">
+    <AuthShell title={t('title')} backHref="/login">
       <div className="mb-6 flex flex-col items-center gap-2">
         <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-brand">
           <Phone className="h-8 w-8 text-black" aria-hidden />
         </span>
         <p className="text-center text-sm text-ink-soft">
-          ยืนยันเบอร์โทรด้วยรหัสยืนยัน 6 หลัก ที่ระบบสร้างให้คุณในแอปโดยตรง (หมดอายุ 10 นาที)
+          {t('subtitle')}
         </p>
       </div>
 
@@ -73,7 +75,7 @@ export default function RegisterPage() {
             placeholder="812345678"
             autoComplete="tel"
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-            aria-label="เบอร์โทรศัพท์"
+            aria-label={t('phoneLabel')}
             required
           />
         </label>
@@ -84,10 +86,10 @@ export default function RegisterPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="อีเมล"
+            placeholder={t('emailPlaceholder')}
             autoComplete="email"
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-            aria-label="อีเมล"
+            aria-label={t('emailPlaceholder')}
             required
           />
         </label>
@@ -98,10 +100,10 @@ export default function RegisterPage() {
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="ชื่อ-นามสกุล"
+            placeholder={t('fullNamePlaceholder')}
             autoComplete="name"
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-neutral-400"
-            aria-label="ชื่อ-นามสกุล"
+            aria-label={t('fullNamePlaceholder')}
             required
           />
         </label>
@@ -111,14 +113,14 @@ export default function RegisterPage() {
           disabled={loading}
           className="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-black transition hover:bg-brand-strong disabled:opacity-60"
         >
-          {loading ? 'กำลังส่งรหัส...' : 'สมัครสมาชิก'}
+          {loading ? t('submitting') : t('submit')}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-ink-soft">
-        มีบัญชีอยู่แล้ว?{' '}
+        {t('hasAccount')}{' '}
         <Link href="/login" className="font-bold text-ink hover:underline">
-          เข้าสู่ระบบ
+          {t('loginLink')}
         </Link>
       </p>
     </AuthShell>

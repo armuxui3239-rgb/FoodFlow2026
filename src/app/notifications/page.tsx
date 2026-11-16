@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Bell,
   BellOff,
@@ -44,6 +45,7 @@ function thaiDate(iso: string): string {
 
 export default function NotificationsPage() {
   const { user, ready: sessionReady } = useSession();
+  const t = useTranslations('aux');
   const [items, setItems] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -125,7 +127,7 @@ export default function NotificationsPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <BrandLogo className="h-20 w-20 rounded-3xl shadow-sm" />
-        <h1 className="text-lg font-bold text-black">เข้าสู่ระบบเพื่อดูการแจ้งเตือน</h1>
+        <h1 className="text-lg font-bold text-black">{t('notificationsLoginTitle')}</h1>
         <p className="text-sm text-neutral-400">ติดตามสถานะคำสั่งซื้อและโปรโมชันของคุณ</p>
         <Link href="/login?next=%2Fnotifications" className="btn-brand inline-flex h-12 items-center px-8 text-sm">
           เข้าสู่ระบบ
@@ -139,7 +141,7 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between gap-3 pt-1">
-        <h1 className="text-xl font-bold text-black">การแจ้งเตือน</h1>
+        <h1 className="text-xl font-bold text-black">{t('notificationsTitle')}</h1>
         <button
           type="button"
           onClick={() => void markAll()}

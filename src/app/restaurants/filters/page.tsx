@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Check, Filter, Star } from 'lucide-react';
 import { api } from '@/lib/client';
 
@@ -27,6 +28,7 @@ const SORT_OPTIONS = [
 function FiltersInner() {
   const router = useRouter();
   const sp = useSearchParams();
+  const t = useTranslations('aux');
   const [cuisines, setCuisines] = useState<string[]>([]);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>(() =>
     (sp.get('cuisine') ?? '').split(',').filter(Boolean),
@@ -78,7 +80,7 @@ function FiltersInner() {
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#FFC400] text-black">
             <Filter className="h-5 w-5" aria-hidden />
           </span>
-          <h1 className="text-sm font-bold text-black">ตัวกรองร้านอาหาร</h1>
+          <h1 className="text-sm font-bold text-black">{t('filtersTitle')}</h1>
         </div>
       </header>
 

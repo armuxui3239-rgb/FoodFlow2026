@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ArrowLeft,
   Check,
@@ -42,6 +43,7 @@ async function copyText(text: string): Promise<boolean> {
 
 export default function InvitePage() {
   const { user, ready: sessionReady } = useSession();
+  const t = useTranslations('aux');
   const [referral, setReferral] = useState<ReferralData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -111,7 +113,7 @@ export default function InvitePage() {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <BrandLogo className="h-20 w-20 rounded-3xl shadow-sm" />
-        <h1 className="text-lg font-bold text-black">เข้าสู่ระบบเพื่อรับโค้ดเชิญ</h1>
+        <h1 className="text-lg font-bold text-black">{t('inviteLoginTitle')}</h1>
         <p className="text-sm text-neutral-400">เชิญเพื่อนมาสั่งอาหารและรับส่วนลดไปด้วยกัน</p>
         <Link href="/login?next=%2Finvite" className="btn-brand inline-flex h-12 items-center px-8 text-sm">
           เข้าสู่ระบบ
@@ -134,7 +136,7 @@ export default function InvitePage() {
         >
           <ArrowLeft className="h-4 w-4 text-black" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold text-black">เชิญเพื่อนรับส่วนลด</h1>
+        <h1 className="text-lg font-bold text-black">{t('inviteTitle')}</h1>
       </header>
 
       {/* การ์ดโค้ดของฉัน — พื้นดำ โค้ดตัวใหญ่สีเหลือง */}

@@ -57,7 +57,7 @@ export function DriverHeader() {
             <BrandLogo />
             <div className="min-w-0">
               <p className="truncate-1 text-sm font-bold text-black">{name || 'พอร์ทัลไรเดอร์'}</p>
-              <p className="text-[11px] text-neutral-400">มุมมองไรเดอร์{user ? ` · ${user.fullName}` : ''}</p>
+              <p className="truncate-1 text-[11px] text-neutral-400">มุมมองไรเดอร์{user ? ` · ${user.fullName}` : ''}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -79,7 +79,7 @@ export function DriverHeader() {
                 key={href}
                 href={href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold transition-colors ${
+                className={`flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-xs font-bold transition-colors ${
                   active ? 'bg-[#FFC400] text-black' : 'bg-[#FFF4CC] text-black hover:bg-[#FFC400]'
                 }`}
               >
