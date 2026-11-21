@@ -27,34 +27,40 @@ export async function POST(req: NextRequest) {
   );
   if (!item || !item.is_available) return jsonError('เมนูนี้ไม่พร้อมขาย', 400);
 
+  const rest = await sbOne<{ is_open: boolean }>('restaurants', {
+    id: `eq.${item.restaurant_id}`,
+    select: 'is_open',
+  });
+  if (!rest || !rest.is_open) return jsonError('ร้านนี้ปิดให้บริการชั่วคราว', 400);
+
   // ---- ตรวจตัวเลือกเสริมฝั่ง server (ราคาคิดจาก DB เสมอ ห้ามเชื่อ client) ----
   let unitPrice = Number(item.base_price);
-  let selectedOptions: { name: string; value: string; priceModifier: number }[] = [];
+  const selectedOptions: { name: string; value: string; priceModifier: number }[] = [];
   const reqIds = Array.isArray(optionValueIds) ? [...new Set(optionValueIds)].slice(0, 20) : [];
-  if (reqIds.length > 0) {
-    const groups = await sbList<{ id: string; name: string; is_required: boolean; is_multiple: boolean }>(
-      'menu_item_options',
-      { menu_item_id: `eq.${menuItemId}`, select: 'id,name,is_required,is_multiple' },
-    );
-    const groupById = new Map(groups.map((g) => [g.id, g]));
-    const values = await sbList<{
-      id: string;
-      option_id: string;
-      value: string;
-      price_modifier: number;
-    }>('menu_item_option_values', {
-      option_id: `in.(${groups.map((g) => g.id).join(',')})`,
-      select: 'id,option_id,value,price_modifier',
-    });
-    const valueById = new Map(values.map((v) => [v.id, v]));
-
-    const picksPerOption = new Map<string, typeof values>();
-    for (const vid of reqIds) {
-      const v = valueById.get(vid);
-      if (!v) return jsonError('มีตัวเลือกที่ไม่ตรงกับเมนูนี้', 400);
-      const list = picksPerOption.get(v.option_id) ?? [];
-      list.push(v);
-      picksPerOption.set(v.option_id, list);
+  const groups = await sbList<{ id: string; name: string; is_required: boolean; is_multiple: boolean }>(
+    'menu_item_options',
+    { menu_item_id: `eq.${menuItemId}`, select: 'id,name,is_required,is_multiple' },
+  );
+  if (groups.length > 0) {
+    const picksPerOption = new Map<string, { id: string; option_id: string; value: string; price_modifier: number }[]>();
+    if (reqIds.length > 0) {
+      const values = await sbList<{
+        id: string;
+        option_id: string;
+        value: string;
+        price_modifier: number;
+      }>('menu_item_option_values', {
+        option_id: `in.(${groups.map((g) => g.id).join(',')})`,
+        select: 'id,option_id,value,price_modifier',
+      });
+      const valueById = new Map(values.map((v) => [v.id, v]));
+      for (const vid of reqIds) {
+        const v = valueById.get(vid);
+        if (!v) return jsonError('มีตัวเลือกที่ไม่ตรงกับเมนูนี้', 400);
+        const list = picksPerOption.get(v.option_id) ?? [];
+        list.push(v);
+        picksPerOption.set(v.option_id, list);
+      }
     }
     for (const g of groups) {
       const picks = picksPerOption.get(g.id) ?? [];

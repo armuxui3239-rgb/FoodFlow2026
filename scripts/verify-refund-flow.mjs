@@ -79,16 +79,19 @@ async function main() {
   check('ยอดกระเป๋า = 100,000 สตางค์', balance0 === 100000, `balance=${balance0}`);
 
   // ---------- 3. สั่งด้วยกระเป๋าเงิน (หักจริง) ----------
-  const rs = (await api('/api/restaurants?limit=5')).json?.data?.[0]?.id;
+  const rsList = (await api('/api/restaurants?limit=10')).json?.data ?? [];
+  const rs = (rsList.find((x) => x.is_open) ?? rsList[0])?.id;
   const detail = await api(`/api/restaurants/${rs}`);
   const fi = (detail.json?.items ?? detail.json?.menu_items ?? [])[0];
   const fr = await api(`/api/food/${fi.id}`);
-  const ovs = ((fr.json?.option_groups ?? [])[0]?.values ?? []).slice(0, 1).map((v) => v.id);
-  await api('/api/cart', { method: 'POST', body: { menuItemId: fi.id, quantity: 1, optionValueIds: ovs }, cookie: customerCookie });
+  const ovs = (fr.json?.option_groups ?? fr.json?.options ?? [])
+    .filter((g) => g.isRequired ?? g.is_required)
+    .flatMap((g) => (g.values ?? []).slice(0, 1).map((v) => v.id));
+  const cartRes = await api('/api/cart', { method: 'POST', body: { menuItemId: fi.id, quantity: 1, optionValueIds: ovs }, cookie: customerCookie });
   r = await api('/api/orders', { method: 'POST', body: { paymentMethod: 'wallet' }, cookie: customerCookie });
   const orderId = r.json?.order?.id;
   const orderTotal = r.json?.order?.total ?? 0;
-  check('สั่งด้วยกระเป๋าเงิน → paid หักจริง', r.status === 201 && r.json?.order?.status === 'paid', `HTTP ${r.status} total=${orderTotal}`);
+  check('สั่งด้วยกระเป๋าเงิน → paid หักจริง', r.status === 201 && r.json?.order?.status === 'paid', `HTTP ${r.status} total=${orderTotal} cart=${cartRes.status}:${JSON.stringify(cartRes.json)} order=${JSON.stringify(r.json)}`);
   r = await api('/api/wallet', { cookie: customerCookie });
   const balance1 = r.json?.data?.balance ?? 0;
   check('กระเป๋าถูกหักตรงยอด', balance1 === balance0 - orderTotal, `หลังสั่ง=${balance1} ควรเหลือ ${balance0 - orderTotal}`);

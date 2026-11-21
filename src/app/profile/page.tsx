@@ -15,6 +15,7 @@ import {
   MapPin,
   Package,
   Percent,
+  Settings,
   ShieldCheck,
   Wallet,
   Zap,
@@ -30,6 +31,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { api, useSession } from '@/lib/client';
+import { PwaInstallBanner } from '@/components/pwa-install-banner';
 
 interface ProfileData {
   id: string;
@@ -166,13 +168,22 @@ export default function ProfilePage() {
             )}
           </p>
         </div>
-        <Link
-          href="/profile/edit"
-          className="flex h-10 shrink-0 items-center gap-1 rounded-full border border-line px-4 text-xs font-semibold text-black transition-colors hover:bg-[#FFF4CC]"
-        >
-          {tCommon('edit')}
-          <ChevronRight className="h-3.5 w-3.5" aria-hidden />
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/settings"
+            aria-label="ตั้งค่า"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-black transition-colors hover:bg-[#FFF4CC]"
+          >
+            <Settings className="h-4 w-4" aria-hidden />
+          </Link>
+          <Link
+            href="/profile/edit"
+            className="flex h-10 shrink-0 items-center gap-1 rounded-full border border-line px-4 text-xs font-semibold text-black transition-colors hover:bg-[#FFF4CC]"
+          >
+            {tCommon('edit')}
+            <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+          </Link>
+        </div>
       </header>
 
       {/* สรุปสถิติ — จำนวนคำสั่งซื้อ + วันที่เริ่มใช้ (พ.ศ.) */}
@@ -210,6 +221,9 @@ export default function ProfilePage() {
           </span>
         </div>
       </section>
+
+      {/* แนะนำติดตั้งแอปลงมือถือ/พีซี */}
+      <PwaInstallBanner />
 
       {/* เมนูการตั้งค่า — ตามต้นแบบ */}
       <nav aria-label="เมนูโปรไฟล์">

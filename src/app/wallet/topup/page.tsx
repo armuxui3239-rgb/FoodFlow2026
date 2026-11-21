@@ -113,23 +113,6 @@ export default function WalletTopupPage() {
     }
   };
 
-  // ทางลัดโหมดทดสอบ (backend ปิดใน production)
-  const confirmSimulate = async () => {
-    if (!qr) return;
-    setError('');
-    try {
-      await api('/api/wallet/topup', {
-        method: 'PATCH',
-        body: JSON.stringify({ transactionId: qr.transactionId }),
-      });
-      setSlipFile(null);
-      setSlipPreview('');
-      setStep('sent');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'ยืนยันการชำระเงินไม่สำเร็จ');
-    }
-  };
-
   // ขั้นที่ 4: ส่งสลิปแล้ว — รอแอดมินตรวจ
   if (step === 'sent' && qr) {
     return (
@@ -219,14 +202,6 @@ export default function WalletTopupPage() {
             className="btn-brand h-12 w-full text-sm"
           >
             {uploading ? t('uploadingSlip') : t('submitSlip')}
-          </button>
-          <button
-            type="button"
-            onClick={() => void confirmSimulate()}
-            data-testid="topup-simulate"
-            className="h-9 w-full text-xs text-neutral-400 underline"
-          >
-            จำลองการชำระเงินสำเร็จ (โหมดทดสอบเท่านั้น)
           </button>
         </section>
 

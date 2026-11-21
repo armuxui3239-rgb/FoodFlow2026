@@ -90,6 +90,15 @@ export async function checkPromotion(
     return { ok: false, error: 'คูปองนี้ถูกใช้ครบจำนวนแล้ว' };
   }
   if (userId) {
+    if (p.first_order_only) {
+      const priorOrders = await sbList<{ id: string }>('orders', {
+        customer_id: `eq.${userId}`,
+        status: 'neq.cancelled',
+        select: 'id',
+        limit: '1',
+      });
+      if (priorOrders.length > 0) return { ok: false, error: 'คูปองนี้สำหรับคำสั่งซื้อแรกเท่านั้น' };
+    }
     const used = await usageCountOfUser(p.id, userId);
     if (p.first_order_only && used >= 1) return { ok: false, error: 'คูปองนี้สำหรับออเดอร์แรกเท่านั้น' };
     if (p.max_per_user != null && p.max_per_user > 0 && used >= p.max_per_user) {

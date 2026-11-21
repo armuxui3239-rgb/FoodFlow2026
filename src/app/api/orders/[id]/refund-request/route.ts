@@ -73,12 +73,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const payment = await sbOne<PaymentRow>('payments', {
       order_id: `eq.${id}`,
-      status: 'in.(completed,pending)',
+      status: 'eq.completed',
       order: 'created_at.desc',
       limit: '1',
       select: 'id,amount,method,status',
     });
-    if (!payment) return jsonError('ไม่พบรายการชำระเงินของออเดอร์นี้', 404);
+    if (!payment) return jsonError('ยังไม่มีการชำระเงินที่เสร็จสมบูรณ์สำหรับออเดอร์นี้', 400);
 
     const nowIso = new Date().toISOString();
     await sbInsert('payment_refund_requests', {

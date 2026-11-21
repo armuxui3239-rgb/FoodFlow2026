@@ -183,7 +183,7 @@ export default function ChatPage() {
                 <div
                   className={`px-4 py-3 text-sm leading-relaxed ${
                     mine
-                      ? 'rounded-3xl rounded-br-md bg-black text-[#FFF4CC]'
+                      ? 'rounded-3xl rounded-br-md bg-black text-[#FFF4CC] dark:bg-[#FFC400] dark:text-black'
                       : 'rounded-3xl rounded-bl-md border border-line bg-white text-black'
                   }`}
                 >

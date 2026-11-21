@@ -9,8 +9,10 @@ import { AuthShell } from '@/components/auth-shell';
 interface OtpFlow {
   otpId: string;
   phone: string;
+  email?: string;
+  fullName?: string;
   phoneMasked: string;
-  deliveryChannel?: 'dev_console' | 'internal_code' | 'sms_gateway_selfhosted';
+  deliveryChannel?: 'dev_console' | 'internal_code';
   devCode?: string;
   purpose: 'register' | 'reset_pin';
   resendInSec: number;
@@ -110,7 +112,12 @@ export default function VerifyOtpPage() {
       const res = await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: flow.phone, purpose: flow.purpose }),
+        body: JSON.stringify({
+          phone: flow.phone,
+          purpose: flow.purpose,
+          ...(flow.email ? { email: flow.email } : {}),
+          ...(flow.fullName ? { fullName: flow.fullName } : {}),
+        }),
       });
       const body = await res.json();
       if (!res.ok) {

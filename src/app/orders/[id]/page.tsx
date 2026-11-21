@@ -72,7 +72,6 @@ export default function OrderDetailPage() {
   const [qr, setQr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [paying, setPaying] = useState(false);
   const [canceling, setCanceling] = useState(false);
   const [tipSatang, setTipSatang] = useState<number>(TIP_PRESETS[0]);
   const [tipCustom, setTipCustom] = useState<string>('');
@@ -124,16 +123,6 @@ export default function OrderDetailPage() {
   }, [id]);
 
   useEffect(load, [load]);
-
-  const confirmPaid = async () => {
-    setPaying(true);
-    try {
-      await api(`/api/orders/${id}/pay`, { method: 'PATCH' });
-      load();
-    } finally {
-      setPaying(false);
-    }
-  };
 
   /** ยกเลิกได้เฉพาะสถานะเดียวกับที่ API ยอมรับ (ก่อนร้านตอบรับออเดอร์) */
   const canCancel = ['created', 'pending_payment', 'restaurant_pending'].includes(order?.status ?? '');
@@ -247,7 +236,7 @@ export default function OrderDetailPage() {
       <p className="truncate-1 text-sm text-neutral-500">ร้าน {order.restaurants?.name ?? 'อาหาร'}</p>
 
       {/* แถบสถานะ */}
-      <section aria-label="สถานะคำสั่งซื้อ" className="rounded-3xl border border-line bg-white p-4">
+      <section aria-label="สถานะคำสั่งซื้อ" className="space-y-3 rounded-3xl border border-line bg-white p-4">
         <ol className="flex items-center justify-between">
           {STEPS.slice(1).map((s, idx) => (
             <li key={s} className="flex flex-1 flex-col items-center gap-1 last:flex-none">
@@ -264,6 +253,28 @@ export default function OrderDetailPage() {
             </li>
           ))}
         </ol>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Link
+            href={`/orders/${order.id}/tracking`}
+            className="flex h-9 items-center rounded-full border border-line bg-white px-4 text-xs font-semibold text-black hover:bg-neutral-50"
+          >
+            ติดตามสถานะ
+          </Link>
+          <Link
+            href={`/orders/${order.id}/map`}
+            className="flex h-9 items-center rounded-full border border-line bg-white px-4 text-xs font-semibold text-black hover:bg-neutral-50"
+          >
+            ดูแผนที่
+          </Link>
+          {(order.status === 'delivered' || order.status === 'completed') && (
+            <Link
+              href={`/orders/${order.id}/rate`}
+              className="btn-brand flex h-9 items-center px-4 text-xs"
+            >
+              ให้คะแนนออเดอร์
+            </Link>
+          )}
+        </div>
       </section>
 
       {/* ยกเลิกคำสั่งซื้อ — เฉพาะก่อนร้านตอบรับ + เลือกเหตุผลจากระบบ (v4 ข้อ 8.11) */}
@@ -581,18 +592,15 @@ export default function OrderDetailPage() {
               </div>
             </div>
 
-            <button onClick={() => void confirmPaid()} disabled={paying} className="btn-brand h-12 w-full text-sm">
-              {paying ? 'กำลังยืนยัน…' : 'แจ้งชำระเงินแล้ว'}
-            </button>
-            <p className="text-center text-[11px] text-neutral-400">
-              ระบบจะตรวจสอบการชำระเงินของคุณ — ยืนยันด้วยตนเองชั่วคราว
+            <p className="rounded-2xl bg-neutral-50 px-4 py-3 text-center text-xs text-neutral-600">
+              หลังสแกนโอนเงินแล้ว กรุณารอผู้ดูแลระบบตรวจสอบและยืนยันยอดชำระ
             </p>
           </div>
         </section>
       )}
 
-      {/* สลิปสำเร็จ — เหมือนรูปตัวอย่าง */}
-      {order.status !== 'pending_payment' && (
+      {/* สลิปสำเร็จ — แสดงเฉพาะออเดอร์ที่ชำระเงินเสร็จสมบูรณ์แล้วและไม่ถูกยกเลิก */}
+      {order.status !== 'pending_payment' && order.status !== 'cancelled' && payment?.status === 'completed' && (
         <section
           aria-label="สลิปโอนเงินสำเร็จ"
           className="overflow-hidden rounded-3xl border border-line bg-white shadow-md"

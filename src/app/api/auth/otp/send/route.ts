@@ -197,14 +197,14 @@ export async function POST(req: NextRequest) {
       ip: clientIp,
     });
 
-    // ส่งโค้ดผ่านช่องทางที่กำหนด (dev = dev_console, production = sms_gateway_selfhosted)
+    // ส่งรหัสผ่านช่องทางภายในระบบ (internal_code)
     const delivery = getVerificationDelivery();
     const sent = await delivery.sendOtp(phone, code, purpose);
     if (!sent.ok) {
-      // ส่งไม่ถึงผู้ใช้ → ยกเลิกโค้ดที่เพิ่งออก ไม่ให้ใช้ได้
+      // ออกรหัสไม่สำเร็จ → ยกเลิกโค้ดที่เพิ่งออก ไม่ให้ใช้ได้
       await sbUpdate('otp_codes', { id: `eq.${otp.id}` }, { consumed_at: new Date().toISOString() });
       return Response.json(
-        { error: 'ส่ง SMS ไม่สำเร็จ กรุณาลองอีกครั้งในภายหลัง', detail: sent.error },
+        { error: 'สร้างรหัสยืนยันไม่สำเร็จ กรุณาลองอีกครั้งในภายหลัง', detail: sent.error },
         { status: 502 },
       );
     }

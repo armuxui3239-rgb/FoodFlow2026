@@ -64,6 +64,17 @@ body {
   background: var(--background);
   color: var(--foreground);
   overflow-x: clip;
+  touch-action: manipulation;
+  overscroll-behavior-y: contain;
+}
+
+/* กัน iOS Safari ซูมหน้าจออัตโนมัติเมื่อแตะช่องกรอกข้อความบนมือถือ */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 body {

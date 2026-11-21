@@ -7,6 +7,7 @@ import { promptPayPayload } from '@/lib/promptpay';
 import QRCode from 'qrcode';
 import { loadCart } from '@/lib/cart-server';
 import { checkPromotion, recordPromotionUsage, type PromotionRow } from '@/lib/promotion';
+import { getWalletBalance } from '@/lib/wallet';
 
 const DELIVERY_FEE = 3500; // สตางค์ตามมาตรฐานฐานข้อมูล (฿35)
 const FALLBACK_PROMPTPAY = process.env.PROMPTPAY_FALLBACK_TARGET ?? '0812345678';
@@ -41,9 +42,17 @@ export async function POST(req: NextRequest) {
     paymentMethod?: 'wallet' | 'cash' | 'promptpay';
   };
   const pm = paymentMethod === 'wallet' || paymentMethod === 'cash' ? paymentMethod : 'promptpay';
-  // ถ้าไม่ส่งที่อยู่มา ใช้ที่อยู่ตั้งต้นของลูกค้า
-  let finalAddressId = addressId ?? null;
-  if (!finalAddressId) {
+  // ถ้าไม่ส่งที่อยู่มา ใช้ที่อยู่ตั้งต้นของลูกค้า; ถ้าส่งมา ต้องตรวจว่าเป็นของลูกค้ารายนี้จริง
+  let finalAddressId: string | null = null;
+  if (addressId) {
+    const ownedAddr = await sbOne<{ id: string }>('addresses', {
+      id: `eq.${addressId}`,
+      user_id: `eq.${user.id}`,
+      select: 'id',
+    });
+    if (!ownedAddr) return jsonError('ไม่พบที่อยู่จัดส่งนี้ในบัญชีของคุณ', 404);
+    finalAddressId = ownedAddr.id;
+  } else {
     const defaultAddr = await sbOne<{ id: string }>('addresses', {
       user_id: `eq.${user.id}`,
       select: 'id',
@@ -76,16 +85,9 @@ export async function POST(req: NextRequest) {
 
   const total = subtotal + DELIVERY_FEE - promotionDiscount;
 
-  // ---- กระเป๋าเงิน: ตรวจยอดก่อนหัก (เฟส 5.2) — คำนวณแบบเดียวกับ api/wallet (รวม 50 รายการล่าสุดที่ completed) ----
+  // ---- กระเป๋าเงิน: ตรวจยอดรวมทั้งหมดที่ completed ----
   if (pm === 'wallet') {
-    const txs = await sbList<{ amount_delta: number }>('wallet_transactions', {
-      user_id: `eq.${user.id}`,
-      status: 'eq.completed',
-      order: 'created_at.desc',
-      limit: '50',
-      select: 'amount_delta',
-    });
-    const walletBalance = txs.reduce((s, t) => s + t.amount_delta, 0);
+    const walletBalance = await getWalletBalance(user.id);
     if (total > walletBalance) {
       return jsonError(
         `ยอดเงินในกระเป๋าไม่พอ (คงเหลือ ${(walletBalance / 100).toLocaleString('th-TH', { maximumFractionDigits: 2 })} บาท)`,
@@ -117,7 +119,7 @@ export async function POST(req: NextRequest) {
     restaurant_id: cart.restaurant_id,
     delivery_address_id: finalAddressId,
     // wallet = หักเงินทันที -> paid · cash = เงินสดปลายทาง ร้านเริ่มทำได้เลย (payments ยัง pending) · promptpay = รอชำระ
-    status: pm === 'promptpay' ? 'pending_payment' : 'paid',
+    status: pm === 'wallet' ? 'paid' : pm === 'cash' ? 'restaurant_pending' : 'pending_payment',
     subtotal,
     delivery_fee: DELIVERY_FEE,
     promotion_discount: promotionDiscount,
@@ -132,6 +134,7 @@ export async function POST(req: NextRequest) {
       name_snapshot: i.menu_items?.name ?? 'รายการอาหาร',
       quantity: i.quantity,
       unit_price: i.unit_price,
+      selected_options: i.selected_options ?? [],
       notes: i.notes,
     })),
   );

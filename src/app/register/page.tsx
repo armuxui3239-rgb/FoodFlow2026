@@ -33,6 +33,8 @@ export default function RegisterPage() {
         JSON.stringify({
           otpId: body.otpId,
           phone,
+          email,
+          fullName,
           phoneMasked: body.phoneMasked,
           deliveryChannel: body.deliveryChannel,
           devCode: body.devCode,

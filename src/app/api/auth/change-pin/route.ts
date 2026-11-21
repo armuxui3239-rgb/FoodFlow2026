@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         failed_login_count: count,
         updated_at: new Date().toISOString(),
       });
-      return jsonError(`PIN เดิมไม่ถูกต้อง (พยายามได้อีก ${MAX_FAILED - count} ครั้ง)`, 401);
+      return jsonError(`PIN เดิมไม่ถูกต้อง (พยายามได้อีก ${MAX_FAILED - count} ครั้ง)`, 400);
     }
 
     if (newPin === oldPin) return jsonError('PIN ใหม่ต้องไม่ซ้ำกับ PIN เดิม', 400);

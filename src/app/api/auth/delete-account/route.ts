@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { sbDelete, sbList, sbOne, sbUpdate } from '@/lib/supabase';
 import { currentUser, jsonError } from '@/lib/api-user';
+import { clearSessionCookieValue } from '@/lib/session';
 
 /** POST /api/auth/delete-account — ลบบัญชี (สิทธิ์ลบข้อมูลส่วนบุคคล ตาม PDPA / v4 ข้อ 11)
  *  ปิดบัญชี + ลบข้อมูลส่วนบุคคลทันที (ชื่อ/อีเมล/เบอร์/ที่อยู่/ร้านโปรด/PIN)
@@ -14,8 +15,24 @@ export async function POST() {
 
     const anonId = user.id.slice(0, 8);
 
-    // ลบข้อมูลส่วนบุคคลที่ผูกกับบัญชี
-    await sbDelete('addresses', { user_id: `eq.${user.id}` });
+    // ลบหรือล้างข้อมูลที่อยู่ส่วนบุคคลที่ผูกกับบัญชี (ที่อยู่ที่เคยใช้ออกออเดอร์ให้ล้างข้อความแทนเพื่อคง FK ของ orders)
+    const userAddresses = await sbList<{ id: string }>('addresses', { user_id: `eq.${user.id}`, select: 'id', limit: '200' });
+    for (const addr of userAddresses) {
+      const usedInOrder = await sbOne<{ id: string }>('orders', {
+        delivery_address_id: `eq.${addr.id}`,
+        select: 'id',
+        limit: '1',
+      });
+      if (usedInOrder) {
+        await sbUpdate('addresses', { id: `eq.${addr.id}` }, {
+          label: 'ที่อยู่ถูกลบ',
+          address_line: 'ข้อมูลถูกลบตามคำขอ PDPA',
+          is_default: false,
+        });
+      } else {
+        await sbDelete('addresses', { id: `eq.${addr.id}` });
+      }
+    }
     await sbDelete('favorite_restaurants', { user_id: `eq.${user.id}` });
     // cart_items เชื่อมผ่าน cart_id (ไม่มี user_id ตรง) — ลบ items ของตะกร้าตัวเองก่อน แล้วค่อยลบ carts
     const carts = await sbList<{ id: string }>('carts', { user_id: `eq.${user.id}`, select: 'id', limit: '10' });
@@ -48,7 +65,9 @@ export async function POST() {
       });
     }
 
-    return Response.json({ data: { ok: true } });
+    const res = Response.json({ data: { ok: true } });
+    res.headers.append('Set-Cookie', clearSessionCookieValue());
+    return res;
   } catch (err) {
     console.error('delete-account error:', err);
     return jsonError('ลบบัญชีไม่สำเร็จ กรุณาติดต่อฝ่ายบริการ', 500);

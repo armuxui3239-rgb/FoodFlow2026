@@ -203,9 +203,9 @@ export default function FoodDetailPage() {
         )}
       </main>
 
-      {/* แถบสั่งล่าง — จำนวน + ราคารวม + เพิ่มลงตะกร้า */}
+      {/* แถบสั่งล่าง — จำนวน + ราคารวม + เพิ่มลงตะกร้า (วางเหนือแถบเมนูล่างของ AppShell) */}
       {data && data.item.isAvailable && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur">
+        <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+3.75rem)] z-30 border-t border-line bg-white/95 px-4 py-3 backdrop-blur md:bottom-0">
           <div className="mx-auto flex w-full max-w-5xl items-center gap-3">
             <div className="flex shrink-0 items-center gap-1 rounded-full bg-neutral-100 px-1" role="group" aria-label="จำนวน">
               <button

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, Bird, Clock, Drumstick, Fish, Flame, MapPin, Pizza, Plus, Salad, Sandwich, Search, SlidersHorizontal, Soup, Sparkles, Star, Utensils } from 'lucide-react';
@@ -92,6 +93,7 @@ function toOfferCard(p: OfferRow, i: number): OfferCard {
 export default function HomePage() {
   const { user } = useSession();
   const { refresh: refreshCart } = useCart();
+  const router = useRouter();
   const t = useTranslations('home');
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [popular, setPopular] = useState<PopularItem[]>([]);
@@ -147,7 +149,7 @@ export default function HomePage() {
       setAdded(itemId);
       setTimeout(() => setAdded(null), 1200);
     } catch {
-      /* 401 → redirect อัตโนมัติ */
+      router.push(`/food/${itemId}`);
     }
   };
 
@@ -169,18 +171,20 @@ export default function HomePage() {
           <h1 className="truncate-1 text-lg font-bold text-black">
             สวัสดี, {firstName}
           </h1>
-          <p className="flex items-center gap-1 text-xs text-neutral-500">
+          <Link href="/addresses" className="flex items-center gap-1 text-xs text-neutral-500 hover:text-black">
             <span className="h-2 w-2 shrink-0 rounded-full bg-[#FFC400] ring-2 ring-black/5" aria-hidden />
             <span className="truncate-1">{t('deliverTo')}</span>
             <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          </p>
+          </Link>
         </div>
       </header>
 
       {/* 2) ค้นหา + ปุ่มกรอง */}
-      <search className="flex items-center gap-3">
+      <search className="flex items-center gap-2">
         <div className="flex h-12 flex-1 items-center gap-2 rounded-full bg-neutral-100 px-4">
-          <Search className="h-5 w-5 shrink-0 text-neutral-400" aria-hidden />
+          <Link href="/search" aria-label="ค้นหาขั้นสูง" className="shrink-0 text-neutral-400 hover:text-black">
+            <Search className="h-5 w-5" aria-hidden />
+          </Link>
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -189,13 +193,13 @@ export default function HomePage() {
             className="h-full w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
           />
         </div>
-        <button
-          type="button"
+        <Link
+          href="/restaurants/filters"
           aria-label={t('filterLabel')}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-black text-[#FFC400] transition-transform active:scale-95"
         >
           <SlidersHorizontal className="h-5 w-5" aria-hidden />
-        </button>
+        </Link>
       </search>
 
       {/* 3) ข้อเสนอพิเศษ — การ์ดโปรโมชั่นเลื่อนได้ (ข้อมูลจริงจากตาราง promotions) */}
@@ -250,7 +254,7 @@ export default function HomePage() {
         <section aria-label={t('recommendedTitle')}>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-bold text-black">{t('recommendedTitle')} <Sparkles className="inline h-4 w-4 text-[#FFC400]" aria-hidden /></h2>
-            <span className="text-xs font-medium text-neutral-400">{t('seeAll')}</span>
+            <Link href="/restaurants" className="text-xs font-medium text-neutral-400 hover:text-black">{t('seeAll')}</Link>
           </div>
           <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
             {popular.slice(0, 8).map((p) => (
@@ -314,7 +318,7 @@ export default function HomePage() {
                       : 'bg-neutral-100 hover:bg-[#FFF4CC]'
                   }`}
                 >
-                  <c.Icon className="h-7 w-7 text-black" aria-hidden />
+                  <c.Icon className={`h-7 w-7 ${active ? 'text-[#FFC400]' : 'text-black'}`} aria-hidden />
                 </button>
                 <span
                   className={`w-full truncate-1 text-center text-[10px] leading-tight ${

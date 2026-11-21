@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import type { Map as MapLibreMap } from 'maplibre-gl';
 import {
   Briefcase,
   ChevronLeft,
@@ -66,6 +67,10 @@ export default function AddressesPage() {
   const [label, setLabel] = useState<string>('บ้าน');
   const [addressLine, setAddressLine] = useState('');
   const [isDefault, setIsDefault] = useState(false);
+  const [coords, setCoords] = useState({ lng: 100.5018, lat: 13.7563 });
+  const [mapReady, setMapReady] = useState(false);
+  const mapDiv = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -101,11 +106,59 @@ export default function AddressesPage() {
     setFormOpen(true);
   };
 
+  useEffect(() => {
+    if (!formOpen) {
+      setMapReady(false);
+      mapRef.current?.remove();
+      mapRef.current = null;
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const maplibregl = await import('maplibre-gl');
+      if (cancelled || !mapDiv.current) return;
+      try {
+        maplibregl.config.WORKER_URL = '/maplibre-gl-worker.mjs';
+      } catch {
+        // ignore worker override failure
+      }
+      const { buildPmtilesStyle, ensurePmtilesProtocol } = await import('@/lib/map-pmtiles');
+      const pmtilesActive = await ensurePmtilesProtocol();
+      const style = pmtilesActive
+        ? buildPmtilesStyle()
+        : new URL('/api/map/style', window.location.origin).toString();
+      const map = new maplibregl.Map({
+        container: mapDiv.current,
+        style,
+        center: [coords.lng, coords.lat],
+        zoom: 14,
+      });
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+      map.on('load', () => !cancelled && setMapReady(true));
+      map.on('moveend', () => {
+        const c = map.getCenter();
+        setCoords({ lng: c.lng, lat: c.lat });
+      });
+      mapRef.current = map;
+    })();
+    return () => {
+      cancelled = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, [formOpen]);
+
   const save = async () => {
     setFormError('');
     setSaving(true);
     try {
-      const payload = JSON.stringify({ label, addressLine, isDefault });
+      const payload = JSON.stringify({
+        label,
+        addressLine,
+        isDefault,
+        lat: coords.lat,
+        lng: coords.lng,
+      });
       if (editing) {
         await api(`/api/addresses/${editing.id}`, { method: 'PATCH', body: payload });
       } else {
@@ -311,6 +364,26 @@ export default function AddressesPage() {
                 className="w-full resize-none rounded-2xl border border-line bg-white p-3 text-sm text-black outline-none placeholder:text-neutral-300 focus:border-black"
               />
               <p className="mt-1 text-[11px] text-neutral-400">อย่างน้อย 10 ตัวอักษร</p>
+            </div>
+
+            {/* ปักหมุดตำแหน่งบนแผนที่ */}
+            <div>
+              <span className="mb-2 block text-xs font-semibold text-neutral-500">
+                ปักหมุดตำแหน่งจัดส่ง ({coords.lat.toFixed(4)}, {coords.lng.toFixed(4)})
+              </span>
+              <div className="relative h-44 w-full overflow-hidden rounded-2xl border border-line bg-neutral-100">
+                <div ref={mapDiv} className="h-full w-full" />
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <span className="-mt-5 flex h-9 w-9 items-center justify-center rounded-full bg-black text-[#FFC400] shadow-md">
+                    <MapPin className="h-5 w-5" aria-hidden />
+                  </span>
+                </div>
+                {!mapReady && (
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/70 text-xs text-neutral-500">
+                    กำลังโหลดแผนที่...
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* ตั้งเป็นค่าเริ่มต้น */}

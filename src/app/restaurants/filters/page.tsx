@@ -201,8 +201,8 @@ function FiltersInner() {
         </section>
       </main>
 
-      {/* แถบล่าง: ล้าง + ใช้ตัวกรอง */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur">
+      {/* แถบล่าง: ล้าง + ใช้ตัวกรอง (วางเหนือแถบเมนูล่างของ AppShell) */}
+      <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+3.75rem)] z-30 border-t border-line bg-white/95 px-4 py-3 backdrop-blur md:bottom-0">
         <div className="mx-auto flex w-full max-w-5xl gap-2">
           <button
             type="button"

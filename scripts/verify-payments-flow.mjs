@@ -107,7 +107,7 @@ async function main() {
   // ---------- 5. สั่งแบบเงินสดปลายทาง ----------
   check('เพิ่มลงตะกร้า (COD)', await addToCart());
   r = await api('/api/orders', { method: 'POST', body: { paymentMethod: 'cash' }, cookie: customerCookie });
-  check('สั่งแบบเงินสดปลายทาง → paid (payments pending)', r.status === 201 && r.json?.order?.status === 'paid' && r.json?.order?.payment_method === 'cash', `HTTP ${r.status} ${JSON.stringify(r.json).slice(0, 120)}`);
+  check('สั่งแบบเงินสดปลายทาง → restaurant_pending (payments pending)', r.status === 201 && r.json?.order?.status === 'restaurant_pending' && r.json?.order?.payment_method === 'cash', `HTTP ${r.status} ${JSON.stringify(r.json).slice(0, 120)}`);
   check('ไม่มีคิวอาร์สำหรับ COD', r.json?.qrImage == null);
 
   // ---------- 6. สั่งแบบพร้อมเพย์ (รอชำระ มีคิวอาร์) ----------

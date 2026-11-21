@@ -41,7 +41,7 @@ export default function CheckoutPage() {
   // วิธีชำระเงิน (เฟส 5.2): กระเป๋าเงิน / เงินสดปลายทาง / พร้อมเพย์ QR
   const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'cash' | 'promptpay'>('promptpay');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
-  const [defaultAddress, setDefaultAddress] = useState<{ label: string; address_line: string } | null>(null);
+  const [defaultAddress, setDefaultAddress] = useState<{ id: string; label: string; address_line: string } | null>(null);
 
   useEffect(() => {
     api<CartData>('/api/cart').then(setData).catch(() => router.replace('/cart'));
@@ -52,8 +52,11 @@ export default function CheckoutPage() {
     api<{ data: { balance: number } }>('/api/wallet')
       .then((r) => setWalletBalance(r.data?.balance ?? 0))
       .catch(() => setWalletBalance(null));
-    api<{ data: { defaultAddress?: { label: string; address_line: string } | null } }>('/api/profile')
-      .then((r) => setDefaultAddress(r.data?.defaultAddress ?? null))
+    api<{ data: { id: string; label: string; address_line: string; is_default: boolean }[] }>('/api/addresses')
+      .then((r) => {
+        const list = r.data ?? [];
+        setDefaultAddress(list.find((a) => a.is_default) ?? list[0] ?? null);
+      })
       .catch(() => setDefaultAddress(null));
   }, []);
 
@@ -117,6 +120,7 @@ export default function CheckoutPage() {
       const res = await api<{ order: { id: string } }>('/api/orders', {
         method: 'POST',
         body: JSON.stringify({
+          addressId: defaultAddress?.id ?? null,
           notes: notes || null,
           couponCode: coupon?.code ?? null,
           paymentMethod,

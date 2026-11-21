@@ -177,7 +177,7 @@ export default function NotificationSettingsPage() {
 
       <p className="flex items-start gap-2 px-1 text-[11px] leading-relaxed text-neutral-400">
         <Bell className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-        การแจ้งเตือนจะส่งผ่านช่องทางพุช (Push) บนอุปกรณ์ของคุณ คุณสามารถเปลี่ยนแปลงได้ทุกเมื่อ
+        การแจ้งเตือนจะแสดงภายในแอป Food Thunder ตามประเภทที่คุณเลือกเปิดไว้
       </p>
     </div>
   );

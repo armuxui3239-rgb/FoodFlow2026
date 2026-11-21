@@ -104,8 +104,11 @@ async function main() {
   const total = r.json?.order?.total;
   check('total เป็นสตางค์ (integer)', Number.isInteger(total) && total > 0, `total=${total}`);
 
-  r = await api(`/api/orders/${orderId}/pay`, { method: 'PATCH', body: {}, cookie: customerCookie });
-  check('PATCH pay (ยืนยันชำระ)', r.status === 200);
+  const custPay = await api(`/api/orders/${orderId}/pay`, { method: 'PATCH', body: {}, cookie: customerCookie });
+  check('customer PATCH pay ถูกกัน (403)', custPay.status === 403, `HTTP ${custPay.status}`);
+  const preAdm = await api('/api/auth/login', { method: 'POST', body: { email: 'admin@foodthunder.co.th', password: 'Food@1234' } });
+  r = await api(`/api/orders/${orderId}/pay`, { method: 'PATCH', body: {}, cookie: preAdm.cookie });
+  check('admin PATCH pay (ยืนยันชำระ)', r.status === 200);
 
   // ---------- 4. เตรียมงานให้ไรเดอร์: ร้านรับ (ถ้าตรงเจ้าของ) หรือ admin เตรียมถึง ready ----------
   console.log('4) เตรียมงาน — ร้านรับ / admin เตรียมถึง ready_for_pickup');

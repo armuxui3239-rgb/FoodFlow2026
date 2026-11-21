@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import { Home, LogOut, MessageCircle, ReceiptText, ShoppingBag, User } from 'lucide-react';
+import { Bell, Home, LogOut, MessageCircle, ReceiptText, ShoppingBag, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCart, useSession } from '@/lib/client';
 import { BrandLogo } from '@/components/brand-logo';
@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
      
   }, [pathname]);
 
-  const AUTH_PREFIXES = ['/login', '/register', '/verify-otp', '/forgot-pin', '/onboarding'];
+  const AUTH_PREFIXES = ['/login', '/register', '/verify-otp', '/forgot-pin', '/onboarding', '/calls/'];
   // portal ของร้านค้า/ไรเดอร์/แอดมิน มี chrome ของตัวเอง (หัวเรื่อง+เมนูย่อยของ portal)
   const PORTAL_PREFIXES = ['/owner', '/driver', '/admin'];
   const hideChrome =
@@ -47,7 +47,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <BrandLogo />
             <span className="hidden truncate-1 text-lg font-bold text-black sm:inline">ฟู๊ด ธันเดอร์</span>
           </Link>
+          <nav aria-label="เมนูหลักบนเดสก์ท็อป" className="hidden items-center gap-1 md:flex">
+            {TABS.map(({ href, labelKey, icon: Icon }) => {
+              const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition-colors ${
+                    active ? 'bg-black text-[#FFC400]' : 'text-neutral-600 hover:bg-neutral-100 hover:text-black'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" aria-hidden />
+                  <span>{t(labelKey)}</span>
+                </Link>
+              );
+            })}
+          </nav>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <Link
+              href="/notifications"
+              aria-label="การแจ้งเตือน"
+              className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-neutral-100"
+            >
+              <Bell className="h-5 w-5 text-black" aria-hidden />
+            </Link>
             <Link
               href="/cart"
               aria-label={`ตะกร้า ${count} รายการ`}
@@ -67,15 +92,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-4">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-4 md:pb-8">{children}</main>
 
-      <footer className="mt-auto border-t border-line bg-white pb-[calc(env(safe-area-inset-bottom)+5.5rem)] pt-4 text-center text-xs text-neutral-400">
+      <footer className="mt-auto border-t border-line bg-white pb-[calc(env(safe-area-inset-bottom)+5.5rem)] pt-4 text-center text-xs text-neutral-400 md:pb-6">
         © {new Date().getFullYear()} ฟู๊ด ธันเดอร์ — สั่งอาหาร ส่งไว ถึงบ้าน
       </footer>
 
       <nav
         aria-label="เมนูหลัก"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
         <div className="mx-auto grid max-w-5xl grid-cols-5">
           {TABS.map(({ href, labelKey, icon: Icon }) => {

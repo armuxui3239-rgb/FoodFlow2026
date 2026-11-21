@@ -3,6 +3,24 @@
 รูปแบบตาม [Keep a Changelog](https://keepachangelog.com/th/1.1.0/)
 และกำหนดเวอร์ชันตาม [Semantic Versioning](https://semver.org/lang/th/)
 
+## [0.7.6] — 2026-11-21 (ปิดช่องโหว่ความปลอดภัย/การเงินฝั่งลูกค้า + เชื่อม Flow & Mobile Layout + ผ่าน E2E 136/136)
+
+### แก้ไขด้านความปลอดภัยและการเงิน (Fixed — Security & Integrity)
+- **ลืม PIN (`api/auth/onboard/pin`)**: ตรวจสิทธิ์คำขอ `approved` ใน `password_reset_tokens` **ก่อน** เขียนทับ `password_hash` และอัปเดต `session_version` เพื่อเพิกถอน session เก่า
+- **ประตูตรวจสอบ Session (`src/proxy.ts`)**: ตรวจลายเซ็น HMAC ด้วย `parseSession()` แทนการอ่าน JSON จากคุกกี้โดยตรง
+- **ปิดช่องโหว่ IDOR (`api/cart/items/[id]`, `api/orders`)**: ตรวจความเป็นเจ้าของ `cart_id` และ `addressId` ทุกครั้ง
+- **ชำระเงิน PromptPay / COD / คืนเงิน (`api/orders/[id]/pay`, `api/orders`, `api/orders/[id]/refund-request`, `orders/[id]/page.tsx`)**: จำกัดสิทธิ์ยืนยันจ่าย PromptPay เฉพาะ `admin`, แยกสถานะเริ่มต้นของ COD เป็น `restaurant_pending`, อนุญาตขอคืนเงินเฉพาะ `payments.status = completed` และนำปุ่มแจ้งชำระเงินเองออกจากหน้าลูกค้า
+- **คำนวณยอด Wallet และแต้มสะสม (`src/lib/wallet.ts`, `api/wallet`, `api/orders`, `api/points`)**: เปลี่ยนมาแบ่งหน้ารวมยอดทั้งหมด (ไม่ตัดยอดที่ 50 รายการ) และใช้ `currentUser()` ตรวจ `session_version`
+- **ลบซากโค้ด SMS เก่า (`src/lib/verification.ts`, `api/auth/otp/send`)**: เอา `smsGatewaySelfHostedDelivery` และข้อความ `"ส่ง SMS ไม่สำเร็จ"` ออกให้ตรงกับระบบ `internal_code` 100%
+
+### แก้ไขการทำงานจริงและ Mobile UX (Fixed — Business Flows & Layout)
+- **ตัวเลือกอาหาร & ตะกร้า (`api/orders`, `api/cart`, `/`)**: คัดลอก `selected_options` ลง `order_items`, บังคับตรวจท็อปปิ้งบังคับ+ร้านเปิดใน `POST /api/cart` และพาไป `/food/[id]` เมื่อกด `+` บนเมนูที่มีท็อปปิ้งบังคับ
+- **คูปอง & ที่อยู่เช็กเอาต์ (`src/lib/promotion.ts`, `checkout/page.tsx`)**: ตรวจประวัติออเดอร์จริงสำหรับ `first_order_only` และซิงค์ที่อยู่เริ่มต้นใน `/checkout` กับ `/addresses`
+- **เปลี่ยน PIN / ลบที่อยู่ / ลบบัญชี / ปักหมุดแผนที่**: เปลี่ยนสถานะ PIN เดิมผิดใน `change-pin` เป็น `400` (ไม่เด้งออก `/login`), กันลบที่อยู่ที่ติด FK ออเดอร์ (`409`), อัปเดต `delete-account` ให้ล้างข้อมูลที่อยู่ติด FK + ล้างคุกกี้ session, และเพิ่มแผนที่ MapLibre/OSM ใน `/addresses`
+- **เชื่อมปุ่ม/หน้ากำพร้า & ลบปุ่มจำลอง**: เอาปุ่มจำลองจ่ายเงินออกจาก `/wallet/topup`, เชื่อมลิงก์หน้า `/` (`/addresses`, `/restaurants/filters`, `/restaurants`, `/search`), เชื่อม `/orders/[id]` → `/tracking`, `/map`, `/rate`, เพิ่มไอคอน `/notifications` บน `AppShell` และ `/settings` ใน `/profile`
+- **Layout มือถือ & Dark mode**: ขยับแถบปุ่มล่างใน `/restaurants/filters` และ `/food/[id]` ให้อยู่เหนือเมนูล่าง, ซ่อน `AppShell` ใน `/calls/[room]`, แก้สีฟองแชท Dark mode ใน `/messages/[id]`, และอัปเดต FAQ `/help` + คำอธิบาย `/settings/notifications`
+- **ชุดทดสอบ E2E (`scripts/qa-smoke.mjs`, `verify-payments-flow.mjs`, `verify-refund-flow.mjs`)**: อัปเดตสคริปต์ให้ตรงกฎความปลอดภัยใหม่และรันผ่านครบทั้ง 6 ชุด (**136 / 136 จุดตรวจ**) พร้อม `tsc`, `eslint`, `next build`, และเบราว์เซอร์มือถือ `375x812`
+
 ## [0.7.5] — 2026-11-16 (PWA มาตรฐาน + แก้บั๊กโปรไฟล์/สมัครสมาชิก + i18n สองภาษา + นำการ์ดเหลือง OTP ออก)
 
 ### เพิ่ม (Added)

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { parseSession, SESSION_COOKIE } from '@/lib/session';
 
 /**
  * ประตูกันผู้เยี่ยมชม (Guest Gate) + ความปลอดภัย API — ตามมาตรฐานแอปสั่งอาหารระดับโลก
@@ -71,30 +72,27 @@ export function proxy(request: NextRequest) {
     ['/driver', 'driver', '/driver'],
     ['/admin', 'admin', '/admin'],
   ];
-  const sessionCookie = request.cookies.get('ft_session')?.value;
+  const sessionCookie = request.cookies.get(SESSION_COOKIE)?.value;
+  const session = parseSession(sessionCookie);
 
-  if (sessionCookie) {
+  if (session) {
     const gate = ROLE_GATES.find(([p]) => pathname === p || pathname.startsWith(`${p}/`));
     if (gate) {
-      let role: string | undefined;
-      try {
-        const [payload] = sessionCookie.split('.');
-        role = (JSON.parse(Buffer.from(payload, 'base64url').toString()) as { role?: string }).role;
-      } catch {
-        role = undefined;
-      }
       // มี session แต่บทบาทไม่ตรง → พาไป portal ของบทบาทตัวเอง (ลูกค้า → หน้าแรก)
-      if (role && role !== gate[1]) {
+      if (session.role !== gate[1]) {
         const url = request.nextUrl.clone();
-        url.pathname = role === 'restaurant' ? '/owner' : role === 'driver' ? '/driver' : role === 'admin' ? '/admin' : '/';
+        url.pathname =
+          session.role === 'restaurant'
+            ? '/owner'
+            : session.role === 'driver'
+              ? '/driver'
+              : session.role === 'admin'
+                ? '/admin'
+                : '/';
         url.search = '';
         return NextResponse.redirect(url);
       }
     }
-  }
-
-  // มี session → ผ่านทุกหน้า
-  if (sessionCookie) {
     return NextResponse.next();
   }
 

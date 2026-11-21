@@ -45,11 +45,42 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: weak }, { status: 400 });
     }
 
+    // ตรวจสิทธิ์คำขอลืม PIN ก่อนเขียนข้อมูลลงฐานข้อมูลเสมอ
+    let approvedTokenId: string | null = null;
+    if (flow.purpose !== 'register') {
+      const approved = await sbOne<{ id: string }>('password_reset_tokens', {
+        user_id: `eq.${flow.userId}`,
+        status: 'eq.approved',
+        used_at: 'is.null',
+        expires_at: `gte.${new Date().toISOString()}`,
+        select: 'id',
+      });
+      if (!approved) {
+        return Response.json(
+          { error: 'คำขอรีเซ็ต PIN ยังไม่ได้รับอนุมัติจากผู้ดูแลระบบ' },
+          { status: 403 },
+        );
+      }
+      approvedTokenId = approved.id;
+    }
+
+    const dbUser = await sbOne<{ id: string; session_version: number }>('users', {
+      id: `eq.${flow.userId}`,
+      select: 'id,session_version',
+    });
+    if (!dbUser) {
+      return Response.json({ error: 'ไม่พบบัญชีผู้ใช้' }, { status: 404 });
+    }
+
     // bcrypt cost 12 + เก็บ hash หลักที่ users.password_hash (v4 ข้อ 4.2) — preferences เก็บคู่ไว้เพื่อบัญชีเดิม
     const pin_hash = bcrypt.hashSync(pin, 12);
     const pin_set_at = new Date().toISOString();
+    const nextVer = flow.purpose === 'register' ? (dbUser.session_version ?? 0) : (dbUser.session_version ?? 0) + 1;
+
     await sbUpdate('users', { id: `eq.${flow.userId}` }, {
       password_hash: pin_hash,
+      session_version: nextVer,
+      ...(flow.purpose === 'register' ? { is_active: true } : {}),
       updated_at: pin_set_at,
     });
     const prefs: PinPrefs = {
@@ -69,29 +100,10 @@ export async function POST(req: NextRequest) {
     }
 
     let redirect = '/onboarding/biometric';
-    if (flow.purpose === 'register') {
-      await sbUpdate('users', { id: `eq.${flow.userId}` }, {
-        is_active: true,
-        updated_at: new Date().toISOString(),
-      });
-    } else {
-      // ลืม PIN (v4 ข้อ 4.5): ต้องมีคำขอที่แอดมินอนุมัติแล้ว — และปิดการใช้คำขอหลังตั้ง PIN สำเร็จ
-      const approved = await sbOne<{ id: string }>('password_reset_tokens', {
-        user_id: `eq.${flow.userId}`,
-        status: 'eq.approved',
-        used_at: 'is.null',
-        expires_at: `gte.${new Date().toISOString()}`,
-        select: 'id',
-      });
-      if (!approved) {
-        return Response.json(
-          { error: 'คำขอรีเซ็ต PIN ยังไม่ได้รับอนุมัติจากผู้ดูแลระบบ' },
-          { status: 403 },
-        );
-      }
+    if (flow.purpose !== 'register' && approvedTokenId) {
       await sbUpdate(
         'password_reset_tokens',
-        { user_id: `eq.${flow.userId}`, status: 'eq.approved', used_at: 'is.null' },
+        { id: `eq.${approvedTokenId}`, status: 'eq.approved', used_at: 'is.null' },
         { used_at: new Date().toISOString(), status: 'used' },
       );
       redirect = '/';
@@ -102,7 +114,7 @@ export async function POST(req: NextRequest) {
       email: flow.email,
       role: 'customer',
       fullName: flow.fullName,
-      ver: 0, // บัญชีใหม่ — session_version เริ่มที่ 0
+      ver: nextVer,
     };
     const res = Response.json({ ok: true, next: redirect });
     res.headers.append('Set-Cookie', sessionCookieValue(serializeSession(session)));
