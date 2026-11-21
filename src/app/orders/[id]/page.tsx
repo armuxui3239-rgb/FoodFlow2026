@@ -9,6 +9,7 @@ import { api, baht, STATUS_COLOR, STATUS_TH, useSession } from '@/lib/client';
 import { useOrderChat, type ChatMessage } from '@/lib/realtime';
 import { sendRejectedToRoom, useIncomingRing } from '@/lib/calls';
 import { CallButton } from '@/components/call-button';
+import { soundEngine } from '@/lib/sound/engine';
 
 interface Order {
   id: string;
@@ -89,6 +90,29 @@ export default function OrderDetailPage() {
   // กริ่งสายเรียกเข้า (ระบบโทรจบในระบบ) — ลูกค้าฟังช่อง ring ส่วนตัวเฉพาะระหว่างเปิดหน้าออเดอร์
   // (ยอมรับข้อจำกัด: รับสายได้เมื่อกำลังเปิดหน้าออเดอร์บางหน้าอยู่เท่านั้น)
   const incomingCall = useIncomingRing(true);
+  const prevOrderStatusRef = useRef<string | null>(null);
+  const prevRingRoomRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const room = incomingCall?.room ?? null;
+    if (room && room !== prevRingRoomRef.current) {
+      void soundEngine.playPreset('call-ring');
+    }
+    prevRingRoomRef.current = room;
+  }, [incomingCall]);
+
+  useEffect(() => {
+    const status = order?.status ?? null;
+    if (!status) return;
+    if (
+      prevOrderStatusRef.current &&
+      prevOrderStatusRef.current !== status &&
+      (status === 'ready_for_pickup' || status === 'delivering' || status === 'delivered')
+    ) {
+      void soundEngine.playPreset('order-ready');
+    }
+    prevOrderStatusRef.current = status;
+  }, [order?.status]);
 
   const acceptCall = () => {
     if (!incomingCall) return;

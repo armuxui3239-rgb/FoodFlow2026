@@ -1,8 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { soundEngine } from '@/lib/sound/engine';
+import { useNewItemSound } from '@/lib/sound/use-new-item-sound';
+import { PwaInstallBanner } from '@/components/pwa-install-banner';
 import {
   Bell,
   ChevronRight,
@@ -124,13 +127,21 @@ export default function DriverPortalPage() {
 
   useEffect(loadDispatch, [loadDispatch, tick]);
 
+  const incomingJobIds = useMemo(
+    () => [...available.map((j) => j.id), ...offers.map((o) => o.id)],
+    [available, offers],
+  );
+  useNewItemSound(incomingJobIds, 'order-new', !loading);
+
   const answerDispatch = async (offerId: string, action: 'accept' | 'reject') => {
     setBusy(true);
     setError('');
     try {
       await api(`/api/driver/dispatch/${offerId}`, { method: 'POST', body: JSON.stringify({ action }) });
+      void soundEngine.playPreset('ui-success');
       setTick((x) => x + 1);
     } catch (e) {
+      void soundEngine.playPreset('ui-error');
       setError((e as Error).message);
     } finally {
       setBusy(false);
@@ -142,8 +153,10 @@ export default function DriverPortalPage() {
     setError('');
     try {
       await api('/api/driver/me', { method: 'PATCH', body: JSON.stringify({ isOnline: next }) });
+      void soundEngine.playPreset('ui-tap');
       setMe((m) => (m ? { ...m, driver: { ...m.driver, is_online: next } } : m));
     } catch (e) {
+      void soundEngine.playPreset('ui-error');
       setError((e as Error).message);
     } finally {
       setBusy(false);
@@ -210,6 +223,7 @@ export default function DriverPortalPage() {
       <DriverHeader />
 
       <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">
+        <PwaInstallBanner />
         {error && (
           <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}

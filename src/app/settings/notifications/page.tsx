@@ -14,6 +14,10 @@ import {
   Volume2,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { SoundMixerPanel } from '@/components/sound/sound-mixer-panel';
+import { PwaInstallGuideDialog } from '@/components/pwa-install-guide-dialog';
+import { soundEngine } from '@/lib/sound/engine';
+import { useSoundStore } from '@/lib/sound/store';
 import { api } from '@/lib/client';
 
 interface NotificationSetting {
@@ -31,6 +35,8 @@ const DISPLAY: { key: string; titleKey: string; Icon: typeof Bell }[] = [
 
 export default function NotificationSettingsPage() {
   const t = useTranslations('notificationSettings');
+  const soundEnabled = useSoundStore((s) => s.enabled);
+  const setSoundEnabled = useSoundStore((s) => s.setEnabled);
   const [settings, setSettings] = useState<NotificationSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -148,31 +154,46 @@ export default function NotificationSettingsPage() {
         </div>
       </section>
 
-      {/* กลุ่มเพิ่มเติม — ยังไม่เปิดใช้งาน */}
-      <section aria-label={t('other')}>
+      {/* กลุ่มเสียงและตัวเลือกเพิ่มเติม */}
+      <section aria-label={t('other')} className="space-y-3">
         <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">
           {t('other')}
         </h2>
         <div className="overflow-hidden rounded-3xl border border-line bg-white">
-          {[
-            { title: t('sound'), Icon: Volume2 },
-            { title: t('vibrate'), Icon: Vibrate },
-          ].map(({ title, Icon }, i) => (
-            <div
-              key={title}
-              className={`flex items-center gap-3 px-4 py-4 opacity-70 ${i > 0 ? 'border-t border-line' : ''}`}
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100">
-                <Icon className="h-4.5 w-4.5 text-neutral-400" aria-hidden />
-              </span>
-              <span className="flex-1 text-sm font-medium text-neutral-400">{title}</span>
-              <span className="shrink-0 whitespace-nowrap rounded-full bg-[#FFF4CC] px-2 py-0.5 text-[10px] font-bold text-black">
-                {t('notEnabled')}
-              </span>
-              <Switch disabled aria-label={`${title} (ยังไม่เปิดใช้งาน)`} className="data-[state=unchecked]:bg-neutral-200" />
-            </div>
-          ))}
+          <div className="flex items-center gap-3 px-4 py-4">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#FFF4CC]">
+              <Volume2 className="h-4.5 w-4.5 text-black" aria-hidden />
+            </span>
+            <span className="flex-1 text-sm font-medium text-black">{t('sound')}</span>
+            <Switch
+              checked={soundEnabled}
+              onCheckedChange={(checked) => {
+                setSoundEnabled(checked);
+                if (checked) {
+                  void soundEngine.unlock().then((ok) => {
+                    if (ok) void soundEngine.playPreset('ui-success');
+                  });
+                }
+              }}
+              aria-label={t('sound')}
+              className="data-[state=checked]:bg-black data-[state=unchecked]:bg-neutral-200"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 border-t border-line px-4 py-4 opacity-70">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100">
+              <Vibrate className="h-4.5 w-4.5 text-neutral-400" aria-hidden />
+            </span>
+            <span className="flex-1 text-sm font-medium text-neutral-400">{t('vibrate')}</span>
+            <span className="shrink-0 whitespace-nowrap rounded-full bg-[#FFF4CC] px-2 py-0.5 text-[10px] font-bold text-black">
+              {t('notEnabled')}
+            </span>
+            <Switch disabled aria-label={`${t('vibrate')} (ยังไม่เปิดใช้งาน)`} className="data-[state=unchecked]:bg-neutral-200" />
+          </div>
         </div>
+
+        <SoundMixerPanel />
+        <PwaInstallGuideDialog />
       </section>
 
       <p className="flex items-start gap-2 px-1 text-[11px] leading-relaxed text-neutral-400">

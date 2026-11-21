@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, Bird, Clock, Drumstick, Fish, Flame, MapPin, Pizza, Plus, Salad, Sandwich, Search, SlidersHorizontal, Soup, Sparkles, Star, Utensils } from 'lucide-react';
 import { BrandLogo } from '@/components/brand-logo';
+import { PwaInstallBanner } from '@/components/pwa-install-banner';
 import type { LucideIcon } from 'lucide-react';
 // ไอคอนทั้งหมดมาจากไฟล์ SVG (lucide-react) ห้ามใช้อีโมจิ
 import { api, baht, useCart, useSession } from '@/lib/client';
@@ -201,6 +202,9 @@ export default function HomePage() {
           <SlidersHorizontal className="h-5 w-5" aria-hidden />
         </Link>
       </search>
+
+      {/* แนะนำติดตั้งแอปลงมือถือ/พีซี */}
+      <PwaInstallBanner />
 
       {/* 3) ข้อเสนอพิเศษ — การ์ดโปรโมชั่นเลื่อนได้ (ข้อมูลจริงจากตาราง promotions) */}
       {offers.length > 0 ? (

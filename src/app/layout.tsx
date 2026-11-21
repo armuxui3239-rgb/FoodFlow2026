@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { Prompt } from 'next/font/google';
 import { AppShell } from '@/components/app-shell';
 import { PwaRegister } from '@/components/pwa-register';
+import { AudioUnlockBanner } from '@/components/sound/audio-unlock-banner';
 import thMessages from '@/messages/th.json';
 import enMessages from '@/messages/en.json';
 import './globals.css';
@@ -60,6 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <PwaRegister />
         <NextIntlClientProvider locale={locale} messages={MESSAGES[locale]}>
           <AppShell>{children}</AppShell>
+          <AudioUnlockBanner />
         </NextIntlClientProvider>
       </body>
     </html>

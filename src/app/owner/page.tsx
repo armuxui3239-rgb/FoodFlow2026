@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { api, baht, STATUS_TH } from '@/lib/client';
 import { OwnerFooter, OwnerHeader } from '@/components/portal/owner-header';
+import { PwaInstallBanner } from '@/components/pwa-install-banner';
 
 interface OwnerMe {
   restaurant: { id: string; name: string; isOpen: boolean };
@@ -93,6 +94,7 @@ export default function OwnerPortalPage() {
       <OwnerHeader />
 
       <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-5">
+        <PwaInstallBanner />
         {error && (
           <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}

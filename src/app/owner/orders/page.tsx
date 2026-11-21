@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ChefHat, CheckCircle2, Clock, Inbox, Package, RefreshCw, Store } from 'lucide-react';
 import { api, baht, STATUS_TH, useSession } from '@/lib/client';
+import { soundEngine } from '@/lib/sound/engine';
+import { useNewItemSound } from '@/lib/sound/use-new-item-sound';
 
 interface OrderItem {
   name_snapshot: string;
@@ -63,13 +65,21 @@ export default function OwnerOrderBoardPage() {
     return () => clearInterval(t);
   }, []);
 
+  const newOrderIds = useMemo(
+    () => orders.filter((o) => o.status === 'paid').map((o) => o.id),
+    [orders],
+  );
+  useNewItemSound(newOrderIds, 'order-new', !loading);
+
   const act = async (orderId: string, action: string) => {
     setBusyId(orderId);
     setError('');
     try {
       await api(`/api/owner/orders/${orderId}`, { method: 'PATCH', body: JSON.stringify({ action }) });
+      void soundEngine.playPreset('ui-success');
       setTick((x) => x + 1);
     } catch (e) {
+      void soundEngine.playPreset('ui-error');
       setError((e as Error).message);
     } finally {
       setBusyId(null);
