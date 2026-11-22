@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, Bird, Clock, Drumstick, Fish, Flame, MapPin, Pizza, Plus, Salad, Sandwich, Search, SlidersHorizontal, Soup, Sparkles, Star, Utensils } from 'lucide-react';
 import { BrandLogo } from '@/components/brand-logo';
@@ -133,6 +133,25 @@ export default function HomePage() {
       .catch(() => setOffers([]));
   }, []);
 
+  // เลื่อนการ์ดโปรโมชั่นอัตโนมัติทุก 5 วินาที (สั่งโดยเจ้าของ 2026-11-22) — พอถึงใบสุดท้ายวนกลับใบแรก
+  const offersRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (offers.length < 2) return;
+    const t = setInterval(() => {
+      const el = offersRef.current;
+      if (!el) return;
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+        return;
+      }
+      const card = el.querySelector('article');
+      const step = card ? card.getBoundingClientRect().width + 12 : el.clientWidth; // gap-3 = 12px
+      el.scrollBy({ left: step, behavior: 'smooth' });
+    }, 5000);
+    return () => clearInterval(t);
+  }, [offers.length]);
+
   const shown = useMemo(
     () => (activeCat ? restaurants.filter((r) => r.cuisine_types?.includes(activeCat)) : restaurants),
     [restaurants, activeCat],
@@ -213,7 +232,7 @@ export default function HomePage() {
           <h2 className="text-base font-bold text-black">{t('offersTitle')} <Flame className="inline h-4 w-4 text-[#FFC400]" aria-hidden /></h2>
           <Link href="/offers" className="text-xs font-medium text-neutral-400">{t('seeAll')}</Link>
         </div>
-        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
+        <div ref={offersRef} className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
           {offers.map((o) => (
             <article
               key={o.code}
