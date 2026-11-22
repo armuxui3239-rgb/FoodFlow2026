@@ -1,7 +1,7 @@
 # ผังหน้าใช้งานทั้งระบบ (Page Map) — ฟู๊ด ธันเดอร์ FoodFlow2026
 
 > หลักการ: ทุกหน้าต้อง "พร้อมใช้งานจริง" — ผูก API/ฐานข้อมูลจริง ไม่มีหน้าโชว์
-> อัปเดต 2026-11-14 (บัญชีธนาคารร้าน + โอนรายได้ร้าน): นับจากไฟล์จริง `find src/app -name page.tsx` = **109 หน้า** + 139 API routes (เพิ่มจาก 0.7.2: บัญชีธนาคารร้าน / โอนรายได้ร้าน / ประวัติโอนร้าน)
+> อัปเดต 2026-11-22 (v0.7.7): นับจากไฟล์จริง `find src/app -name page.tsx` = **109 หน้า** + 140 API routes (เพิ่มจาก 0.7.5: อัปโหลดรูปโปรไฟล์ /api/profile/avatar)
 > ยืนยันครบเทียบแม่แบบต้นทาง 122 จอ (web 70 + mobile 52) — ทุกจอมีของเทียบเท่า (บางจอรวมเป็นหน้าเดียว เช่น login รวมศูนย์, chat→messages, vouchers→offers, loyalty→points)
 > แหล่งอ้างอิง: `_template-ref/FoodDelivery_App` (โอเพนซอร์ส MIT)
 
@@ -17,7 +17,7 @@
 | ร้านทั้งหมด + ร้านเดี่ยว + ตัวกรอง + ค้นหา | /restaurants · /restaurants/[id] · /restaurants/filters · /search | ✅ |
 | รายละเอียดเมนู + ตัวเลือก (ขนาด/ท็อปปิ้ง) | /food/[id] | ✅ |
 | ตะกร้า → ชำระเงิน PromptPay (คูปอง) | /cart · /checkout | ✅ |
-| ออเดอร์ / รายออเดอร์ / ติดตาม / แผนที่ / รีวิว | /orders · /orders/[id] · /tracking · /map · /rate | ✅ |
+| ออเดอร์ / รายออเดอร์ / ติดตาม / แผนที่ / รีวิว | /orders · /orders/[id] · /orders/[id]/tracking · /orders/[id]/map · /orders/[id]/rate | ✅ |
 | ทิปไรเดอร์ | ใน /orders/[id] (delivered/completed) | ✅ |
 | กระเป๋าเงิน + เติมเงิน | /wallet · /wallet/topup | ✅ |
 | แต้มสะสม / ข้อเสนอ / เชิญเพื่อน | /points · /offers · /invite | ✅ |
