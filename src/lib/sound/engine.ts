@@ -54,10 +54,6 @@ class SoundEngine {
   private compressor: DynamicsCompressorNode | null = null;
   private channels: Partial<Record<SoundChannel, GainNode>> = {};
   private unsubscribeStore: (() => void) | null = null;
-  private workletLoaded = false;
-  private workletLoading: Promise<boolean> | null = null;
-  private callSource: MediaStreamAudioSourceNode | null = null;
-  private callWorklet: AudioWorkletNode | null = null;
 
   private getAudioContextCtor(): typeof AudioContext | null {
     if (typeof window === 'undefined') return null;
@@ -226,80 +222,8 @@ class SoundEngine {
     return true;
   }
 
-  private async ensureWorklet(ctx: AudioContext): Promise<boolean> {
-    if (this.workletLoaded) return true;
-    if (!ctx.audioWorklet) return false;
-    if (!this.workletLoading) {
-      this.workletLoading = ctx.audioWorklet
-        .addModule('/worklets/dsp-processor.js')
-        .then(() => {
-          this.workletLoaded = true;
-          return true;
-        })
-        .catch(() => false)
-        .finally(() => {
-          this.workletLoading = null;
-        });
-    }
-    return this.workletLoading;
-  }
-
-  /** เชื่อม MediaStream จากสายโทร WebRTC ผ่าน Custom AudioWorklet DSP เข้าช่อง call */
-  async attachCallStream(stream: MediaStream): Promise<boolean> {
-    if (stream.getAudioTracks().length === 0) return false;
-
-    this.detachCallStream();
-    const ctx = this.ensureGraph();
-    const callChannel = this.channels.call;
-    if (!ctx || !callChannel) return false;
-
-    if (ctx.state !== 'running') {
-      await this.unlock();
-    }
-
-    const source = ctx.createMediaStreamSource(stream);
-    const hasWorklet = await this.ensureWorklet(ctx);
-
-    if (hasWorklet) {
-      try {
-        const worklet = new AudioWorkletNode(ctx, 'foodflow-dsp-processor');
-        source.connect(worklet);
-        worklet.connect(callChannel);
-        this.callSource = source;
-        this.callWorklet = worklet;
-        return true;
-      } catch {
-        // Fallback สู่ GainNode ปกติหากสร้าง AudioWorkletNode ไม่สำเร็จ
-      }
-    }
-
-    source.connect(callChannel);
-    this.callSource = source;
-    return true;
-  }
-
-  /** ตัดการเชื่อมต่อและคืนทรัพยากรของสายโทร WebRTC */
-  detachCallStream(): void {
-    if (this.callWorklet) {
-      try {
-        this.callWorklet.port.postMessage({ type: 'stop' });
-      } catch {
-        /* ignore if port already closed */
-      }
-      this.callWorklet.disconnect();
-      this.callWorklet = null;
-    }
-    if (this.callSource) {
-      this.callSource.disconnect();
-      this.callSource = null;
-    }
-  }
-
   /** ตัดการเชื่อมต่อ Node ทั้งหมดและปิด AudioContext เพื่อป้องกัน Memory Leak */
   async dispose(): Promise<void> {
-    this.detachCallStream();
-    this.workletLoaded = false;
-    this.workletLoading = null;
     if (this.unsubscribeStore) {
       this.unsubscribeStore();
       this.unsubscribeStore = null;

@@ -1,12 +1,11 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ArrowLeft, Mic, MicOff, PhoneOff, UserRound, Video, VideoOff } from 'lucide-react';
 import { useSession } from '@/lib/client';
 import { CALL_STATUS_TH, useCall, type CallStatus } from '@/lib/calls';
-import { soundEngine } from '@/lib/sound/engine';
 
 /**
  * หน้าสายโทร (จบในระบบ) — สื่อเสียง/ภาพวิ่ง P2P ผ่าน WebRTC ล้วน ๆ ไม่มีเซิร์ฟเวอร์กลาง
@@ -43,26 +42,9 @@ function CallScreenInner() {
 
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
-  const [dspActive, setDspActive] = useState(false);
 
   useEffect(() => {
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = call.remoteStream;
-    let cancelled = false;
-
-    if (call.remoteStream) {
-      void soundEngine.attachCallStream(call.remoteStream).then((ok) => {
-        if (!cancelled) setDspActive(ok);
-      });
-    } else {
-      soundEngine.detachCallStream();
-      setDspActive(false);
-    }
-
-    return () => {
-      cancelled = true;
-      soundEngine.detachCallStream();
-      setDspActive(false);
-    };
   }, [call.remoteStream]);
   useEffect(() => {
     if (localVideoRef.current) localVideoRef.current.srcObject = call.localStream;
@@ -87,7 +69,7 @@ function CallScreenInner() {
       <main className="relative mx-auto flex w-full max-w-3xl flex-1 items-center justify-center px-4">
         <div className="relative aspect-[3/4] max-h-[70vh] w-full overflow-hidden rounded-3xl bg-neutral-900">
           {call.remoteStream && (
-            <video ref={remoteVideoRef} autoPlay playsInline muted={dspActive} className="h-full w-full object-cover" />
+            <video ref={remoteVideoRef} autoPlay playsInline className="h-full w-full object-cover" />
           )}
           {!call.remoteStream && (
             <div className="flex h-full flex-col items-center justify-center gap-3 text-neutral-500">

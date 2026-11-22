@@ -14,8 +14,6 @@ import {
   Volume2,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import { SoundMixerPanel } from '@/components/sound/sound-mixer-panel';
-import { PwaInstallGuideDialog } from '@/components/pwa-install-guide-dialog';
 import { soundEngine } from '@/lib/sound/engine';
 import { useSoundStore } from '@/lib/sound/store';
 import { api } from '@/lib/client';
@@ -191,9 +189,6 @@ export default function NotificationSettingsPage() {
             <Switch disabled aria-label={`${t('vibrate')} (ยังไม่เปิดใช้งาน)`} className="data-[state=unchecked]:bg-neutral-200" />
           </div>
         </div>
-
-        <SoundMixerPanel />
-        <PwaInstallGuideDialog />
       </section>
 
       <p className="flex items-start gap-2 px-1 text-[11px] leading-relaxed text-neutral-400">
