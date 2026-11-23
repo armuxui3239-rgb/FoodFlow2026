@@ -186,7 +186,7 @@ function HelpCenterContent() {
             aria-selected={tab === key}
             data-testid={`help-tab-${key}`}
             onClick={() => setTab(key)}
-            className={`flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full text-sm font-semibold transition-colors ${
+            className={`flex h-11 flex-1 items-center justify-center gap-1.5 truncate-1 rounded-full text-sm font-semibold transition-colors ${
               tab === key ? 'bg-black text-[#FFC400]' : 'text-neutral-500 hover:text-black'
             }`}
           >

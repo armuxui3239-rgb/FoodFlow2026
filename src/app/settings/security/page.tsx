@@ -265,7 +265,7 @@ export default function SecuritySettingsPage() {
           onClick={() => void deleteAccount()}
           disabled={deleting}
           data-testid="delete-account"
-          className="h-11 w-full rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+          className="h-11 w-full truncate-1 rounded-full border border-red-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
         >
           {deleting ? 'กำลังลบบัญชี…' : 'ลบบัญชีของฉัน'}
         </button>

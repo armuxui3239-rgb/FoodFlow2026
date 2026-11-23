@@ -183,7 +183,7 @@ export default function WalletTopupPage() {
           )}
           <label
             htmlFor="topup-slip-input"
-            className="flex h-11 cursor-pointer items-center justify-center rounded-full border border-line bg-white text-sm font-semibold text-black hover:bg-neutral-50"
+            className="flex h-11 cursor-pointer items-center justify-center truncate-1 rounded-full border border-line bg-white text-sm font-semibold text-black hover:bg-neutral-50"
           >
             {slipFile ? 'เลือกไฟล์อื่น' : 'เลือกไฟล์สลิป (PNG/JPG/WEBP)'}
           </label>
@@ -309,7 +309,7 @@ export default function WalletTopupPage() {
                   setError('');
                 }}
                 aria-pressed={selected}
-                className={`h-11 rounded-2xl border text-sm font-bold tabular-nums transition-colors ${
+                className={`h-11 truncate-1 rounded-2xl border text-sm font-bold tabular-nums transition-colors ${
                   selected
                     ? 'border-black bg-[#FFF4CC] text-black'
                     : 'border-line bg-white text-black hover:border-neutral-300'

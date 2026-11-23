@@ -195,7 +195,7 @@ export default function SearchPage() {
                 <button
                   type="button"
                   onClick={clearRecent}
-                  className="flex h-11 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-neutral-400 transition-colors hover:text-black"
+                  className="flex h-11 items-center gap-1.5 truncate-1 rounded-full px-3 text-xs font-semibold text-neutral-400 transition-colors hover:text-black"
                 >
                   <Trash2 className="h-4 w-4" aria-hidden />
                   ลบทั้งหมด
@@ -237,7 +237,7 @@ export default function SearchPage() {
                   key={s}
                   type="button"
                   onClick={() => setTerm(s)}
-                  className="flex h-11 items-center gap-1.5 rounded-full border border-line bg-white px-4 text-sm font-medium text-neutral-700 transition-colors hover:bg-[#FFF4CC]"
+                  className="flex h-11 items-center gap-1.5 truncate-1 rounded-full border border-line bg-white px-4 text-sm font-medium text-neutral-700 transition-colors hover:bg-[#FFF4CC]"
                 >
                   <Soup className="h-4 w-4 shrink-0 text-[#FFC400]" aria-hidden />
                   {s}
