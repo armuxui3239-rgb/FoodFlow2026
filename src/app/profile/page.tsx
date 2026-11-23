@@ -159,10 +159,10 @@ export default function ProfilePage() {
               <span className="ml-1.5 text-sm font-normal text-neutral-400">({profile.nickname})</span>
             ) : null}
           </h1>
-          <p className="flex items-center gap-1.5 text-xs text-neutral-400">
+          <p className="flex items-center gap-1.5 truncate-1 text-xs text-neutral-400">
             {displayPhone(profile?.phone ?? null)}
             {profile?.phoneVerified && (
-              <span className="inline-flex items-center rounded-full bg-[#FFF4CC] px-1.5 py-0.5 text-[10px] font-bold text-black">
+              <span className="inline-flex shrink-0 items-center rounded-full bg-[#FFF4CC] px-1.5 py-0.5 text-[10px] font-bold text-black">
                 {tCommon('verified')}
               </span>
             )}
@@ -207,8 +207,8 @@ export default function ProfilePage() {
             <Zap className="h-5 w-5 text-black" aria-hidden />
           </span>
           <span>
-            <span className="block text-sm font-bold leading-tight text-black">{t('memberBadge')}</span>
-            <span className="block text-[11px] text-neutral-400">
+            <span className="block truncate-1 text-sm font-bold leading-tight text-black">{t('memberShort')}</span>
+            <span className="block truncate-1 text-[11px] text-neutral-400">
               {t('since')}{' '}
               {profile?.memberSince
                 ? new Date(profile.memberSince).toLocaleDateString('th-TH', {
